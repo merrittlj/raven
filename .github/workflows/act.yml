@@ -2,6 +2,7 @@ name: act-build
 
 jobs:
   act-linux:
+    if: $GITHUB_ACTIONS == false
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3

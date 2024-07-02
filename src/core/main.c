@@ -1,124 +1,87 @@
 /*
  * filename:	main.c
- * date:	07.01.24
+ * date:	07.02.24
  * author:	Lucas Merritt/merrittlj
- * description:	Program core.
+ * description:	Main and init
  */
 
-#include <stdint.h>
-
-#include "stm32wb55xx.h"
-
 #include "main.h"
-#include "prog.h"
-#include "hal.h"
-#include "state.h"
-#include "seg.h"
-#include "tfp.h"
 
 
-void SystemInit(void)
-{
-	s_ticks = 0;
-	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGCOMPEN;
-	SysTick_Config(FREQ / 1000);
-	NVIC_SetPriority(SysTick_IRQn, 0);
-}
+static void SystemClock_Config();
+static void PeriphCommonClock_Config();
 
 int main()
 {
-	uint32_t debounce_timer, debounce_period = 20;
-	uint32_t idle_timer, idle_period = 10000;
-	uint8_t is_idle = 0;
-	uint32_t seg_timer, seg_period = 5;
-	uint32_t status_timer, status_period = 5000;
+	/* Reset of all peripherals, initializes the flash interface and SysTick */
+	HAL_Init();
 
-	uint8_t button_pressed = 0;
-	gpio_set_mode(STATEBTN_PIN, GPIO_MODE_INPUT);
-	
-	gpio_set_mode(SHIFT_SER_PIN, GPIO_MODE_OUTPUT);
-	gpio_set_mode(SHIFT_RCLK_PIN, GPIO_MODE_OUTPUT);
-	gpio_set_mode(SHIFT_SRCLK_PIN, GPIO_MODE_OUTPUT);
-	
-	gpio_set_mode(DP1_PIN, GPIO_MODE_OUTPUT);
-	gpio_set_mode(DP2_PIN, GPIO_MODE_OUTPUT);
-	gpio_set_mode(DP3_PIN, GPIO_MODE_OUTPUT);
-	gpio_set_mode(DP4_PIN, GPIO_MODE_OUTPUT);
+	/* Configure the system clock */
+	SystemClock_Config();
 
-	gpio_set_mode(STATUS_PIN, GPIO_MODE_OUTPUT);
-	gpio_write(STATUS_PIN, GPIO_OUTPUT_SET);
-	
-	uart_init(USART1, 9600);
-		
-	struct fsm machine;
-	fsm_init(&machine, DEFAULT_FSM, STATE_MAX_SPEED);
-	
-	tfp_printf("\r\n\r\n[prog] ready to run!\r\n");
-	for (;;) {
-		/* To prevent debounce, simply poll the button every 50ms or so. */
-		if (timer_expired(&debounce_timer, debounce_period, s_ticks)) {
-			if (!gpio_read(STATEBTN_PIN) && !button_pressed) {  /* Button input is pull-up. */
-				button_pressed = 1;
-				/* Capture first button press and re-do the action. */
-				if (is_idle) {
-					is_idle = 0;
-					enable_timer(&idle_timer, &idle_period, 10000, s_ticks);
-					fsm_action(&machine);
-					tfp_printf("[idle] disabling idle mode\r\n");
-					continue;
-				}
+	/* Configure the peripherals common clocks */
+	PeriphCommonClock_Config();
 
-				idle_timer = s_ticks + idle_period;
-				fsm_next(&machine);
-			} else if (gpio_read(STATEBTN_PIN)) button_pressed = 0;
-		}
-		if (timer_expired(&idle_timer, idle_period, s_ticks) && !is_idle) {
-			is_idle = 1;
-			gpio_write(LED_RED_PIN, GPIO_OUTPUT_CLEAR);
-			gpio_write(LED_GREEN_PIN, GPIO_OUTPUT_CLEAR);
-			gpio_write(LED_BLUE_PIN, GPIO_OUTPUT_CLEAR);
-			seg_clear_output();
-			disable_timer(&idle_period);
-			tfp_printf("[idle] enabling idle mode\r\n");
-		}
-		if (timer_expired(&seg_timer, seg_period, s_ticks) && !is_idle) {
-			seg_display_next();
-		}
-		if (timer_expired(&status_timer, status_period, s_ticks)) {
-			uint8_t led_on = gpio_read(STATUS_PIN);
-			
-			gpio_write(STATUS_PIN, led_on ^ 1);
-			tfp_printf("[heartbeat] LED = %d, tick = %lu\r\n", led_on, s_ticks);
-		}
-	}
-
-	return 0;
+	for (;;);
 }
 
-void WWDG_IRQHandler() {}
-void USB_IRQHandler() {}
-void USART3_4_IRQHandler() {}
-void USART2_IRQHandler() {}
-void USART1_IRQHandler() {}
-void TSC_IRQHandler() {}
-void TIM7_IRQHandler() {}
-void TIM6_DAC_IRQHandler() {}
-void TIM3_IRQHandler() {}
-void TIM2_IRQHandler() {}
-void TIM1_CC_IRQHandler() {}
-void TIM1_BRK_UP_TRG_COM_IRQHandler() {}
-void TIM17_IRQHandler() {}
-void TIM16_IRQHandler() {}
-void TIM15_IRQHandler() {}
-void TIM14_IRQHandler() {}
-void SVC_Handler() {}
-void SPI2_IRQHandler() {}
-void SPI1_IRQHandler() {}
-void RTC_IRQHandler() {}
-void RCC_CRS_IRQHandler() {}
-void PendSV_Handler() {}
-void PVD_VDDIO2_IRQHandler() {}
-void NMI_Handler() {}
-void I2C2_IRQHandler() {}
-void I2C1_IRQHandler() {}
-void HardFault_Handler() {}
+static void SystemClock_Config()
+{
+	RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+	RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+
+	/* Configure the main internal regulator output voltage */
+	__HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
+
+	/* Initializes the RCC Oscillators according to the specified parameters in the RCC_OscInitTypeDef structure */
+	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_MSI;
+	RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+	RCC_OscInitStruct.MSIState = RCC_MSI_ON;
+	RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+	RCC_OscInitStruct.MSICalibrationValue = RCC_MSICALIBRATION_DEFAULT;
+	RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_6;
+	RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+	if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) Error_Handler();
+
+	/* Configure the SYSCLKSource, HCLK, PCLK1 and PCLK2 clocks dividers */
+	RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK4|RCC_CLOCKTYPE_HCLK2
+				      |RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+				      |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+	RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_MSI;
+	RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+	RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+	RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+	RCC_ClkInitStruct.AHBCLK2Divider = RCC_SYSCLK_DIV1;
+	RCC_ClkInitStruct.AHBCLK4Divider = RCC_SYSCLK_DIV1;
+
+	if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK) Error_Handler();
+}
+
+static void PeriphCommonClock_Config()
+{
+	RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
+
+	/* Initializes the peripherals clock */
+	PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_SMPS;
+	PeriphClkInitStruct.SmpsClockSelection = RCC_SMPSCLKSOURCE_HSI;
+	PeriphClkInitStruct.SmpsDivSelection = RCC_SMPSCLKDIV_RANGE1;
+
+	if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) Error_Handler();
+}
+
+void Error_Handler()
+{
+	/* Add implementation to report the HAL error return state */
+	__disable_irq();
+	for (;;);
+}
+
+#ifdef	USE_FULL_ASSERT
+
+void assert_failed(uint8_t *file, uint32_t line)
+{
+	/* Add implementation to report the file name and line number,
+	ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+}
+
+#endif /* USE_FULL_ASSERT */
