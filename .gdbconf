@@ -1,0 +1,4 @@
+target extended-remote :3333
+monitor [target current] configure -event gdb-detach {shutdown}
+monitor reset halt
+load

@@ -1,0 +1,16 @@
+name: build
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - run: sudo apt-get update
+    - run: sudo apt -y install gcc-arm-none-eabi make openocd git
+    - run: make build

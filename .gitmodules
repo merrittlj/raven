@@ -1,0 +1,9 @@
+[submodule "src/include/cmsis_wb"]
+	path = src/include/cmsis_wb
+	url = https://github.com/STMicroelectronics/cmsis_device_wb
+[submodule "src/include/cmsis_hal"]
+	path = src/include/cmsis_hal
+	url = https://github.com/STMicroelectronics/stm32wbxx_hal_driver
+[submodule "src/include/cmsis_core"]
+	path = src/include/cmsis_core
+	url = https://github.com/ARM-software/CMSIS_6
