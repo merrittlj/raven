@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - run: sudo apt-get update
-    - run: sudo apt -y install gcc-arm-none-eabi make openocd git
+    - run: apt-get update
+    - run: su -
+    - run: apt -y install gcc-arm-none-eabi make openocd git
+    - run: exit
     - run: make build

@@ -5,7 +5,7 @@ TARGET       = $(BUILD_DIR)/$(PROJECT_NAME).elf
 BUILD_DIR      = build
 SRC_DIRS       = src
 INCLUDE_DIR    = $(SRC_DIRS)/include
-CMSIS_GCC_DIR  = $(INCLUDE_DIR)/cmsis_wb/Source/Templates/gcc
+CMSIS_GCC_DIR  = $(INCLUDE_DIR)/st_cmsis/Source/Templates/gcc
 
 # Hardware specific
 STARTUP := $(CMSIS_GCC_DIR)/startup_stm32wb55xx_cm4.s
@@ -42,6 +42,9 @@ CPPFLAGS ?= $(INC_FLAGS) -MMD -MP
 # Linker flags
 LDFLAGS ?= -T$(LSCRIPT) -nostartfiles -nostdlib --specs nano.specs -Wl,--gc-sections -Wl,-Map=$(TARGET).map
 OFLAGS  ?= -O binary
+
+# LVGL setup
+include $(INCLUDE_DIR)/lvgl/lvgl.mk
 
 
 .DEFAULT_GOAL = all
