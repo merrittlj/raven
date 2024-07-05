@@ -14,6 +14,3 @@
 [submodule "src/include/button_debouncer"]
 	path = src/include/button_debouncer
 	url = https://github.com/tcleg/Button_Debouncer.git
-[submodule "src/include/free_rtos"]
-	path = src/include/free_rtos
-	url = https://github.com/FreeRTOS/FreeRTOS.git
