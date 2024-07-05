@@ -1,16 +1,19 @@
-[submodule "src/include/stm_cmsis"]
-	path = src/include/stm_cmsis
-	url = https://github.com/STMicroelectronics/cmsis_device_wb
-[submodule "src/include/stm_hal"]
-	path = src/include/stm_hal
-	url = https://github.com/STMicroelectronics/stm32wbxx_hal_driver
-[submodule "src/include/arm_cmsis"]
-	path = src/include/arm_cmsis
-	url = https://github.com/ARM-software/CMSIS_6
-[submodule "src/include/lvgl"]
+[submodule "src/include/cmsis_device_wb"] # v1.12.1
+	path = src/include/cmsis_device_wb
+	url = https://github.com/STMicroelectronics/cmsis_device_wb.git
+[submodule "src/include/stm32wbxx_hal_driver"] # v1.14.2
+	path = src/include/stm32wbxx_hal_driver
+	url = https://github.com/STMicroelectronics/stm32wbxx_hal_driver.git
+[submodule "src/include/CMSIS_6"] # v6.0.0
+	path = src/include/CMSIS_6
+	url = https://github.com/ARM-software/CMSIS_6.git
+[submodule "src/include/lvgl"] # v9.1
 	path = src/include/lvgl
-	url = https://github.com/lvgl/lvgl
+	url = https://github.com/lvgl/lvgl.git
 	branch = release/v9.1
-[submodule "src/include/button_debouncer"]
-	path = src/include/button_debouncer
+[submodule "src/include/Button_Debouncer"] # No ver.
+	path = src/include/Button_Debouncer
 	url = https://github.com/tcleg/Button_Debouncer.git
+[submodule "src/include/FreeRTOS"] # V10.4.1
+	path = src/include/FreeRTOS
+	url = https://github.com/FreeRTOS/FreeRTOS.git
