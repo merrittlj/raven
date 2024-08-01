@@ -1,4 +1,4 @@
-PROJECT_NAME = raven
+PROJECT_NAME = ocelot
 TARGET       = $(BUILD_DIR)/$(PROJECT_NAME).elf
 
 # Directories
