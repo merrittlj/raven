@@ -9,7 +9,7 @@
 	url = https://github.com/ARM-software/CMSIS_6.git
 [submodule "libs/lvgl"] # v9.1
 	path = libs/lvgl
-	url = https://github.com/lvgl/lvgl.git
+	url = https://github.com/lvgl/lvgl
 	branch = release/v9.1
 [submodule "libs/Button_Debouncer"] # No ver.
 	path = libs/Button_Debouncer
