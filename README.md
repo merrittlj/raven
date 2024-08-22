@@ -1,3 +1,3 @@
-# *ocelot*
+# *raven*
 
 A minimalist smartwatch.
