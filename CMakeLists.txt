@@ -1,7 +1,12 @@
 cmake_minimum_required(VERSION 3.28.0)
 
-set(CMAKE_TOOLCHAIN_FILE "toolchain.cmake")
-project(ocelot
+message("cmake dir: ${CMAKE_SOURCE_DIR}")
+message("cmake toolchain: ${CMAKE_SOURCE_DIR}/toolchain.cmake")
+if (EXISTS "${CMAKE_SOURCE_DIR}/toolchain.cmake")
+    message("exists")
+endif()
+set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/toolchain.cmake")
+project(raven
 		VERSION 0.2
 		DESCRIPTION "Smartwatch"
 		LANGUAGES C CXX)
@@ -14,10 +19,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY 	${CMAKE_BINARY_DIR})
 set(PROJECT_SOURCE_DIR 				${CMAKE_SOURCE_DIR}/src)
 set(PROJECT_INCLUDE_DIR 			${CMAKE_SOURCE_DIR}/include)
 set(PROJECT_LIBRARIES_DIR 			${CMAKE_SOURCE_DIR}/libs)
-
-if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-	message("WARNING: Ocelot is only supported(compilation-wise) on Linux!")
-endif()
 
 if(NOT CMAKE_BUILD_TYPE) # Set mode to debug by default
     set(CMAKE_BUILD_TYPE Debug)
@@ -71,4 +72,3 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_23)
-#target_compile_definitions(${PROJECT_NAME} PRIVATE
