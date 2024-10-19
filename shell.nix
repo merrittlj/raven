@@ -8,5 +8,6 @@ pkgs.mkShellNoCC {
     gcc-arm-embedded
     openocd
     picocom
+    doxygen
   ];
 }

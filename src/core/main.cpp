@@ -7,6 +7,8 @@
 
 #include "main.h"
 
+#include "stm32wbxx_hal.h"
+
 
 static void SystemClock_Config();
 static void PeriphCommonClock_Config();
@@ -22,7 +24,15 @@ int main()
 	/* Configure the peripherals common clocks */
 	PeriphCommonClock_Config();
 
-	for (;;);
+    GPIO_InitTypeDef GPIO_InitStruct;
+    GPIO_InitStruct.Pin = GPIO_PIN_4;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+    GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+	for (;;) {
+        HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_4);
+        HAL_Delay(100);
+    }
 }
 
 static void SystemClock_Config()

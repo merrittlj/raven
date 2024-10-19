@@ -30,12 +30,15 @@ include(${PROJECT_LIBRARY_DIR}/lvgl.cmake)
 
 include_directories(
         ${PROJECT_SOURCE_DIR}
+        ${PROJECT_SOURCE_DIR}/core
 )
 
 add_executable(${PROJECT_NAME}
+    ${STARTUP_SRC}
     ${PROJECT_SOURCE_DIR}/core/main.cpp
     ${PROJECT_SOURCE_DIR}/core/syscalls.c
     ${PROJECT_SOURCE_DIR}/core/sysmem.c
+    ${PROJECT_SOURCE_DIR}/stm32/stm32wbxx_it.c
 )
 
 target_link_directories(${PROJECT_NAME}
