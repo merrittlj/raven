@@ -51,6 +51,8 @@ target_link_libraries(${PROJECT_NAME}
 		lib::stm_cube
         lib::debouncer
         lib::lvgl
+
+        #"-lc"
 )
 
 target_compile_features(${PROJECT_NAME}

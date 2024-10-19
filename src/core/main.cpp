@@ -7,8 +7,6 @@
 
 #include "main.h"
 
-#include "stm32wbxx_hal.h"
-
 
 static void SystemClock_Config();
 static void PeriphCommonClock_Config();

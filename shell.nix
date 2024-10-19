@@ -9,5 +9,7 @@ pkgs.mkShellNoCC {
     openocd
     picocom
     doxygen
+    newlib
+    newlib-nano
   ];
 }

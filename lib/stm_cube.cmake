@@ -9,16 +9,29 @@ set(SYSTEM_SRC ${stm32cubewb_SOURCE_DIR}/Drivers/CMSIS/Device/ST/STM32WBxx/Sourc
 set(STARTUP_SRC ${stm32cubewb_SOURCE_DIR}/Drivers/CMSIS/Device/ST/STM32WBxx/Source/Templates/gcc/startup_stm32wb55xx_cm4.s)
 
 set(LINKER_SCRIPT ${stm32cubewb_SOURCE_DIR}/Drivers/CMSIS/Device/ST/STM32WBxx/Source/Templates/gcc/linker/stm32wb55xx_flash_cm4.ld)
-set(LDFLAGS "-T${LINKER_SCRIPT} ${LDFLAGS}")
+#set(LDFLAGS "-T${LINKER_SCRIPT} ${LDFLAGS}")
 add_library(STM32CubeWB
     ${SYSTEM_SRC}
     ${STARTUP_SRC}
+    ${stm32cubewb_SOURCE_DIR}/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal.c
+    ${stm32cubewb_SOURCE_DIR}/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_pwr.c
+    ${stm32cubewb_SOURCE_DIR}/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_pwr_ex.c
+    ${stm32cubewb_SOURCE_DIR}/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_rcc.c
+    ${stm32cubewb_SOURCE_DIR}/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_rcc_ex.c
+    ${stm32cubewb_SOURCE_DIR}/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_cortex.c
+    ${stm32cubewb_SOURCE_DIR}/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_gpio.c
 )
 add_library(lib::stm_cube ALIAS STM32CubeWB)
 
 set_source_files_properties(${STARTUP_SRC} PROPERTIES COMPILE_FLAGS "-x assembler-with-cpp")
 set_source_files_properties(${SYSTEM_SRC} PROPERTIES COMPILE_FLAGS "-Wno-sign-conversion")
 set_property(SOURCE ${STARTUP_SRC} PROPERTY LANGUAGE C)
+
+target_compile_options(STM32CubeWB
+    PUBLIC
+        -Wno-sign-conversion
+        -Wno-unused-parameter
+)
 
 target_include_directories(STM32CubeWB
     PRIVATE
