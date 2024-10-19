@@ -10,8 +10,8 @@ set(CMAKE_CXX_COMPILER          ${TC_PATH}g++)
 set(CMAKE_LINKER                ${TC_PATH}gcc)
 set(CMAKE_OBJCOPY               ${TC_PATH}objcopy)
 set(CMAKE_RANLIB                ${TC_PATH}gcc-ranlib)
-set(CMAKE_SIZE                  size) # TODO
-set(CMAKE_STRIP                 strip) # TODO
+set(CMAKE_SIZE                  ${TC_PATH}size)
+set(CMAKE_STRIP                 ${TC_PATH}strip)
 
 
 # Device-specific

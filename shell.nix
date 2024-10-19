@@ -6,5 +6,7 @@ pkgs.mkShellNoCC {
   packages = with pkgs; [
     cmake
     gcc-arm-embedded
+    openocd
+    picocom
   ];
 }

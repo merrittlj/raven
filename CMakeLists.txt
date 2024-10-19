@@ -10,6 +10,7 @@ project(raven
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
 
 set(CMAKE_BINARY_DIR 				${CMAKE_SOURCE_DIR}/build)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY 	${CMAKE_BINARY_DIR})
@@ -52,4 +53,33 @@ target_link_libraries(${PROJECT_NAME}
 target_compile_features(${PROJECT_NAME}
     PRIVATE
         cxx_std_23
+)
+
+# list size of executable after building
+add_custom_command(TARGET ${PROJECT_NAME}
+    POST_BUILD
+        COMMAND ${CMAKE_SIZE} ${PROJECT_NAME}
+)
+
+# generate .hex and .bin files after building
+add_custom_command(TARGET ${PROJECT_NAME}
+    POST_BUILD
+        COMMAND ${CMAKE_OBJCOPY} -O ihex ${PROJECT_NAME} ${PROJECT_NAME}.hex
+        COMMAND ${CMAKE_OBJCOPY} -O binary ${PROJECT_NAME} ${PROJECT_NAME}.bin
+)
+
+add_custom_target(flash
+    COMMAND openocd -f interface/stlink.cfg -f board/st_nucleo_wb55.cfg -c "program ${PROJECT_NAME} verify reset exit"
+    DEPENDS ${PROJECT_NAME}
+)
+
+add_custom_target(debug
+    COMMAND openocd -f interface/stlink.cfg -f board/st_nucleo_wb55.cfg -c "init" &
+    COMMAND arm-none-eabi-gdb ${PROJECT_NAME} -x gdbconf
+    DEPENDS ${PROJECT_NAME}
+)
+
+add_custom_target(serial
+    COMMAND picocom -b 9600 -f n -y n -d 8 -p 1 -c /dev/ttyUSB0
+    DEPENDS ${PROJECT_NAME}
 )
