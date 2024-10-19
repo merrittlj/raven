@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.28.0)
+cmake_minimum_required(VERSION 3.29)
+include(FetchContent)
 
 message("cmake dir: ${CMAKE_SOURCE_DIR}")
 message("cmake toolchain: ${CMAKE_SOURCE_DIR}/toolchain.cmake")
@@ -18,7 +19,7 @@ set(CMAKE_BINARY_DIR 				${CMAKE_SOURCE_DIR}/build)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY 	${CMAKE_BINARY_DIR})
 set(PROJECT_SOURCE_DIR 				${CMAKE_SOURCE_DIR}/src)
 set(PROJECT_INCLUDE_DIR 			${CMAKE_SOURCE_DIR}/include)
-set(PROJECT_LIBRARIES_DIR 			${CMAKE_SOURCE_DIR}/libs)
+set(PROJECT_LIBRARY_DIR 			${CMAKE_SOURCE_DIR}/lib)
 
 if(NOT CMAKE_BUILD_TYPE) # Set mode to debug by default
     set(CMAKE_BUILD_TYPE Debug)
@@ -26,34 +27,14 @@ endif()
 
 ###############################
 
-# v6.0.0
-set(ARM_CMSIS_DIR "${PROJECT_LIBRARIES_DIR}/CMSIS_6")
-add_subdirectory(${ARM_CMSIS_DIR} EXCLUDE_FROM_ALL)
+include(${PROJECT_LIBRARY_DIR}/stm_cube.cmake) # STM32 CMSIS/HAL/Drivers, Arm CMSIS/RTOS
+include(${PROJECT_LIBRARY_DIR}/debouncer.cmake)
+include(${PROJECT_LIBRARY_DIR}/lvgl.cmake)
 
-# v1.12.1
-set(STM_CMSIS_DIR "${PROJECT_LIBRARIES_DIR}/cmsis_device_wb")
-add_subdirectory(${STM_CMSIS_DIR} EXCLUDE_FROM_ALL)
-
-# v1.14.2
-set(STM_HAL_DIR "${PROJECT_LIBRARIES_DIR}/stm32wbxx_hal_driver")
-add_subdirectory(${STM_HAL_DIR} EXCLUDE_FROM_ALL)
-
-# No version
-set(DEBOUNCER_DIR "${PROJECT_LIBRARIES_DIR}/Button_Debouncer")
-add_subdirectory(${DEBOUNCER_DIR} EXCLUDE_FROM_ALL)
-
-# v9.1
-set(LVGL_DIR "${PROJECT_LIBRARIES_DIR}/lvgl")
-add_subdirectory(${LVGL_DIR} EXCLUDE_FROM_ALL)
-
-# V10.4.1
-set(FREE_RTOS_DIR "${PROJECT_LIBRARIES_DIR}/FreeRTOS")
-add_subdirectory(${FREE_RTOS_DIR} EXCLUDE_FROM_ALL)
-
-target_include_directories(${PROJECT_SOURCE_DIR})
+include_directories(${PROJECT_SOURCE_DIR})
 
 add_executable(${PROJECT_NAME}
-    ${PROJECT_SOURCE_DIR}/main.cpp
+    ${PROJECT_SOURCE_DIR}/core/main.cpp
 )
 
 target_link_directories(${PROJECT_NAME}
@@ -63,12 +44,12 @@ target_link_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
-        CMSIS_6
-        cmsis_device_wb
-		stm32wbxx_hal_driver
-        Button_Debouncer
-        lvgl
-		FreeRTOS
+		lib::stm_cube
+        lib::debouncer
+        lib::lvgl
 )
 
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_23)
+target_compile_features(${PROJECT_NAME}
+    PRIVATE
+        cxx_std_23
+)

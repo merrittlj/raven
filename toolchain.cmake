@@ -13,10 +13,11 @@ set(CMAKE_RANLIB                ${TC_PATH}gcc-ranlib)
 set(CMAKE_SIZE                  size) # TODO
 set(CMAKE_STRIP                 strip) # TODO
 
+
 # Device-specific
 set(DFLAGS "-mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16")
 set(DEFINES "-DUSE_HAL_DRIVER -DSTM32WB55xx -DSTM32WB")
-set(LDFLAGS "-T$(LSCRIPT) -nostartfiles -nostdlib --specs nano.specs -Wl,--gc-sections")
+set(LDFLAGS "-T${LINKER_SCRIPT} -nostartfiles -nostdlib --specs nano.specs -Wl,--gc-sections")
 
 set(CMAKE_C_FLAGS                   "-Wall -Wextra -Werror -Wundef -Wshadow -Wdouble-promotion -Wformat-truncation -Wno-padded -Wconversion  -ffunction-sections -fdata-sections -fno-common")
 set(CMAKE_C_FLAGS					"${CMAKE_C_FLAGS} ${DFLAGS} ${DEFINES} ${LDFLAGS}")
