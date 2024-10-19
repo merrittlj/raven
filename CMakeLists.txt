@@ -1,12 +1,8 @@
 cmake_minimum_required(VERSION 3.29)
 include(FetchContent)
 
-message("cmake dir: ${CMAKE_SOURCE_DIR}")
-message("cmake toolchain: ${CMAKE_SOURCE_DIR}/toolchain.cmake")
-if (EXISTS "${CMAKE_SOURCE_DIR}/toolchain.cmake")
-    message("exists")
-endif()
 set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/toolchain.cmake")
+
 project(raven
 		VERSION 0.2
 		DESCRIPTION "Smartwatch"
@@ -31,10 +27,14 @@ include(${PROJECT_LIBRARY_DIR}/stm_cube.cmake) # STM32 CMSIS/HAL/Drivers, Arm CM
 include(${PROJECT_LIBRARY_DIR}/debouncer.cmake)
 include(${PROJECT_LIBRARY_DIR}/lvgl.cmake)
 
-include_directories(${PROJECT_SOURCE_DIR})
+include_directories(
+        ${PROJECT_SOURCE_DIR}
+)
 
 add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCE_DIR}/core/main.cpp
+    ${PROJECT_SOURCE_DIR}/core/syscalls.c
+    ${PROJECT_SOURCE_DIR}/core/sysmem.c
 )
 
 target_link_directories(${PROJECT_NAME}
