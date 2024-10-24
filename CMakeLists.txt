@@ -4,7 +4,7 @@ include(FetchContent)
 set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/toolchain.cmake")
 
 project(raven
-		VERSION 0.2
+		VERSION 0.1
 		DESCRIPTION "Smartwatch"
 		LANGUAGES C CXX)
 
@@ -35,6 +35,7 @@ include_directories(
 
 add_executable(${PROJECT_NAME}
     ${STARTUP_SRC}
+    ${SYSTEM_SRC}
     ${PROJECT_SOURCE_DIR}/core/main.cpp
     ${PROJECT_SOURCE_DIR}/core/syscalls.c
     ${PROJECT_SOURCE_DIR}/core/sysmem.c
@@ -80,7 +81,7 @@ add_custom_target(flash
 
 add_custom_target(debug
     COMMAND openocd -f interface/stlink.cfg -f board/st_nucleo_wb55.cfg -c "init" &
-    COMMAND arm-none-eabi-gdb ${PROJECT_NAME} -x gdbconf
+    COMMAND arm-none-eabi-gdb ${PROJECT_NAME} -x ${CMAKE_SOURCE_DIR}/.gdbconf
     DEPENDS ${PROJECT_NAME}
 )
 

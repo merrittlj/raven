@@ -11,6 +11,7 @@
 static void SystemClock_Config();
 static void PeriphCommonClock_Config();
 
+extern "C" void _init() {}
 int main()
 {
 	/* Reset of all peripherals, initializes the flash interface and SysTick */
@@ -22,14 +23,34 @@ int main()
 	/* Configure the peripherals common clocks */
 	PeriphCommonClock_Config();
 
-    GPIO_InitTypeDef GPIO_InitStruct;
-    GPIO_InitStruct.Pin = GPIO_PIN_4;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
-    GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    GPIO_InitTypeDef gpio_blue;
+    gpio_blue.Pin = GPIO_PIN_5;
+    gpio_blue.Mode = GPIO_MODE_OUTPUT_PP;
+    gpio_blue.Pull = GPIO_PULLUP;
+    gpio_blue.Speed = GPIO_SPEED_FREQ_HIGH;
+    HAL_GPIO_Init(GPIOB, &gpio_blue);
+
+    GPIO_InitTypeDef gpio_green;
+    gpio_green.Pin = GPIO_PIN_0;
+    gpio_green.Mode = GPIO_MODE_OUTPUT_PP;
+    gpio_green.Pull = GPIO_PULLUP;
+    gpio_green.Speed = GPIO_SPEED_FREQ_HIGH;
+    HAL_GPIO_Init(GPIOB, &gpio_green);
+
+    GPIO_InitTypeDef gpio_red;
+    gpio_red.Pin = GPIO_PIN_1;
+    gpio_red.Mode = GPIO_MODE_OUTPUT_PP;
+    gpio_red.Pull = GPIO_PULLUP;
+    gpio_red.Speed = GPIO_SPEED_FREQ_HIGH;
+    HAL_GPIO_Init(GPIOB, &gpio_red);
+
 	for (;;) {
-        HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_4);
+        HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
         HAL_Delay(100);
+        HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0);
+        HAL_Delay(100);
+        HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_1);
+        HAL_Delay(500);
     }
 }
 
@@ -63,6 +84,8 @@ static void SystemClock_Config()
 	RCC_ClkInitStruct.AHBCLK4Divider = RCC_SYSCLK_DIV1;
 
 	if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK) Error_Handler();
+
+    __HAL_RCC_GPIOB_CLK_ENABLE();
 }
 
 static void PeriphCommonClock_Config()
