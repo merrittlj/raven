@@ -12,31 +12,31 @@
 /* Non-Maskable Interrupt */
 void NMI_Handler(void)
 {
-	for(;;);
+    for(;;);
 }
 
 /* Hard fault */
 void HardFault_Handler(void)
 {
-	for (;;);
+    for (;;);
 }
 
 /* Memory management fault */
 void MemManage_Handler(void)
 {
-	for (;;);
+    for (;;);
 }
 
 /* Prefetch fault, memory access fault */
 void BusFault_Handler(void)
 {
-	for (;;);
+    for (;;);
 }
 
 /* Undefined instruction or illegal state */
 void UsageFault_Handler(void)
 {
-	for (;;);
+    for (;;);
 }
 
 /* System service call via SWI instruction */
@@ -57,5 +57,5 @@ void PendSV_Handler(void)
 /* SysTick timer */
 void SysTick_Handler(void)
 {
-	HAL_IncTick();
+    HAL_IncTick();
 }

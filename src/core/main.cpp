@@ -8,8 +8,8 @@
 #include "main.h"
 
 
-static void SystemClock_Config();
-static void PeriphCommonClock_Config();
+static void init_sysclk();
+static void init_periphclk();
 
 extern "C" void _init() {}
 int main()
@@ -17,11 +17,8 @@ int main()
 	/* Reset of all peripherals, initializes the flash interface and SysTick */
 	HAL_Init();
 
-	/* Configure the system clock */
-	SystemClock_Config();
-
-	/* Configure the peripherals common clocks */
-	PeriphCommonClock_Config();
+	init_sysclk();
+	init_periphclk();
 
     GPIO_InitTypeDef gpio_blue;
     gpio_blue.Pin = GPIO_PIN_5;
@@ -54,7 +51,7 @@ int main()
     }
 }
 
-static void SystemClock_Config()
+static void init_sysclk()
 {
 	RCC_OscInitTypeDef RCC_OscInitStruct = {0};
 	RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
@@ -88,7 +85,7 @@ static void SystemClock_Config()
     __HAL_RCC_GPIOB_CLK_ENABLE();
 }
 
-static void PeriphCommonClock_Config()
+static void init_periphclk()
 {
 	RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
 

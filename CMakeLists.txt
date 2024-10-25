@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.29)
 include(FetchContent)
 
 set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/toolchain.cmake")
+set(CMAKE_GENERATOR Ninja)
 
 project(raven
 		VERSION 0.1
@@ -31,11 +32,10 @@ include(${PROJECT_LIBRARY_DIR}/lvgl.cmake)
 include_directories(
         ${PROJECT_SOURCE_DIR}
         ${PROJECT_SOURCE_DIR}/core
+        ${PROJECT_SOURCE_DIR}/stm32
 )
 
 add_executable(${PROJECT_NAME}
-    ${STARTUP_SRC}
-    ${SYSTEM_SRC}
     ${PROJECT_SOURCE_DIR}/core/main.cpp
     ${PROJECT_SOURCE_DIR}/core/syscalls.c
     ${PROJECT_SOURCE_DIR}/core/sysmem.c
@@ -52,8 +52,6 @@ target_link_libraries(${PROJECT_NAME}
 		lib::stm_cube
         lib::debouncer
         lib::lvgl
-
-        #"-lc"
 )
 
 target_compile_features(${PROJECT_NAME}

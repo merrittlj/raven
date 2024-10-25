@@ -7,6 +7,7 @@ in
 pkgs.mkShellNoCC {
   packages = with pkgs; [
     cmake
+    ninja
     openocd
     picocom
     doxygen

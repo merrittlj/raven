@@ -9,7 +9,6 @@ set(SYSTEM_SRC ${stm32cubewb_SOURCE_DIR}/Drivers/CMSIS/Device/ST/STM32WBxx/Sourc
 set(STARTUP_SRC ${stm32cubewb_SOURCE_DIR}/Drivers/CMSIS/Device/ST/STM32WBxx/Source/Templates/gcc/startup_stm32wb55xx_cm4.s)
 
 set(LINKER_SCRIPT ${stm32cubewb_SOURCE_DIR}/Drivers/CMSIS/Device/ST/STM32WBxx/Source/Templates/gcc/linker/stm32wb55xx_flash_cm4.ld)
-#set(LDFLAGS "-T${LINKER_SCRIPT} ${LDFLAGS}")
 add_library(STM32CubeWB
     ${SYSTEM_SRC}
     ${STARTUP_SRC}
@@ -42,5 +41,4 @@ include_directories(
     ${stm32cubewb_SOURCE_DIR}/Drivers/STM32WBxx_HAL_Driver/Inc
     ${stm32cubewb_SOURCE_DIR}/Drivers/CMSIS/Include
     ${stm32cubewb_SOURCE_DIR}/Drivers/CMSIS/Device/ST/STM32WBxx/Include
-    ${PROJECT_SOURCE_DIR}/stm32
 )

@@ -9,7 +9,6 @@
 #define __MAIN_H
 
 #include "stm32wbxx_hal.h"
-#include "stm32wbxx_hal_gpio.h"
 
 
 void Error_Handler(void);
