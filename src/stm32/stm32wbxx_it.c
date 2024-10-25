@@ -5,8 +5,10 @@
  * description:	Interrupt Service Routine functions
  */
 
-#include "main.h"
-#include "stm32wbxx_it.h"
+#include "stm32/stm32wbxx_it.h"
+#include "core/main.h"
+
+#include "hw.h"
 
 
 /* Non-Maskable Interrupt */
@@ -58,4 +60,15 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
     HAL_IncTick();
+}
+
+
+void IPCC_C1_TX_IRQHandler(void)
+{
+    HW_IPCC_Tx_Handler();
+}
+
+void IPCC_C1_RX_IRQHandler(void)
+{
+    HW_IPCC_Rx_Handler();
 }

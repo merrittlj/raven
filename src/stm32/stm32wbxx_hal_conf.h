@@ -1,5 +1,26 @@
-#ifndef __STM32WBxx_HAL_CONF_H
-#define __STM32WBxx_HAL_CONF_H
+/* USER CODE BEGIN Header */
+/**
+  ******************************************************************************
+  * @file    stm32wbxx_hal_conf.h
+  * @author  MCD Application Team
+  * @brief   HAL configuration file.
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2019 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  */
+/* USER CODE END Header */
+
+/* Define to prevent recursive inclusion -------------------------------------*/
+#ifndef STM32WBxx_HAL_CONF_H
+#define STM32WBxx_HAL_CONF_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -12,12 +33,12 @@
 /**
   * @brief This is the list of modules to be used in the HAL driver
   */
-#define HAL_MODULE_ENABLED
+#define HAL_MODULE_ENABLED  
 /*#define HAL_ADC_MODULE_ENABLED   */
 /*#define HAL_CRYP_MODULE_ENABLED   */
 /*#define HAL_COMP_MODULE_ENABLED   */
 /*#define HAL_CRC_MODULE_ENABLED   */
-/*#define HAL_HSEM_MODULE_ENABLED   */
+#define HAL_HSEM_MODULE_ENABLED
 /*#define HAL_I2C_MODULE_ENABLED   */
 /*#define HAL_IPCC_MODULE_ENABLED   */
 /*#define HAL_IRDA_MODULE_ENABLED   */
@@ -73,8 +94,8 @@
   *        This value is used by the RCC HAL module to compute the system frequency
   *        (when HSE is used as system clock source, directly or through the PLL).
   */
-#if !defined  (HSE_VALUE)
-#define HSE_VALUE    8000000U             /*!< Value of the External oscillator in Hz */
+#if !defined  (HSE_VALUE) 
+#define HSE_VALUE    32000000U             /*!< Value of the External oscillator in Hz */
 #endif /* HSE_VALUE */
 
 #if !defined  (HSE_STARTUP_TIMEOUT)
@@ -101,7 +122,7 @@
 /**
   * @brief Internal Low Speed oscillator (LSI1) value.
   */
-#if !defined  (LSI1_VALUE)
+#if !defined  (LSI1_VALUE) 
  #define LSI1_VALUE  ((uint32_t)32000)       /*!< LSI1 Typical Value in Hz*/
 #endif /* LSI1_VALUE */                      /*!< Value of the Internal Low Speed oscillator in Hz
                                              The real value may vary depending on the variations
@@ -109,7 +130,7 @@
 /**
   * @brief Internal Low Speed oscillator (LSI2) value.
   */
-#if !defined  (LSI2_VALUE)
+#if !defined  (LSI2_VALUE) 
  #define LSI2_VALUE  ((uint32_t)32000)       /*!< LSI2 Typical Value in Hz*/
 #endif /* LSI2_VALUE */                      /*!< Value of the Internal Low Speed oscillator in Hz
                                              The real value may vary depending on the variations
@@ -130,14 +151,14 @@
 #if !defined (HSI48_VALUE)
   #define HSI48_VALUE    ((uint32_t)48000000) /*!< Value of the Internal oscillator in Hz*/
 #endif /* HSI48_VALUE */
-
+   
 #if !defined  (LSE_STARTUP_TIMEOUT)
 #define LSE_STARTUP_TIMEOUT    5000U      /*!< Time out for LSE start up, in ms */
 #endif /* LSE_STARTUP_TIMEOUT */
 
 /**
   * @brief External clock source for SAI1 peripheral
-  *        This value is used by the RCC HAL module to compute the SAI1 & SAI2 clock source
+  *        This value is used by the RCC HAL module to compute the SAI1 & SAI2 clock source 
   *        frequency.
   */
 #if !defined (EXTERNAL_SAI1_CLOCK_VALUE)
@@ -150,11 +171,11 @@
 /* ########################### System Configuration ######################### */
 /**
   * @brief This is the HAL system configuration section
-  */
-
-#define  VDD_VALUE				3300U                   /*!< Value of VDD in mv */
-#define  TICK_INT_PRIORITY            15U      /*!< tick interrupt priority */
-#define  USE_RTOS                     0U
+  */     
+  
+#define  VDD_VALUE				3300U                   /*!< Value of VDD in mv */           
+#define  TICK_INT_PRIORITY            0U      /*!< tick interrupt priority */            
+#define  USE_RTOS                     0U     
 #define  PREFETCH_ENABLE              1U
 #define  INSTRUCTION_CACHE_ENABLE     1U
 #define  DATA_CACHE_ENABLE            1U
@@ -206,7 +227,7 @@
 #ifdef HAL_EXTI_MODULE_ENABLED
   #include "stm32wbxx_hal_exti.h"
 #endif /* HAL_EXTI_MODULE_ENABLED */
-
+   
 #ifdef HAL_FLASH_MODULE_ENABLED
   #include "stm32wbxx_hal_flash.h"
 #endif /* HAL_FLASH_MODULE_ENABLED */
@@ -266,7 +287,7 @@
 #ifdef HAL_RNG_MODULE_ENABLED
   #include "stm32wbxx_hal_rng.h"
 #endif /* HAL_RNG_MODULE_ENABLED */
-
+    
 #ifdef HAL_RTC_MODULE_ENABLED
  #include "stm32wbxx_hal_rtc.h"
 #endif /* HAL_RTC_MODULE_ENABLED */
@@ -328,4 +349,4 @@
 }
 #endif
 
-#endif /* __STM32WBxx_HAL_CONF_H */
+#endif /* STM32WBxx_HAL_CONF_H */

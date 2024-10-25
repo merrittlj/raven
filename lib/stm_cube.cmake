@@ -19,6 +19,22 @@ add_library(STM32CubeWB
     ${stm32cubewb_SOURCE_DIR}/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_rcc_ex.c
     ${stm32cubewb_SOURCE_DIR}/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_cortex.c
     ${stm32cubewb_SOURCE_DIR}/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_gpio.c
+
+    ${stm32cubewb_SOURCE_DIR}/Middlewares/ST/STM32_WPAN/ble/core/auto/ble_gatt_aci.c 
+    ${stm32cubewb_SOURCE_DIR}/Middlewares/ST/STM32_WPAN/ble/core/template/osal.c
+    ${stm32cubewb_SOURCE_DIR}/Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/tl_mbox.c
+    ${stm32cubewb_SOURCE_DIR}/Middlewares/ST/STM32_WPAN/utilities/stm_list.c
+    ${stm32cubewb_SOURCE_DIR}/Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/hci_tl.c
+    ${stm32cubewb_SOURCE_DIR}/Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/shci_tl.c
+    ${stm32cubewb_SOURCE_DIR}/Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/shci/shci.c
+    ${stm32cubewb_SOURCE_DIR}/Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/shci_tl_if.c
+    ${stm32cubewb_SOURCE_DIR}/Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl/hci_tl_if.c
+    ${stm32cubewb_SOURCE_DIR}/Middlewares/ST/STM32_WPAN/ble/svc/Src/svc_ctl.c
+    ${stm32cubewb_SOURCE_DIR}/Middlewares/ST/STM32_WPAN/utilities/otp.c
+    ${stm32cubewb_SOURCE_DIR}/Middlewares/ST/STM32_WPAN/ble/core/auto/ble_hal_aci.c
+    ${stm32cubewb_SOURCE_DIR}/Middlewares/ST/STM32_WPAN/ble/core/auto/ble_hci_le.c
+    ${stm32cubewb_SOURCE_DIR}/Middlewares/ST/STM32_WPAN/ble/core/auto/ble_gap_aci.c
+    ${stm32cubewb_SOURCE_DIR}/
 )
 add_library(lib::stm_cube ALIAS STM32CubeWB)
 
@@ -29,6 +45,8 @@ set_property(SOURCE ${STARTUP_SRC} PROPERTY LANGUAGE C)
 target_compile_options(STM32CubeWB
     PUBLIC
         -Wno-sign-conversion
+        -Wno-conversion
+        -Wno-undef
         -Wno-unused-parameter
 )
 
@@ -41,4 +59,14 @@ include_directories(
     ${stm32cubewb_SOURCE_DIR}/Drivers/STM32WBxx_HAL_Driver/Inc
     ${stm32cubewb_SOURCE_DIR}/Drivers/CMSIS/Include
     ${stm32cubewb_SOURCE_DIR}/Drivers/CMSIS/Device/ST/STM32WBxx/Include
+
+    ${stm32cubewb_SOURCE_DIR}/Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread # hw.h
+    ${stm32cubewb_SOURCE_DIR}/Middlewares/ST/STM32_WPAN/ble/core # ble_bufsize.h
+    ${stm32cubewb_SOURCE_DIR}/Middlewares/ST/STM32_WPAN/ble/core/auto # ble_types.h
+    ${stm32cubewb_SOURCE_DIR}/Middlewares/ST/STM32_WPAN/utilities # utilities_common.h
+    ${stm32cubewb_SOURCE_DIR}/Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/shci # shci.h
+    ${stm32cubewb_SOURCE_DIR}/Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl # mbox_def.h
+    ${stm32cubewb_SOURCE_DIR}/Middlewares/ST/STM32_WPAN # stm32_wpan_common.h
+    ${stm32cubewb_SOURCE_DIR}/Middlewares/ST/STM32_WPAN/ble # ble_common.h
+    ${stm32cubewb_SOURCE_DIR}/Middlewares/ST/STM32_WPAN/ble/core/template # ble_const.h
 )

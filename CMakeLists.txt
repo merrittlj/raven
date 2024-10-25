@@ -5,7 +5,7 @@ set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/toolchain.cmake")
 set(CMAKE_GENERATOR Ninja)
 
 project(raven
-		VERSION 0.1
+		VERSION 0.2
 		DESCRIPTION "Smartwatch"
 		LANGUAGES C CXX)
 
@@ -31,15 +31,24 @@ include(${PROJECT_LIBRARY_DIR}/lvgl.cmake)
 
 include_directories(
         ${PROJECT_SOURCE_DIR}
-        ${PROJECT_SOURCE_DIR}/core
-        ${PROJECT_SOURCE_DIR}/stm32
+        ${PROJECT_SOURCE_DIR}/stm32 # For stm*hal_conf
+        ${PROJECT_SOURCE_DIR}/app # For utilities_common
+        ${PROJECT_SOURCE_DIR}/ble # For ble_common
 )
 
 add_executable(${PROJECT_NAME}
-    ${PROJECT_SOURCE_DIR}/core/main.cpp
+    # ${PROJECT_SOURCE_DIR}/core/main.cpp
+    ${PROJECT_SOURCE_DIR}/core/main.c
     ${PROJECT_SOURCE_DIR}/core/syscalls.c
     ${PROJECT_SOURCE_DIR}/core/sysmem.c
+
     ${PROJECT_SOURCE_DIR}/stm32/stm32wbxx_it.c
+
+    ${PROJECT_SOURCE_DIR}/hw/hw_ipcc.c
+
+    ${PROJECT_SOURCE_DIR}/app/app_debug.c
+
+    ${PROJECT_SOURCE_DIR}/ble/gatt_service.c
 )
 
 target_link_directories(${PROJECT_NAME}
