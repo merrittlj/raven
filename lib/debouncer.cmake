@@ -10,6 +10,11 @@ add_library(Button_Debouncer
 )
 add_library(lib::debouncer ALIAS Button_Debouncer)
 
+target_compile_options(Button_Debouncer
+    PUBLIC
+        -Wno-conversion
+)
+
 target_include_directories(Button_Debouncer
     PUBLIC
     ${button_debouncer_SOURCE_DIR}/C++

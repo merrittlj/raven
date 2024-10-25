@@ -9,7 +9,7 @@ project(raven
 		DESCRIPTION "Smartwatch"
 		LANGUAGES C CXX)
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 
@@ -56,7 +56,7 @@ target_link_libraries(${PROJECT_NAME}
 
 target_compile_features(${PROJECT_NAME}
     PRIVATE
-        cxx_std_23
+        cxx_std_17
 )
 
 # list size of executable after building
