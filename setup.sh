@@ -1,6 +1,6 @@
 #!/bin/sh
 
-mkdir -p build
+mkdir -p ./{libs,build}
 
 git submodule update --init
 git pull --recurse-submodules
