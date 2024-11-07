@@ -37,8 +37,7 @@ include_directories(
 )
 
 add_executable(${PROJECT_NAME}
-    # ${PROJECT_SOURCE_DIR}/core/main.cpp
-    ${PROJECT_SOURCE_DIR}/core/main.c
+    ${PROJECT_SOURCE_DIR}/core/main.cpp
     ${PROJECT_SOURCE_DIR}/core/syscalls.c
     ${PROJECT_SOURCE_DIR}/core/sysmem.c
 
@@ -49,6 +48,8 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCE_DIR}/app/app_debug.c
 
     ${PROJECT_SOURCE_DIR}/ble/gatt_service.c
+
+    ${PROJECT_SOURCE_DIR}/gpio/gpio.c
 )
 
 target_link_directories(${PROJECT_NAME}

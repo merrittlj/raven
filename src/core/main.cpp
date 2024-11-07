@@ -7,6 +7,7 @@
 #include "app/app_debug.h"
 #include "hw/hw_conf.h"
 #include "ble/gatt_service.h"
+#include "gpio/gpio.h"
 
 #include "otp.h"
 #include "ble.h"
@@ -16,7 +17,6 @@
 
 
 void Config_SysClk(void);
-static void Config_GPIO(void);
 static void Config_HSE(void);
 static void Init_CPU2(void);
 
@@ -24,7 +24,7 @@ static void SYS_UserEventReceivedCallback(void * pData);
 static void SYS_StatusNotificationCallback(SHCI_TL_CmdStatus_t status);
 static void SYS_ProcessEvent(void);
 
-void _init(){} /* To avoid linker errors */
+extern "C" void _init(){} /* To avoid linker errors */
 
 /**
  * @brief  The application entry point.
@@ -44,33 +44,16 @@ int main(void)
     HAL_Init();
     /* Tune the HSE internal load capacitors - P-NUCLEO-WB55.Nucleo board */
     Config_HSE();
+
+    GPIO::Controller controller = new GPIO::Controller();
+    controller.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 3), GPIO::Types::LED));
+    controller.Config();
+    controller.Init();
+
     /* Configure the debug support if needed */
     APPD_Init();
 
     Config_SysClk();
-    Config_GPIO();
-
-    /* TODO: Should this be reimplemented? */
-    GPIO_InitTypeDef gpio_blue;
-    gpio_blue.Pin = GPIO_PIN_5;
-    gpio_blue.Mode = GPIO_MODE_OUTPUT_PP;
-    gpio_blue.Pull = GPIO_PULLUP;
-    gpio_blue.Speed = GPIO_SPEED_FREQ_HIGH;
-    HAL_GPIO_Init(GPIOB, &gpio_blue);
-
-    GPIO_InitTypeDef gpio_green;
-    gpio_green.Pin = GPIO_PIN_0;
-    gpio_green.Mode = GPIO_MODE_OUTPUT_PP;
-    gpio_green.Pull = GPIO_PULLUP;
-    gpio_green.Speed = GPIO_SPEED_FREQ_HIGH;
-    HAL_GPIO_Init(GPIOB, &gpio_green);
-
-    GPIO_InitTypeDef gpio_red;
-    gpio_red.Pin = GPIO_PIN_1;
-    gpio_red.Mode = GPIO_MODE_OUTPUT_PP;
-    gpio_red.Pull = GPIO_PULLUP;
-    gpio_red.Speed = GPIO_SPEED_FREQ_HIGH;
-    HAL_GPIO_Init(GPIOB, &gpio_red);
 
     /* Initialize all transport layers */
     Init_CPU2();
@@ -203,20 +186,6 @@ void Config_SysClk(void)
     {
         Error_Handler();
     }
-}
-
-/**
- * @brief Configure GPIO
- * @param None
- * @retval None
- */
-static void Config_GPIO(void)
-{
-
-    /* GPIO Ports Clock Enable */
-    __HAL_RCC_GPIOA_CLK_ENABLE();
-    __HAL_RCC_GPIOB_CLK_ENABLE();
-    __HAL_RCC_GPIOC_CLK_ENABLE();
 }
 
 /**
