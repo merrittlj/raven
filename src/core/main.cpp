@@ -2,12 +2,13 @@
 
 #include "main.h"
 
-#include "core/main.h"
+#include "core/main.hpp"
 #include "app/app_common.h"
 #include "app/app_debug.h"
 #include "hw/hw_conf.h"
 #include "ble/gatt_service.h"
-#include "gpio/gpio.h"
+#include "gpio/gpio.hpp"
+#include "ble/ble.hpp"
 
 #include "otp.h"
 #include "ble.h"
@@ -15,14 +16,6 @@
 #include "shci_tl.h"
 #include "shci.h"
 
-
-void Config_SysClk(void);
-static void Config_HSE(void);
-static void Init_CPU2(void);
-
-static void SYS_UserEventReceivedCallback(void * pData);
-static void SYS_StatusNotificationCallback(SHCI_TL_CmdStatus_t status);
-static void SYS_ProcessEvent(void);
 
 extern "C" void _init(){} /* To avoid linker errors */
 
@@ -77,30 +70,8 @@ int main(void)
 
     /* Set the green LED On to indicate that the wireless stack FW is running */
     /* BSP_LED_On(LED_GREEN); */
-
-    /* At this point it is still unknown from the app perspective, which wireless stack
-       and which version is installed on CPU2. It is expected that a BLE stack is installed.
-       In order to check that, SHCI_GetWirelessFwInfo(...) can be used to read out
-       the information about the CM0+ wireless stack FW running since the Device Information Table
-       is initialized. For more information on this topic, please refer to AN5289 and AN5185. */
-
-    /* Initialize BLE (BLE TL, BLE stack, HAL, HCI, GATT, GAP) */
-    BLE_Init();
-
-    /* Set the blue LED On to indicate that the BLE stack is initialized */
-    /* BSP_LED_On(LED_BLUE); */
-
-    /* Initialize My Very Own GATT Service - user may also implement SVCCTL_InitCustomSvc()
-       interface function as explained in AN5289. SVCCTL_InitCustomSvc() is called at the end of
-       SVCCTL_Init() called from BLE_Init() */
-    MyVeryOwnService_Init();
-
-    /* Reset BLUE LED => Will be used by the example */
-    /* BSP_LED_Off(LED_BLUE); */
-
-    /* Start BLE advertising */
-    BLE_Advertising(SET);
-
+    bleApp.Init();
+    bleApp.Advertising(SET);
 
     for(;;)
     {
@@ -121,219 +92,9 @@ int main(void)
                 if (MyVeryOwnWriteCharacteristic_Update(MY_VERY_OWN_NOTIFY_CHARACTERISTIC_UUID,
                             MY_VERY_OWN_NOTIFY_CHARACTERISTIC_VALUE_LENGTH,
                             myVeryOwnNotifyCharacteristicData) != BLE_STATUS_SUCCESS)
-                {
                     Error_Handler(); /* UNEXPECTED */
-                }
             }
         }
-    }
-}
-
-/**
- * @brief System Clock Configuration
- * @retval None
- */
-void Config_SysClk(void)
-{
-    RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-    RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-    RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
-
-    /** Configure LSE Drive Capability 
-    */
-    HAL_PWR_EnableBkUpAccess();
-    __HAL_RCC_LSEDRIVE_CONFIG(RCC_LSEDRIVE_LOW);
-    /** Configure the main internal regulator output voltage 
-    */
-    __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
-    /** Initializes the CPU, AHB and APB busses clocks 
-    */
-    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_HSE
-        |RCC_OSCILLATORTYPE_LSE;
-    RCC_OscInitStruct.HSEState = RCC_HSE_ON;
-    RCC_OscInitStruct.LSEState = RCC_LSE_ON;
-    RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-    RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-    RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
-    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-    {
-        Error_Handler();
-    }
-    /** Configure the SYSCLKSource, HCLK, PCLK1 and PCLK2 clocks dividers 
-    */
-    RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK4|RCC_CLOCKTYPE_HCLK2
-        |RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-        |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-    RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSE;
-    RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-    RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
-    RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
-    RCC_ClkInitStruct.AHBCLK2Divider = RCC_SYSCLK_DIV1;
-    RCC_ClkInitStruct.AHBCLK4Divider = RCC_SYSCLK_DIV1;
-
-    if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
-    {
-        Error_Handler();
-    }
-    /** Initializes the peripherals clocks 
-    */
-    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_SMPS|RCC_PERIPHCLK_RFWAKEUP;
-    PeriphClkInitStruct.RFWakeUpClockSelection = RCC_RFWKPCLKSOURCE_LSE;
-    PeriphClkInitStruct.SmpsClockSelection = RCC_SMPSCLKSOURCE_HSE;
-    PeriphClkInitStruct.SmpsDivSelection = RCC_SMPSCLKDIV_RANGE1;
-
-    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
-    {
-        Error_Handler();
-    }
-}
-
-/**
- * @brief This function initializes and releases the CPU2 subsystem
- * @param None
- * @retval None
- */
-static void Init_CPU2( void )
-{
-    TL_MM_Config_t tl_mm_config;
-    SHCI_TL_HciInitConf_t SHci_Tl_Init_Conf;
-
-    /**< Reference table initialization */
-    TL_Init();
-
-    /**< System channel initialization */
-    SHci_Tl_Init_Conf.p_cmdbuffer = (uint8_t*)&SystemCmdBuffer;
-    SHci_Tl_Init_Conf.StatusNotCallBack = SYS_StatusNotificationCallback;
-    shci_init(SYS_UserEventReceivedCallback, (void*) &SHci_Tl_Init_Conf);
-
-    /**< Memory Manager channel initialization */
-    tl_mm_config.p_AsynchEvtPool = EvtPool;
-    tl_mm_config.p_BleSpareEvtBuffer = BleSpareEvtBuffer; /* UNUSED, but kept for future compatibility */
-    tl_mm_config.p_SystemSpareEvtBuffer = SystemSpareEvtBuffer; /* UNUSED, but kept for future compatibility, but used by FUS today only */
-    tl_mm_config.AsynchEvtPoolSize = EVENT_POOL_SIZE;
-    TL_MM_Init( &tl_mm_config );
-
-    /**< Release the CPU2 */
-    TL_Enable();
-
-    return;
-}
-
-/**
- * @brief As stated in AN5289, this is the system event user callback. It is
- *        registered and passed as argument to shci_init() function.
- *        This reports the received system user event.
- *        The buffer holding the received event is freed on return
- *        of this function.
- * @param pData: pointer to a structure of tSHCI_UserEvtRxParam type
- *
- *               typedef struct
- *               {
- *                 SHCI_TL_UserEventFlowStatus_t status;
- *                 TL_EvtPacket_t *pckt;
- *               } tSHCI_UserEvtRxParam;
- *
- *               pckt: holds the address of the received event
- *               status: provides a way for user to notify the system transport layer that the received packet
- *                       has not been processed and must not be thrown away. When not filled by the user on return
- *                       of UserEvtRx(), this parameter is set to SHCI_TL_UserEventFlow_Enable, which means the
- *                       user has processed the received event
- * @retval None
- */
-static void SYS_UserEventReceivedCallback( void * pData )
-{
-    TL_AsynchEvt_t *p_sys_event;
-    SHCI_C2_Ready_Evt_t *p_sys_ready_event;
-    SCHI_SystemErrCode_t *p_sys_error_code;
-
-    p_sys_event = (TL_AsynchEvt_t*)(((tSHCI_UserEvtRxParam*)pData)->pckt->evtserial.evt.payload);
-
-    /* We have received some event from CPU2, so CPU2 to be considered as running and responding */
-    APP_FLAG_SET(APP_FLAG_CPU2_INITIALIZED);
-
-    switch(p_sys_event->subevtcode)
-    {
-        case SHCI_SUB_EVT_CODE_READY:
-            p_sys_ready_event = (SHCI_C2_Ready_Evt_t*)p_sys_event->payload;
-            if (p_sys_ready_event->sysevt_ready_rsp == WIRELESS_FW_RUNNING)
-            {
-                APP_FLAG_RESET(APP_FLAG_FUS_FW_RUNNING);
-                APP_FLAG_SET(APP_FLAG_WIRELESS_FW_RUNNING);
-                /* RF stack installed and ready */
-            }
-            else if (p_sys_ready_event->sysevt_ready_rsp == FUS_FW_RUNNING)
-            {
-                APP_FLAG_SET(APP_FLAG_FUS_FW_RUNNING);
-                APP_FLAG_RESET(APP_FLAG_WIRELESS_FW_RUNNING);
-
-                /* No RF stack installed most probably */
-                Error_Handler(); /* UNEXPECTED */
-            }
-            else {
-                APP_FLAG_SET(APP_FLAG_CPU2_ERROR);
-                Error_Handler(); /* UNEXPECTED */
-            }
-            break; /* SHCI_SUB_EVT_CODE_READY */
-        case SHCI_SUB_EVT_ERROR_NOTIF:
-            APP_FLAG_SET(APP_FLAG_CPU2_ERROR);
-
-            p_sys_error_code = (SCHI_SystemErrCode_t*)p_sys_event->payload;
-            if (p_sys_error_code == ERR_BLE_INIT)
-            {
-                /* Error during BLE stack initialization */
-                APP_FLAG_SET(APP_FLAG_BLE_INITIALIZATION_ERROR);
-                Error_Handler(); /* UNEXPECTED */
-            }
-            else {
-                Error_Handler(); /* UNEXPECTED */
-            }
-            break; /* SHCI_SUB_EVT_ERROR_NOTIF */
-        default:
-            break;
-    }
-
-    ((tSHCI_UserEvtRxParam *)pData)->status = SHCI_TL_UserEventFlow_Disable;
-
-    return;
-}
-
-/**
- * @brief As stated in AN5289, this is the callback used to acknowledge
- *        if a system command can be sent. It is registered in shci_init()
- *        It must be used in a multi-thread application where the system commands
- *        may be sent from different threads.
- *  
- *        switch (status)
- *        {
- *        case SHCI_TL_CmdBusy:
- *          break;
- *        case SHCI_TL_CmdAvailable:
- *          break;
- *        default:
- *          break;
- *
- * @param status: SHCI_TL_CmdBusy in case the system transport layer is busy and no
- *                new system command are be sent, SHCI_TL_CmdAvailable otherwise
- * @retval None
- */
-static void SYS_StatusNotificationCallback( SHCI_TL_CmdStatus_t status )
-{
-    /* Callback not implemented - code flow under control of the developer */
-    UNUSED(status);
-    return;
-}
-
-/**
- * @brief This function is used to process all events coming from BLE stack by executing the related callback
- * @param None
- * @retval None
- */
-static void SYS_ProcessEvent(void)
-{
-    if (APP_FLAG_GET(APP_FLAG_SHCI_EVENT_PENDING) == 1)
-    {
-        APP_FLAG_RESET(APP_FLAG_SHCI_EVENT_PENDING);
-        shci_user_evt_proc();
     }
 }
 
@@ -347,6 +108,104 @@ void Error_Handler(void)
         /* Toggle RED LED */
         HAL_Delay(250);
     }
+}
+
+/**
+ * @brief This callback is triggered when either
+ *          + a GAP event is received from the BLE core device.
+ *          + a GATT event that has not been positively acknowledged by the registered handler is received from the
+ *            BLE core device.
+ *        The event is returned in a HCI packet. The full HCI packet is stored in a single buffer and is available when
+ *        this callback is triggered. However, an ACI event may be longer than a HCI packet and could be fragmented over
+ *        several HCI packets. The HCI layer only handles HCI packets so when an ACI packet is split over several HCI
+ *        packets, this callback is triggered for each HCI fragment. It is the responsibility of the application to
+ *        reassemble the ACI event.
+ *        This callback is triggered in the TL_BLE_HCI_UserEvtProc() context
+ *
+ * @param  pckt: The user event received from the BLE core device
+ * @retval None
+ */
+SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
+{
+    hci_event_pckt *event_pckt;
+    evt_blecore_aci *blecore_evt;
+    evt_le_meta_event *le_meta_evt;
+
+    event_pckt = (hci_event_pckt*) ((hci_uart_pckt *) pckt)->data;
+
+    switch (event_pckt->evt)
+    {
+        case HCI_DISCONNECTION_COMPLETE_EVT_CODE:
+            APP_FLAG_RESET(APP_FLAG_BLE_CONNECTED);
+            /* Start advertising */
+            BLE_Advertising(SET);
+            break; /* HCI_DISCONNECTION_COMPLETE_EVT_CODE */
+        case HCI_LE_META_EVT_CODE:
+            le_meta_evt = (evt_le_meta_event *)(event_pckt->data);
+            switch (le_meta_evt->subevent)
+            {
+                case HCI_LE_CONNECTION_COMPLETE_SUBEVT_CODE:
+                    APP_FLAG_RESET(APP_FLAG_BLE_ADVERTISING);
+                    APP_FLAG_SET(APP_FLAG_BLE_CONNECTED);
+                    break; /* HCI_LE_CONNECTION_COMPLETE_SUBEVT_CODE */
+                default:
+                    break;
+            }
+            break; /* HCI_LE_CONNECTION_COMPLETE_SUBEVT_CODE */
+        case HCI_VENDOR_SPECIFIC_DEBUG_EVT_CODE:
+            blecore_evt = (evt_blecore_aci*) event_pckt->data;
+            switch (blecore_evt->ecode)
+            {
+                case EVT_END_OF_RADIO_ACTIVITY:
+                    /* BSP_LED_Toggle(LED_GREEN); */
+                    HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0);
+                    break; /* EVT_END_OF_RADIO_ACTIVITY */
+            }
+            break; /* HCI_VENDOR_SPECIFIC_DEBUG_EVT_CODE */
+
+        default:
+            break;
+    }
+
+    return (SVCCTL_UserEvtFlowEnable);
+}
+
+/**
+ * @brief  Interrupt service routine that must be called when the system channel
+ *         reports a packet has been received
+ *         As stated in AN5289, this API notifies the user that a system user event has been received.
+ *         The user has to call the shci_user_evt_proc() to process
+ *         the notification in the system transport layer.
+ *         As the shci_notify_asynch_evt() notification is called from the IPCC
+ *         Interrupt Service Routine, it is strongly recommended to implement
+ *         a background mechanism to call shci_user_evt_proc()
+ *         (out of IPCC Interrupt Service Routine).
+ * @param  pdata: Pointer to the packet or event data
+ * @retval None
+ */
+void shci_notify_asynch_evt(void* pdata)
+{
+    APP_FLAG_SET(APP_FLAG_SHCI_EVENT_PENDING);
+    return;
+}
+
+/**
+ * @brief  Callback called from related IPCC RX Interrupt Service Routine, called when the BLE core (CPU2)
+ *         reports a packet received or an event to the host.
+ *         As stated in AN5289, this API notifies the user that a BLE user event has been received.
+ *         The user has to call the hci_user_evt_proc() to process
+ *         the notification in the BLE transport layer.
+ *         As the hci_notify_asynch_evt() notification is called from the IPCC
+ *         Interrupt Service Routine, it is strongly recommended to implement
+ *         a background mechanism to call hci_user_evt_proc()
+ *         (out of IPCC Interrupt Service Routine).
+ * @param  pdata: Pointer to the packet or event data
+ * @retval None
+ */
+void hci_notify_asynch_evt(void* pdata)
+{
+    APP_FLAG_SET(APP_FLAG_HCI_EVENT_PENDING);
+    return;
 }
 
 #ifdef  USE_FULL_ASSERT

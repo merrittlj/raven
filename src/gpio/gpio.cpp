@@ -1,4 +1,4 @@
-#include "gpio/gpio_controller.h"
+#include "gpio/gpio.hpp"
 
 
 GPIO_InitTypeDef GPIO::Types::LED = {
@@ -36,6 +36,19 @@ GPIO::Component::Init()
     GPIO_InitTypeDef GPIOInit = this.Type;
     GPIOInit.Pin = (uint16_t)(1 << (this.Pin.PinNum - 1));
     HAL_GPIO_Init(this.Pin.Bank, &GPIOInit);
+}
+
+GPIO::Component::Write(FlagStatus pStatus)
+{
+    if (pStatus == SET)
+        HAL_GPIO_WritePin(this.Pin.Bank, this.Pin.PinNum, GPIO_PIN_SET); 
+    if (pStatus == RESET)
+        HAL_GPIO_WritePin(this.Pin.Bank, this.Pin.PinNum, GPIO_PIN_RESET); 
+}
+
+GPIO::Controller::~Controller()
+{
+
 }
 
 GPIO::Controller::Controller(std::vector<GPIO::Component> Components)

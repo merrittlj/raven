@@ -1,5 +1,5 @@
-#ifndef GPIO_CONTROLLER_H
-#define GPIO_CONTROLLER_H
+#ifndef GPIO_HPP
+#define GPIO_HPP
 
 
 namespace GPIO
@@ -22,8 +22,7 @@ namespace GPIO
         void Config();
         void Init();
 
-        void Set();
-        void Reset();
+        void Write(FlagStatus pStatus);
     } Component;
 
     namespace Types
@@ -47,4 +46,4 @@ namespace GPIO
 }
 
 
-#endif /* GPIO_CONTROLLER_H */
+#endif /* GPIO_HPP */

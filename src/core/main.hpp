@@ -5,8 +5,8 @@
  * description:	main.c functions
  */
 
-#ifndef __MAIN_H
-#define __MAIN_H
+#ifndef MAIN_HPP
+#define MAIN_HPP
 
 #include "stm32wbxx_hal.h"
 
@@ -22,4 +22,4 @@ void Error_Handler(void);
 #define VariableBit_Get_BB(VariableAddress, BitNumber) \
 (*(volatile uint32_t *) (RAM_BB_BASE | ((VariableAddress - RAM_BASE) << 5) | ((BitNumber) << 2)))
 
-#endif /* __MAIN_H */
+#endif /* MAIN_HPP */
