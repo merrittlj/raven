@@ -4,6 +4,8 @@
 
 namespace Sys
 {
+    void Error_Handler();
+
     class Controller
     {
         public:

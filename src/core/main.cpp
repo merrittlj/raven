@@ -9,6 +9,7 @@
 #include "ble/gatt_service.h"
 #include "gpio/gpio.hpp"
 #include "ble/ble.hpp"
+#include "sys/sys.hpp"
 
 #include "otp.h"
 #include "ble.h"
@@ -35,50 +36,55 @@ int main(void)
 
     /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
     HAL_Init();
-    /* Tune the HSE internal load capacitors - P-NUCLEO-WB55.Nucleo board */
-    Config_HSE();
 
-    GPIO::Controller controller = new GPIO::Controller();
-    controller.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 3), GPIO::Types::LED));
-    controller.Config();
-    controller.Init();
+    Sys::Controller sysCtrl = new Sys::Controller();
+    Sys::Event_Processor sysEvtP = new Sys::Event_Processor();
+    Sys::State sysState = new Sys::State();
+    GPIO::Controller gpioCtrl = new GPIO::Controller();
+    BLE::Application bleApp = new BLE::Application();
+
+    /* Tune the HSE internal load capacitors - P-NUCLEO-WB55.Nucleo board */
+    sysCtrl.Config_HSE();
+
+    sysState.Register_LED_Red(gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 3), GPIO::Types::LED)));
+    gpioCtrl.Config();
+    gpioCtrl.Init();
 
     /* Configure the debug support if needed */
     APPD_Init();
 
-    Config_SysClk();
-
-    /* Initialize all transport layers */
-    Init_CPU2();
+    sysCtrl.Config_SysClk();
+    sysCtrl.Init_CPU2();
 
     /* Set the red LED On to indicate that the CPU2 is initializing */
-    /* BSP_LED_On(LED_RED); */ 
+    gpioCtrl.Write_Component(sysState.Fetch_LED_Red(), SET);
 
     /* Wait until the CPU2 gets initialized */
     while((APP_FLAG_GET(APP_FLAG_CPU2_INITIALIZED) == 0) \
             || (APP_FLAG_GET(APP_FLAG_WIRELESS_FW_RUNNING) == 0))
     {
         /* Process pending SYSTEM event coming from CPU2 (if any) */
-        SYS_ProcessEvent();
+        sysEvtP.Sys_ProcessEvent();
     }
 
     /* Configure the CPU2 Debug (Optional) */
     APPD_EnableCPU2();
 
     /* Set the red LED Off to indicate that the CPU2 is initialized */
-    /* BSP_LED_Off(LED_RED); */
+    gpioCtrl.Write_Component(sysState.Fetch_LED_Red(), RESET);
 
     /* Set the green LED On to indicate that the wireless stack FW is running */
-    /* BSP_LED_On(LED_GREEN); */
+    gpioCtrl.Write_Component(sysState.Fetch_LED_Green(), SET);
+
     bleApp.Init();
     bleApp.Advertising(SET);
 
     for(;;)
     {
         /* Process pending BLE event coming from CPU2 (if any) */
-        BLE_ProcessEvent();
+        sysEvtP.BLE_ProcessEvent();
         /* Process pending SYSTEM event coming from CPU2 (if any) */
-        SYS_ProcessEvent();
+        sysEvtP.Sys_ProcessEvent();
 
         /* Update the My Very Own Notify Characteristic every ~1 second and only if BLE connected.
            It might be also done only after the GATT client enables the notifications,
@@ -92,21 +98,9 @@ int main(void)
                 if (MyVeryOwnWriteCharacteristic_Update(MY_VERY_OWN_NOTIFY_CHARACTERISTIC_UUID,
                             MY_VERY_OWN_NOTIFY_CHARACTERISTIC_VALUE_LENGTH,
                             myVeryOwnNotifyCharacteristicData) != BLE_STATUS_SUCCESS)
-                    Error_Handler(); /* UNEXPECTED */
+                    Sys::Error_Handler(); /* UNEXPECTED */
             }
         }
-    }
-}
-
-/**
- * @brief  This function is executed in case of error occurrence.
- * @retval None
- */
-void Error_Handler(void)
-{
-    for(;;) {
-        /* Toggle RED LED */
-        HAL_Delay(250);
     }
 }
 
@@ -157,8 +151,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
             switch (blecore_evt->ecode)
             {
                 case EVT_END_OF_RADIO_ACTIVITY:
-                    /* BSP_LED_Toggle(LED_GREEN); */
-                    HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0);
+                    gpioCtrl.Write_Component(sysState.Fetch_LED_Green(), TOGGLE);
                     break; /* EVT_END_OF_RADIO_ACTIVITY */
             }
             break; /* HCI_VENDOR_SPECIFIC_DEBUG_EVT_CODE */

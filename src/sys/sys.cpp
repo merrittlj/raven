@@ -1,6 +1,18 @@
 #include "sys/sys.hpp"
 
 
+/**
+ * @brief  This function is executed in case of error occurrence.
+ * @retval None
+ */
+void Sys::Error_Handler()
+{
+    for(;;) {
+        /* Toggle RED LED */
+        HAL_Delay(250);
+    }
+}
+
 void Sys::Controller::Controller()
 {
 

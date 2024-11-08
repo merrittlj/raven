@@ -73,7 +73,13 @@ void GPIO::Controller::Init(void)
         c.Init();
 }
 
-void GPIO::Controller::Add_Component(GPIO::Component pComponent)
+uint32_t GPIO::Controller::Add_Component(GPIO::Component pComponent)
 {
     this.Components.push_back(pComponent);
+    return this.Components.size() - 1;
+}
+
+void GPIO::Controller::Write_Component(uint32_t pIndex, FlagStatus pStatus)
+{
+    this.Components.at(pIndex).Write(pStatus);
 }

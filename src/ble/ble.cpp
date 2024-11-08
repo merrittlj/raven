@@ -1,5 +1,7 @@
 #include "ble/ble.hpp"
 
+#include "sys/sys.cpp"
+
 
 BLE::Application()
 {
@@ -23,7 +25,7 @@ void BLE::Application::Init()
     BLE_Init();
 
     /* Set the blue LED On to indicate that the BLE stack is initialized */
-    /* BSP_LED_On(LED_BLUE); */
+    gpioCtrl.Write_Component(sysState.Fetch_LED_Blue(), SET);
 
     /* Initialize My Very Own GATT Service - user may also implement SVCCTL_InitCustomSvc()
        interface function as explained in AN5289. SVCCTL_InitCustomSvc() is called at the end of
@@ -31,7 +33,7 @@ void BLE::Application::Init()
     MyVeryOwnService_Init();
 
     /* Reset BLUE LED => Will be used by the example */
-    /* BSP_LED_Off(LED_BLUE); */
+    gpioCtrl.Write_Component(sysState.Fetch_LED_Blue(), RESET);
 }
 
 /**
@@ -57,19 +59,19 @@ void BLE::Application::Advertising(FlagStatus newState)
                     0, NULL,                                       /*< Do not include the service UUID list. (no adopted services) */
                     0x0000, 0x0000);                               /*< NaN, do not put in advertising data. */
             if (ret != BLE_STATUS_SUCCESS)
-                Error_Handler(); /* UNEXPECTED */
+                Sys::Error_Handler(); /* UNEXPECTED */
 
             /* Update the advertising data. */
             ret = aci_gap_update_adv_data(sizeof(ad_manufacturer_specific_data), (uint8_t*)ad_manufacturer_specific_data);
             if (ret != BLE_STATUS_SUCCESS)
-                Error_Handler(); /* UNEXPECTED */
+                Sys::Error_Handler(); /* UNEXPECTED */
             APP_FLAG_SET(APP_FLAG_BLE_ADVERTISING);
         }
     } else {
         /* Stop(reset) device advertising. */
         ret = aci_gap_set_non_discoverable();
         if (ret != BLE_STATUS_SUCCESS)
-            Error_Handler(); /* UNEXPECTED */
+            Sys::Error_Handler(); /* UNEXPECTED */
         APP_FLAG_RESET(APP_FLAG_BLE_ADVERTISING);
     }
 }
@@ -127,7 +129,7 @@ void BLE::Application::BLE_Init()
      */
     ret = SHCI_C2_BLE_Init(&ble_init_cmd_packet);
     if (ret != SHCI_Success)
-        Error_Handler(); /* UNEXPECTED */
+        Sys::Error_Handler(); /* UNEXPECTED */
 
     /**
      * Initialization of HCI & GATT & GAP layer
@@ -207,21 +209,21 @@ void BLE::Application::Hci_Gap_Gatt_Init()
      */
     ret = aci_hal_set_tx_power_level(0, CFG_TX_POWER);
     if (ret != BLE_STATUS_SUCCESS)
-        Error_Handler(); /* UNEXPECTED */
+        Sys::Error_Handler(); /* UNEXPECTED */
 
     /**
      * Set Radio activity event mask.
      */
     ret = aci_hal_set_radio_activity_mask(CFG_RADIO_ACTIVITY_EVENT_MASK);
     if (ret != BLE_STATUS_SUCCESS)
-        Error_Handler(); /* UNEXPECTED */
+        Sys::Error_Handler(); /* UNEXPECTED */
 
     /**
      * Initialize GATT
      */
     ret = aci_gatt_init();
     if (ret != BLE_STATUS_SUCCESS)
-        Error_Handler(); /* UNEXPECTED */
+        Sys::Error_Handler(); /* UNEXPECTED */
 
     /**
      * Initialize GAP
@@ -233,7 +235,7 @@ void BLE::Application::Hci_Gap_Gatt_Init()
             &gap_dev_name_char_handle,
             &gap_appearance_char_handle);
     if (ret != BLE_STATUS_SUCCESS)
-        Error_Handler(); /* UNEXPECTED */
+        Sys::Error_Handler(); /* UNEXPECTED */
 
     /**
      * Update GAP Service Device Name characteristic value
@@ -244,7 +246,7 @@ void BLE::Application::Hci_Gap_Gatt_Init()
             sizeof(gap_device_name),
             (uint8_t *)gap_device_name);
     if (ret != BLE_STATUS_SUCCESS)
-        Error_Handler(); /* UNEXPECTED */
+        Sys::Error_Handler(); /* UNEXPECTED */
 
     /**
      * Update GAP Service Appearance  characteristic value
@@ -255,7 +257,7 @@ void BLE::Application::Hci_Gap_Gatt_Init()
             sizeof(gap_appearance),
             (uint8_t *)&gap_appearance);
     if (ret != BLE_STATUS_SUCCESS)
-        Error_Handler(); /* UNEXPECTED */
+        Sys::Error_Handler(); /* UNEXPECTED */
 }
 
 /**

@@ -41,15 +41,15 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCE_DIR}/core/syscalls.c
     ${PROJECT_SOURCE_DIR}/core/sysmem.c
 
-    ${PROJECT_SOURCE_DIR}/stm32/stm32wbxx_it.c
+    ${PROJECT_SOURCE_DIR}/stm32/stm32wbxx_it.cpp
 
-    ${PROJECT_SOURCE_DIR}/hw/hw_ipcc.c
+    ${PROJECT_SOURCE_DIR}/hw/hw_ipcc.cpp
 
-    ${PROJECT_SOURCE_DIR}/app/app_debug.c
+    ${PROJECT_SOURCE_DIR}/app/app_debug.cpp
 
-    ${PROJECT_SOURCE_DIR}/ble/gatt_service.c
+    ${PROJECT_SOURCE_DIR}/ble/gatt_service.cpp
 
-    ${PROJECT_SOURCE_DIR}/gpio/gpio.c
+    ${PROJECT_SOURCE_DIR}/gpio/gpio.cpp
 )
 
 target_link_directories(${PROJECT_NAME}

@@ -41,7 +41,8 @@ namespace GPIO
             void Config();
             void Init();
 
-            void Add_Component(GPIO::Component pComponent);
+            uint32_t Add_Component(GPIO::Component pComponent);
+            void Write_Component(uint32_t pIndex, FlagStatus pStatus);
     };
 }
 
