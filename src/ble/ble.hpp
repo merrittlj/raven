@@ -2,6 +2,10 @@
 #define BLE_HPP
 
 
+#include "ble/gatt_service.hpp"
+#include "gpio/gpio.hpp"
+#include "sys/state.hpp"
+
 #define EVT_END_OF_RADIO_ACTIVITY           0x0004
 
 #define BD_ADDR_SIZE_LOCAL                  6
@@ -13,8 +17,6 @@ namespace BLE
     class App
     {
         private:
-            static volatile uint32_t APP_State = 0x00000000;
-
             PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static uint8_t EvtPool[EVENT_POOL_SIZE];
             PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static TL_CmdPacket_t SystemCmdBuffer;
             PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static TL_CmdPacket_t BleCmdBuffer;
@@ -60,6 +62,9 @@ namespace BLE
                can be found in the related documentation, e.g. in UM2496 */
 
 
+            GPIO::Controller &gpioCtrl;
+            Sys::State &sysState;
+
             void BLE_Init();
             void Tl_Init();
             void Hci_Gap_Gatt_Init();
@@ -68,12 +73,12 @@ namespace BLE
             SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *pckt);
 
         public:
-            App();
+            App(GPIO::Controller &gpioCtrl, Sys::State &sysState);
             ~App();
 
             uint8_t notifyCharacteristicData[NOTIFY_CHARACTERISTIC_VALUE_LENGTH] = {0x00, 0x00};
 
-            void Init();
+            void Init(BLE::Gatt_Service gattService);
             void Advertising(FlagStatus setReset);
     };
 }

@@ -12,13 +12,13 @@
 #define APP_FLAG_BLE_CONNECTED              5
 #define APP_FLAG_HCI_EVENT_PENDING         18
 #define APP_FLAG_SHCI_EVENT_PENDING        19
-#define APP_FLAG_GET(flag)                  VariableBit_Get_BB(((uint32_t)&APP_State), flag)
-#define APP_FLAG_SET(flag)                  VariableBit_Set_BB(((uint32_t)&APP_State), flag)
-#define APP_FLAG_RESET(flag)                VariableBit_Reset_BB(((uint32_t)&APP_State), flag)
+#define APP_FLAG_GET(flag)                  VariableBit_Get_BB(((uint32_t)&App::APP_State), flag)
+#define APP_FLAG_SET(flag)                  VariableBit_Set_BB(((uint32_t)&App::APP_State), flag)
+#define APP_FLAG_RESET(flag)                VariableBit_Reset_BB(((uint32_t)&App::APP_State), flag)
 
 namespace App
 {
-
+    volatile uint32_t APP_State = 0x00000000;
 }
 
 

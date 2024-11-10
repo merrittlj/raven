@@ -7,9 +7,10 @@
 #include "ble_types.h"
 
 
-BLE::Gatt_Service::Gatt_Service()
+BLE::Gatt_Service::Gatt_Service(GPIO::Controller &gpioCtrl, Sys::State &sysState)
 {
-
+    this.gpioCtrl = gpioCtrl;
+    this.sysState = sysState;
 }
 
 BLE::Gatt_Service::~Gatt_Service()
@@ -42,9 +43,9 @@ SVCCTL_EvtAckStatus_t BLE::Gatt_Service::Event_Handler(void *Event)
                         {
                             if (attribute_modified->Attr_Data[1] == 0x01)
                             {
-                                gpioCtrl.Write_Component(sysState.Fetch_LED_Blue(), SET);
+                                this.gpioCtrl.Write_Component(this.sysState.Fetch_LED_Blue(), SET);
                             } else {
-                                gpioCtrl.Write_Component(sysState.Fetch_LED_Blue(), RESET);
+                                this.gpioCtrl.Write_Component(this.sysState.Fetch_LED_Blue(), RESET);
                             }
                         }
 

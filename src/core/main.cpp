@@ -25,7 +25,7 @@ extern "C" void _init(){} /* To avoid linker errors */
  * @brief  The application entry point.
  * @retval int
  */
-int main(void)
+int main()
 {
     /**
      * The OPTVERR flag is wrongly set at power on
@@ -42,14 +42,14 @@ int main(void)
     Sys::Event_Processor sysEvtP = new Sys::Event_Processor();
     Sys::State sysState = new Sys::State();
     GPIO::Controller gpioCtrl = new GPIO::Controller();
-    BLE::App bleApp = new BLE::App();
-    BLE::Gatt_Service myService = new BLE::Gatt_Service();
+    BLE::App bleApp = new BLE::App(gpioCtrl, sysState);
+    BLE::Gatt_Service myService = new BLE::Gatt_Service(gpioCtrl, sysState);
     App::Debug_Controller debugCtrl = new App::Debug_Controller();
 
     /* Tune the HSE internal load capacitors - P-NUCLEO-WB55.Nucleo board */
     sysCtrl.Config_HSE();
 
-    sysState.Register_LED_Red(gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 3), GPIO::Types::LED)));
+    sysState.Register_LED_Red(gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 1), GPIO::Types::LED)));
     gpioCtrl.Config();
     gpioCtrl.Init();
 
@@ -79,7 +79,7 @@ int main(void)
     /* Set the green LED On to indicate that the wireless stack FW is running */
     gpioCtrl.Write_Component(sysState.Fetch_LED_Green(), SET);
 
-    bleApp.Init();
+    bleApp.Init(myService);
     bleApp.Advertising(SET);
 
     for(;;)

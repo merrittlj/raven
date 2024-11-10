@@ -1,30 +1,9 @@
-/* USER CODE BEGIN Header */
-/**
-  ******************************************************************************
-  * @file    hw_conf.h
-  * @author  MCD Application Team
-  * @brief   Configuration of hardware interface
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2019-2021 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
-/* USER CODE END Header */
-
-/* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef HW_CONF_H
-#define HW_CONF_H
+#ifndef HW_CONF_HPP
+#define HW_CONF_HPP
 
 /******************************************************************************
  * Semaphores
- * THIS SHALL NO BE CHANGED AS THESE SEMAPHORES ARE USED AS WELL ON THE CM0+
+ * THIS SHALL NOT BE CHANGED AS THESE SEMAPHORES ARE USED AS WELL ON THE CM0+
  *****************************************************************************/
 /**
 *  The CPU2 may be configured to store the Thread persistent data either in internal NVM storage on CPU2 or in
@@ -269,4 +248,4 @@
 #define CFG_HW_USART1_TX_DMA_IRQn             DMA2_Channel4_IRQn
 #define CFG_HW_USART1_DMA_TX_IRQHandler       DMA2_Channel4_IRQHandler
 
-#endif /* HW_CONF_H */
+#endif /* HW_CONF_HPP */

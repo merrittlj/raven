@@ -1,4 +1,5 @@
 /* Hardware IPCC source file for STM32WPAN Middleware. */
+/* TODO: How to handle this file? */
 
 #include "app/app_common.h"
 

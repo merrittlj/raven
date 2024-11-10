@@ -4,6 +4,9 @@
 
 #include "ble_types.h"
 
+#include "gpio/gpio.hpp"
+#include "sys/state.hpp"
+
 
 #define SERVICE_UUID                                      (0xFE40)
 #define WRITE_CHARACTERISTIC_UUID                         (0xFE41)
@@ -48,11 +51,13 @@ namespace BLE
 
 
             ServiceContext_t serviceContext;
+            GPIO::Controller &gpioCtrl;
+            Sys::State &sysState;
 
             SVCCTL_EvtAckStatus_t Event_Handler(void *pckt);
 
         public:
-            Gatt_Service();
+            Gatt_Service(GPIO::Controller &gpioCtrl, Sys::State &sysState);
             ~Gatt_Service();
 
             void Init();
