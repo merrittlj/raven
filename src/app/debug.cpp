@@ -1,5 +1,5 @@
-#include "app/app_common.h"
-#include "app/app_debug.h"
+#include "app/common.hpp"
+#include "app/debug.hpp"
 
 #include "utilities_common.h"
 #include "shci.h"
@@ -20,9 +20,7 @@ typedef PACKED_STRUCT
 #define NBR_OF_TRACES_CONFIG_PARAMETERS         4
 #define NBR_OF_GENERAL_CONFIG_PARAMETERS        4
 
-/**
- * THIS SHALL BE SET TO A VALUE DIFFERENT FROM 0 ONLY ON REQUEST FROM ST SUPPORT, Uh Oh...
- */
+/* THIS SHALL BE SET TO A VALUE DIFFERENT FROM 0 ONLY ON REQUEST FROM ST SUPPORT !!!!! */
 #define BLE_DTB_CFG     0
 
 /**
@@ -34,7 +32,7 @@ typedef PACKED_STRUCT
  * which are used to set following configuration bits:
  * - bit 0:   0: IP BLE core in LP mode    1: IP BLE core in run mode (no LP supported)
  * - bit 1:   0: CPU2 STOP mode Enable     1: CPU2 STOP mode Disable 
- * - bit [2-7]: bits reserved ( shall be set to 0)
+ * - bit [2-7]: bits reserved (shall be set to 0)
  */
 #define SYS_DBG_CFG1  (SHCI_C2_DEBUG_OPTIONS_IPCORE_LP | SHCI_C2_DEBUG_OPTIONS_CPU2_STOP_EN) 
 
@@ -104,7 +102,7 @@ static const APPD_GpioConfig_t aGpioConfigList[GPIO_CFG_NBR_OF_FEATURES] =
  * New signals may be allocated at any location when requested by ST
  * The GPIO allocated to each signal depend on the BLE_DTB_CFG value and cannot be changed
  */
-#if( BLE_DTB_CFG == 7)
+#if(BLE_DTB_CFG == 7)
 static const APPD_GpioConfig_t aRfConfigList[GPIO_NBR_OF_RF_SIGNALS] =
 {
     { GPIOB, LL_GPIO_PIN_2, 0, 0},      /* DTB10 - Tx/Rx SPI */
@@ -119,19 +117,24 @@ static const APPD_GpioConfig_t aRfConfigList[GPIO_NBR_OF_RF_SIGNALS] =
 };
 #endif
 
-static void APPD_SetCPU2GpioConfig();
-static void APPD_BleDtbCfg();
+App::Debug_Controller::Debug_Controller()
+{
 
-void APPD_Init()
+}
+
+App::Debug_Controller::~Debug_Controller()
+{
+
+}
+
+void App::Debug_Controller::Init()
 {
 #if (CFG_DEBUGGER_SUPPORTED == 1)
-    /**
-     * Keep debugger enabled while in any low power mode
-     */
+    /* Keep debugger enabled while in any low power mode */
     HAL_DBGMCU_EnableDBGSleepMode();
     HAL_DBGMCU_EnableDBGStopMode();
 
-    /***************** ENABLE DEBUGGER *************************************/
+    /* Enable Debugger */
     LL_EXTI_EnableIT_32_63(LL_EXTI_LINE_48);
 
 #else
@@ -160,11 +163,11 @@ void APPD_Init()
     DbgTraceInit();
 #endif
 
-    APPD_SetCPU2GpioConfig();
-    APPD_BleDtbCfg();
+    this.SetCPU2GpioConfig();
+    this.BleDtbCfg();
 }
 
-void APPD_EnableCPU2()
+void App::Debug_Controller::EnableCPU2()
 {
     SHCI_C2_DEBUG_Init_Cmd_Packet_t DebugCmdPacket =
     {
@@ -177,15 +180,15 @@ void APPD_EnableCPU2()
             NBR_OF_GENERAL_CONFIG_PARAMETERS}
     };
 
-    /**< Traces channel initialization */
+    /* Traces channel initialization */
     TL_TRACES_Init();
 
-    /** GPIO DEBUG Initialization */
-    SHCI_C2_DEBUG_Init( &DebugCmdPacket  );
+    /* GPIO Debug Initialization */
+    SHCI_C2_DEBUG_Init(&DebugCmdPacket);
 }
 
 /* Local Functions */
-static void APPD_SetCPU2GpioConfig()
+void App::Debug_Controller::SetCPU2GpioConfig()
 {
     GPIO_InitTypeDef gpio_config = {0};
     uint8_t local_loop;
@@ -199,7 +202,7 @@ static void APPD_SetCPU2GpioConfig()
 
     for(local_loop = 0 ; local_loop < GPIO_CFG_NBR_OF_FEATURES; local_loop++)
     {
-        if( aGpioConfigList[local_loop].enable != 0)
+        if(aGpioConfigList[local_loop].enable != 0)
         {
             switch((uint32_t)aGpioConfigList[local_loop].port)
             {
@@ -253,7 +256,7 @@ static void APPD_SetCPU2GpioConfig()
     }
 }
 
-static void APPD_BleDtbCfg()
+void App::Debug_Controller::BleDtbCfg()
 {
 #if (BLE_DTB_CFG != 0)
     GPIO_InitTypeDef gpio_config = {0};
@@ -266,7 +269,7 @@ static void APPD_BleDtbCfg()
 
     for(local_loop = 0 ; local_loop < GPIO_NBR_OF_RF_SIGNALS; local_loop++)
     {
-        if( aRfConfigList[local_loop].enable != 0)
+        if(aRfConfigList[local_loop].enable != 0)
         {
             switch((uint32_t)aRfConfigList[local_loop].port)
             {
@@ -314,7 +317,7 @@ void DbgOutputInit()
     HW_UART_Init(CFG_DEBUG_TRACE_UART);
 }
 
-void DbgOutputTraces(  uint8_t *p_data, uint16_t size, void (*cb)(void) )
+void DbgOutputTraces(uint8_t *p_data, uint16_t size, void (*cb)(void))
 {
     HW_UART_Transmit_DMA(CFG_DEBUG_TRACE_UART, p_data, size, cb);
 }

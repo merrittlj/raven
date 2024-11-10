@@ -1,19 +1,20 @@
 #include "ble/ble.hpp"
 
-#include "sys/sys.cpp"
+#include "app/app.hpp"
+#include "sys/sys.hpp"
 
 
-BLE::Application()
+BLE::App()
 {
 
 }
 
-BLE::~Application()
+BLE::~App()
 {
 
 }
 
-void BLE::Application::Init()
+void BLE::App::Init()
 {
     /* At this point it is still unknown from the app perspective, which wireless stack
        and which version is installed on CPU2. It is expected that a BLE stack is installed.
@@ -41,7 +42,7 @@ void BLE::Application::Init()
  * @param newState: SET to start the advertising, RESET to stop
  * @retval None
  */
-void BLE::Application::Advertising(FlagStatus newState)
+void BLE::App::Advertising(FlagStatus newState)
 {
     tBleStatus ret = BLE_STATUS_SUCCESS;
 
@@ -81,7 +82,7 @@ void BLE::Application::Advertising(FlagStatus newState)
  * @param None
  * @retval None
  */
-void BLE::Application::BLE_Init()
+void BLE::App::BLE_Init()
 {
     SHCI_CmdStatus_t ret;
 
@@ -147,7 +148,7 @@ void BLE::Application::BLE_Init()
  * @param None
  * @retval None
  */
-void BLE::Application::Tl_Init()
+void BLE::App::Tl_Init()
 {
     HCI_TL_HciInitConf_t Hci_Tl_Init_Conf;
 
@@ -162,7 +163,7 @@ void BLE::Application::Tl_Init()
  * @param None
  * @retval None
  */
-void BLE::Application::Hci_Gap_Gatt_Init()
+void BLE::App::Hci_Gap_Gatt_Init()
 {
     uint16_t gap_service_handle, gap_dev_name_char_handle, gap_appearance_char_handle;
     const uint8_t *bd_address;
@@ -265,7 +266,7 @@ void BLE::Application::Hci_Gap_Gatt_Init()
  * @param None
  * @retval Pointer to the array holding the BD address
  */
-const uint8_t* BLE::Application::GetBdAddress()
+const uint8_t* BLE::App::GetBdAddress()
 {
     uint8_t *p_otp_addr;
     const uint8_t *p_bd_addr;
@@ -311,4 +312,64 @@ const uint8_t* BLE::Application::GetBdAddress()
 
     return p_bd_addr;
 }
+
+/**
+ * @brief This callback is triggered when either
+ *          + a GAP event is received from the BLE core device.
+ *          + a GATT event that has not been positively acknowledged by the registered handler is received from the
+ *            BLE core device.
+ *        The event is returned in a HCI packet. The full HCI packet is stored in a single buffer and is available when
+ *        this callback is triggered. However, an ACI event may be longer than a HCI packet and could be fragmented over
+ *        several HCI packets. The HCI layer only handles HCI packets so when an ACI packet is split over several HCI
+ *        packets, this callback is triggered for each HCI fragment. It is the responsibility of the application to
+ *        reassemble the ACI event.
+ *        This callback is triggered in the TL_BLE_HCI_UserEvtProc() context
+ *
+ * @param  pckt: The user event received from the BLE core device
+ * @retval None
+ */
+SVCCTL_UserEvtFlowStatus_t BLE::App::SVCCTL_App_Notification(void *pckt)
+{
+    hci_event_pckt *event_pckt;
+    evt_blecore_aci *blecore_evt;
+    evt_le_meta_event *le_meta_evt;
+
+    event_pckt = (hci_event_pckt*) ((hci_uart_pckt *) pckt)->data;
+
+    switch (event_pckt->evt)
+    {
+        case HCI_DISCONNECTION_COMPLETE_EVT_CODE:
+            APP_FLAG_RESET(APP_FLAG_BLE_CONNECTED);
+            /* Start advertising */
+            BLE_Advertising(SET);
+            break; /* HCI_DISCONNECTION_COMPLETE_EVT_CODE */
+        case HCI_LE_META_EVT_CODE:
+            le_meta_evt = (evt_le_meta_event *)(event_pckt->data);
+            switch (le_meta_evt->subevent)
+            {
+                case HCI_LE_CONNECTION_COMPLETE_SUBEVT_CODE:
+                    APP_FLAG_RESET(APP_FLAG_BLE_ADVERTISING);
+                    APP_FLAG_SET(APP_FLAG_BLE_CONNECTED);
+                    break; /* HCI_LE_CONNECTION_COMPLETE_SUBEVT_CODE */
+                default:
+                    break;
+            }
+            break; /* HCI_LE_CONNECTION_COMPLETE_SUBEVT_CODE */
+        case HCI_VENDOR_SPECIFIC_DEBUG_EVT_CODE:
+            blecore_evt = (evt_blecore_aci*) event_pckt->data;
+            switch (blecore_evt->ecode)
+            {
+                case EVT_END_OF_RADIO_ACTIVITY:
+                    gpioCtrl.Write_Component(sysState.Fetch_LED_Green(), TOGGLE);
+                    break; /* EVT_END_OF_RADIO_ACTIVITY */
+            }
+            break; /* HCI_VENDOR_SPECIFIC_DEBUG_EVT_CODE */
+
+        default:
+            break;
+    }
+
+    return (SVCCTL_UserEvtFlowEnable);
+}
+
 

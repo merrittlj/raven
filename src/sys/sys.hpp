@@ -32,6 +32,9 @@ namespace Sys
 
             void Sys_ProcessEvent();
             void BLE_ProcessEvent();
+
+            void shci_notify_asynch_evt(void* pdata);
+            void hci_notify_asynch_evt(void* pdata);
     };
 }
 

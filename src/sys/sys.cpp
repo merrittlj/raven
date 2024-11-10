@@ -1,5 +1,7 @@
 #include "sys/sys.hpp"
 
+#include "app/app.hpp"
+
 
 /**
  * @brief  This function is executed in case of error occurrence.
@@ -330,4 +332,42 @@ void Sys::Event_Processor::BLE_ProcessEvent()
         APP_FLAG_RESET(APP_FLAG_HCI_EVENT_PENDING);
         hci_user_evt_proc();
     }
+}
+
+/**
+ * @brief  Interrupt service routine that must be called when the system channel
+ *         reports a packet has been received
+ *         As stated in AN5289, this API notifies the user that a system user event has been received.
+ *         The user has to call the shci_user_evt_proc() to process
+ *         the notification in the system transport layer.
+ *         As the shci_notify_asynch_evt() notification is called from the IPCC
+ *         Interrupt Service Routine, it is strongly recommended to implement
+ *         a background mechanism to call shci_user_evt_proc()
+ *         (out of IPCC Interrupt Service Routine).
+ * @param  pdata: Pointer to the packet or event data
+ * @retval None
+ */
+void Sys::Event_Processor::shci_notify_asynch_evt(void* pdata)
+{
+    APP_FLAG_SET(APP_FLAG_SHCI_EVENT_PENDING);
+    return;
+}
+
+/**
+ * @brief  Callback called from related IPCC RX Interrupt Service Routine, called when the BLE core (CPU2)
+ *         reports a packet received or an event to the host.
+ *         As stated in AN5289, this API notifies the user that a BLE user event has been received.
+ *         The user has to call the hci_user_evt_proc() to process
+ *         the notification in the BLE transport layer.
+ *         As the hci_notify_asynch_evt() notification is called from the IPCC
+ *         Interrupt Service Routine, it is strongly recommended to implement
+ *         a background mechanism to call hci_user_evt_proc()
+ *         (out of IPCC Interrupt Service Routine).
+ * @param  pdata: Pointer to the packet or event data
+ * @retval None
+ */
+void Sys::Event_Processor::hci_notify_asynch_evt(void* pdata)
+{
+    APP_FLAG_SET(APP_FLAG_HCI_EVENT_PENDING);
+    return;
 }

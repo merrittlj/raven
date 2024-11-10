@@ -1,8 +1,8 @@
 /*
- * filename:	main.h
+ * filename:	main.hpp
  * date:	07.02.24
  * author:	Lucas Merritt/merrittlj
- * description:	main.c functions
+ * description:	header for main.cpp
  */
 
 #ifndef MAIN_HPP

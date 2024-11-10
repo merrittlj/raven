@@ -1,7 +1,7 @@
 /* App Common application configuration file for STM32WPAN Middleware. */
 
-#ifndef APP_COMMON_H
-#define APP_COMMON_H
+#ifndef APP_COMMON_HPP
+#define APP_COMMON_HPP
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,7 +13,7 @@ extern "C" {
 #include <stdlib.h>
 #include <stdarg.h>
 
-#include "app/app_conf.h"
+#include "app/conf.hpp"
 
 
     /* Basic definitions */
@@ -83,4 +83,4 @@ extern "C" {
 } /* extern "C" */
 #endif
 
-#endif /* APP_COMMON_H */
+#endif /* APP_COMMON_HPP */

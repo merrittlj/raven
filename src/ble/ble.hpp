@@ -8,23 +8,9 @@
 #define APP_BLE_GAP_DEVICE_NAME_LENGTH      sizeof(gap_device_name)
 #define EVENT_POOL_SIZE                    (CFG_TLBLE_EVT_QUEUE_LENGTH*4U*DIVC(( sizeof(TL_PacketHeader_t) + TL_BLE_EVENT_FRAME_SIZE ), 4U))
 
-#define APP_FLAG_CPU2_INITIALIZED           0
-#define APP_FLAG_CPU2_ERROR                24
-#define APP_FLAG_WIRELESS_FW_RUNNING        1
-#define APP_FLAG_FUS_FW_RUNNING             2
-#define APP_FLAG_BLE_INITIALIZATION_ERROR  25
-#define APP_FLAG_BLE_INITIALIZED            3
-#define APP_FLAG_BLE_ADVERTISING            4
-#define APP_FLAG_BLE_CONNECTED              5
-#define APP_FLAG_HCI_EVENT_PENDING         18
-#define APP_FLAG_SHCI_EVENT_PENDING        19
-#define APP_FLAG_GET(flag)                  VariableBit_Get_BB(((uint32_t)&APP_State), flag)
-#define APP_FLAG_SET(flag)                  VariableBit_Set_BB(((uint32_t)&APP_State), flag)
-#define APP_FLAG_RESET(flag)                VariableBit_Reset_BB(((uint32_t)&APP_State), flag)
-
 namespace BLE
 {
-    class Application
+    class App
     {
         private:
             static volatile uint32_t APP_State = 0x00000000;
@@ -36,8 +22,6 @@ namespace BLE
             PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static uint8_t BleSpareEvtBuffer[sizeof(TL_PacketHeader_t) + TL_EVT_HDR_SIZE + 255];
 
             static uint8_t bd_address_udn[BD_ADDR_SIZE_LOCAL];
-
-            static uint8_t myVeryOwnNotifyCharacteristicData[MY_VERY_OWN_NOTIFY_CHARACTERISTIC_VALUE_LENGTH] = {0x00, 0x00};
 
             /* Generic Access GATT Service Characteristics configuration data  */
             static const char gap_device_name[] = { 'R', 'a', 'v', 'e', 'n', ' ', 'S', 'W' };
@@ -72,7 +56,6 @@ namespace BLE
                 (uint8_t)((CFG_ADV_BD_ADDRESS & 0xFF0000000000) >> 40)
             };
 
-
             /* More details about BlueST protocol and how it is used in our demos and examples
                can be found in the related documentation, e.g. in UM2496 */
 
@@ -82,9 +65,13 @@ namespace BLE
             void Hci_Gap_Gatt_Init();
             const uint8_t* GetBdAddress();
 
+            SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *pckt);
+
         public:
-            Application();
-            ~Application();
+            App();
+            ~App();
+
+            uint8_t notifyCharacteristicData[NOTIFY_CHARACTERISTIC_VALUE_LENGTH] = {0x00, 0x00};
 
             void Init();
             void Advertising(FlagStatus setReset);

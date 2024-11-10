@@ -1,52 +1,22 @@
-/* USER CODE BEGIN Header */
-/**
-  ******************************************************************************
-  * @file    app_conf.h
-  * @author  MCD Application Team
-  * @brief   Application configuration file for STM32WPAN Middleware.
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2020-2021 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
-/* USER CODE END Header */
+#ifndef APP_CONF_HPP
+#define APP_CONF_HPP
 
-/* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef APP_CONF_H
-#define APP_CONF_H
-
-#include "hw/hw_conf.h"
-#include "hw/hw_if.h"
+#include "hw/conf.hpp"
+#include "hw/if.hpp"
 
 #include "hw.h"
 #include "ble_bufsize.h"
 
-/******************************************************************************
- * Application Config
- ******************************************************************************/
 
-/**< generic parameters ******************************************************/
-
-/**
- * Define Tx Power
- */
+/* Application Config */
+/* Generic parameters */
+/* Define Tx Power */
 #define CFG_TX_POWER                      (0x18) /* -0.15dBm */
 
-/**
- * Radio activity event
- */   
+/* Radio activity event */
 #define CFG_RADIO_ACTIVITY_EVENT_MASK      (0x0006)  /**< 0x0000 default */
 
-/**
- * Define Advertising parameters
- */
+/* Define Advertising parameters */
 #define CFG_ADV_BD_ADDRESS                (0x7257acd87a6c)
 
 #define CFG_FAST_CONN_ADV_INTERVAL_MIN    (0x00C8)  /**< 250ms */
@@ -54,9 +24,7 @@
 #define CFG_LP_CONN_ADV_INTERVAL_MIN      (0x0640)  /**< 1s */
 #define CFG_LP_CONN_ADV_INTERVAL_MAX      (0x0FA0)  /**< 2.5s */
 
-/******************************************************************************
- * BLE Stack
- ******************************************************************************/
+/* BLE Stack */
 /**
  * Maximum number of simultaneous connections that the device will support.
  * Valid values are from 1 to 8
@@ -109,14 +77,10 @@
  */
 #define CFG_BLE_MBLOCK_COUNT            (BLE_MBLOCKS_CALC(CFG_BLE_PREPARE_WRITE_LIST_SIZE, CFG_BLE_MAX_ATT_MTU, CFG_BLE_NUM_LINK))
 
-/**
- * Enable or disable the Extended Packet length feature. Valid values are 0 or 1.
- */
+/* Enable or disable the Extended Packet length feature. Valid values are 0 or 1. */
 #define CFG_BLE_DATA_LENGTH_EXTENSION   1
 
-/**
- * Sleep clock accuracy in Peripheral mode (ppm value)
- */
+/* Sleep clock accuracy in Peripheral mode (ppm value) */
 #define CFG_BLE_PERIPHERAL_SCA   500
 
 /**
@@ -145,14 +109,10 @@
   #define CFG_BLE_LS_SOURCE  (SHCI_C2_BLE_INIT_CFG_BLE_LS_NOCALIB | SHCI_C2_BLE_INIT_CFG_BLE_LS_OTHER_DEV | SHCI_C2_BLE_INIT_CFG_BLE_LS_CLK_LSE)
 #endif
 
-/**
- * Start up time of the high speed (16 or 32 MHz) crystal oscillator in units of 625/256 us (~2.44 us)
- */
+/* Start up time of the high speed (16 or 32 MHz) crystal oscillator in units of 625/256 us (~2.44 us) */
 #define CFG_BLE_HSE_STARTUP_TIME  0x148
 
-/**
- * Maximum duration of the connection event when the device is in Peripheral mode in units of 625/256 us (~2.44 us)
- */
+/* Maximum duration of the connection event when the device is in Peripheral mode in units of 625/256 us (~2.44 us) */
 #define CFG_BLE_MAX_CONN_EVENT_LENGTH  (0xFFFFFFFF)
 
 /**
@@ -277,9 +237,7 @@
  
   
 
-/******************************************************************************
- * Transport Layer
- ******************************************************************************/
+/* Transport Layer */
 /**
  * Queue length of BLE Event
  * This parameter defines the number of asynchronous events that can be stored in the HCI layer before
@@ -308,9 +266,7 @@
 
 #define TL_BLE_EVENT_FRAME_SIZE ( TL_EVT_HDR_SIZE + CFG_TLBLE_MOST_EVENT_PAYLOAD_SIZE )
 
-/******************************************************************************
- * Debug
- ******************************************************************************/
+/* Debug */
 /**
  * When set, this resets some hw resources to put the device in the same state as at power up.
  * It resets only register that may prevent the FW to run properly.
@@ -326,11 +282,9 @@
  */
 #define CFG_DEBUGGER_SUPPORTED    1
 
-/******************************************************************************
- * OTP manager
- ******************************************************************************/
+/* OTP manager */
 #define CFG_OTP_BASE_ADDRESS    OTP_AREA_BASE
 
 #define CFG_OTP_END_ADRESS      OTP_AREA_END_ADDR
 
-#endif /* APP_CONF_H */
+#endif /* APP_CONF_HPP */
