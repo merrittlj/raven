@@ -6,7 +6,7 @@
  */
 
 #include "stm32/stm32wbxx_it.h"
-#include "core/main.h"
+#include "core/main.hpp"
 
 #include "hw.h"
 

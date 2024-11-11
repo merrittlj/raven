@@ -2,6 +2,9 @@
 #define STATE_HPP
 
 
+#include <cstdint>
+
+
 namespace Sys
 {
     class State

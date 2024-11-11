@@ -163,8 +163,8 @@ void App::Debug_Controller::Init()
     DbgTraceInit();
 #endif
 
-    this.SetCPU2GpioConfig();
-    this.BleDtbCfg();
+    this->SetCPU2GpioConfig();
+    this->BleDtbCfg();
 }
 
 void App::Debug_Controller::EnableCPU2()

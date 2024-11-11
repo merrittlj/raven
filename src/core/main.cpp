@@ -12,12 +12,6 @@
 #include "ble/gatt_service.hpp"
 #include "sys/sys.hpp"
 
-#include "otp.h"
-#include "ble.h"
-#include "hci_tl.h"
-#include "shci_tl.h"
-#include "shci.h"
-
 
 extern "C" void _init(){} /* To avoid linker errors */
 

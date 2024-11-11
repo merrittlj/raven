@@ -2,6 +2,11 @@
 #define GPIO_HPP
 
 
+#include "hw/if.hpp"
+
+#include <cstdint>
+
+
 namespace GPIO
 {
     typedef struct 

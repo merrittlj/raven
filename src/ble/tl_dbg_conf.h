@@ -27,7 +27,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "app/app_conf.h"   /* required as some configuration used in dbg_trace.h are set there */
 #include "dbg_trace.h"
-#include "hw/hw_if.h"
+#include "hw/if.hpp"
 
 /**
  * Enable or Disable traces

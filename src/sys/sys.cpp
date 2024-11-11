@@ -2,6 +2,9 @@
 
 #include "app/app.hpp"
 
+#include "hci_tl.h"
+#include "shci_tl.h"
+
 
 /**
  * @brief  This function is executed in case of error occurrence.

@@ -8,6 +8,8 @@
 #include "ble_bufsize.h"
 
 
+/* MUST STAY app_conf.h DUE TO STUPID STM32 LIBRARY INCLUDES */
+
 /* Application Config */
 /* Generic parameters */
 /* Define Tx Power */

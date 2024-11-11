@@ -13,7 +13,7 @@ extern "C" {
 #include <stdlib.h>
 #include <stdarg.h>
 
-#include "app/conf.hpp"
+#include "app/app_conf.h"
 
 
     /* Basic definitions */

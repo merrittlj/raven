@@ -2,6 +2,9 @@
 #define APP_HPP
 
 
+#include <cstdint>
+
+
 #define APP_FLAG_CPU2_INITIALIZED           0
 #define APP_FLAG_CPU2_ERROR                24
 #define APP_FLAG_WIRELESS_FW_RUNNING        1

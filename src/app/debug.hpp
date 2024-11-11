@@ -15,7 +15,7 @@ namespace App
 
             void Init();
             void EnableCPU2();
-    }
+    };
 }
 
 #endif /* APP_DEBUG_HPP */

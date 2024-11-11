@@ -1,7 +1,7 @@
 /* Hardware IPCC source file for STM32WPAN Middleware. */
 /* TODO: How to handle this file? */
 
-#include "app/app_common.h"
+#include "app/common.hpp"
 
 #include "mbox_def.h"
 
