@@ -5,30 +5,33 @@
 #include "hw/if.hpp"
 
 #include <cstdint>
+#include <vector>
 
 
 namespace GPIO
 {
-    typedef struct 
+    struct Pin
     {
-        GPIO_TypeDef Bank;
+        GPIO_TypeDef *Bank;
         uint32_t PinNum;
 
-        Pin(GPIO_TypeDef pBank, uint32_t pPinNum);
-    } Pin;
+        Pin();
+        Pin(GPIO_TypeDef *pBank, uint32_t pPinNum);
+    };
 
-    typedef struct
+    struct Component
     {
         GPIO::Pin Pin;
         GPIO_InitTypeDef Type;
 
+        Component();
         Component(GPIO::Pin pPin, GPIO_InitTypeDef pType);
         
         void Config();
         void Init();
 
         void Write(FlagStatus pStatus);
-    } Component;
+    };
 
     namespace Types
     {
@@ -40,8 +43,8 @@ namespace GPIO
         private:
             std::vector<GPIO::Component> Components;
         public:
-            GPIO_Controller(std::vector<GPIO::Component> pComponents = std::vector<GPIO::Component>());
-            ~GPIO_Controller();
+            Controller(std::vector<GPIO::Component> pComponents = std::vector<GPIO::Component>());
+            ~Controller();
 
             void Config();
             void Init();

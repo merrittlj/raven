@@ -4,10 +4,10 @@
 #include "sys/sys.hpp"
 
 
-BLE::App(GPIO::Controlller &gpioCtrl, Sys::State &sysState)
+BLE::App(GPIO::Controller *pGpioCtrl, Sys::State *pSysState);
 {
-    this.gpioCtrl = gpioCtrl;
-    this.sysState = sysState
+    this.gpioCtrl = pGpioCtrl;
+    this.sysState = pSysState
 }
 
 BLE::~App()

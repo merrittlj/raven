@@ -2,6 +2,10 @@
 #define SYS_HPP
 
 
+#include "hci_tl.h"
+#include "shci_tl.h"
+
+
 namespace Sys
 {
     void Error_Handler();

@@ -7,10 +7,10 @@
 #include "ble_types.h"
 
 
-BLE::Gatt_Service::Gatt_Service(GPIO::Controller &gpioCtrl, Sys::State &sysState)
+BLE::Gatt_Service::Gatt_Service(GPIO::Controller *pGpioCtrl, Sys::State *pSysState)
 {
-    this.gpioCtrl = gpioCtrl;
-    this.sysState = sysState;
+    this->gpioCtrl = pGpioCtrl;
+    this->sysState = pSysState;
 }
 
 BLE::Gatt_Service::~Gatt_Service()
@@ -43,9 +43,9 @@ SVCCTL_EvtAckStatus_t BLE::Gatt_Service::Event_Handler(void *Event)
                         {
                             if (attribute_modified->Attr_Data[1] == 0x01)
                             {
-                                this.gpioCtrl.Write_Component(this.sysState.Fetch_LED_Blue(), SET);
+                                this->gpioCtrl->Write_Component(this->sysState->Fetch_LED_Blue(), SET);
                             } else {
-                                this.gpioCtrl.Write_Component(this.sysState.Fetch_LED_Blue(), RESET);
+                                this->gpioCtrl->Write_Component(this->sysState->Fetch_LED_Blue(), RESET);
                             }
                         }
 
@@ -75,7 +75,7 @@ void BLE::Gatt_Service::Init()
     Char_UUID_t uuid16;
 
     /* Register the event handler to the BLE controller */
-    SVCCTL_RegisterSvcHandler(this.Event_Handler);
+    SVCCTL_RegisterSvcHandler(BLE::Gatt_Service::Event_Handler);
 
     /* Add Service */
     COPY_SERVICE_UUID(uuid16.Char_UUID_128);

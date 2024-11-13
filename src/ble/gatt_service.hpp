@@ -2,10 +2,12 @@
 #define GATT_SERVICE_HPP
 
 
-#include "ble_types.h"
-
 #include "gpio/gpio.hpp"
 #include "sys/state.hpp"
+
+#include "ble.h"
+#include "ble_common.h"
+#include "ble_types.h"
 
 
 #define SERVICE_UUID                                      (0xFE40)
@@ -51,18 +53,18 @@ namespace BLE
 
 
             ServiceContext_t serviceContext;
-            GPIO::Controller &gpioCtrl;
-            Sys::State &sysState;
+            GPIO::Controller *gpioCtrl;
+            Sys::State *sysState;
 
-            SVCCTL_EvtAckStatus_t Event_Handler(void *pckt);
+            static SVCCTL_EvtAckStatus_t Event_Handler(void *pckt);
 
         public:
-            Gatt_Service(GPIO::Controller &gpioCtrl, Sys::State &sysState);
+            Gatt_Service(GPIO::Controller *pGpioCtrl, Sys::State *pSysState);
             ~Gatt_Service();
 
             void Init();
             tBleStatus Write_Characteristic_Update(uint16_t UUID, uint16_t newValueLength, uint8_t *pNewValue);
-    }
+    };
 }
 
 

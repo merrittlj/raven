@@ -4,6 +4,7 @@
 
 #include "hci_tl.h"
 #include "shci_tl.h"
+#include "stm32wbxx_hal.h"
 
 
 /**

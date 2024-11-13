@@ -62,8 +62,8 @@ namespace BLE
                can be found in the related documentation, e.g. in UM2496 */
 
 
-            GPIO::Controller &gpioCtrl;
-            Sys::State &sysState;
+            GPIO::Controller *gpioCtrl;
+            Sys::State *sysState;
 
             void BLE_Init();
             void Tl_Init();
@@ -73,7 +73,7 @@ namespace BLE
             SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *pckt);
 
         public:
-            App(GPIO::Controller &gpioCtrl, Sys::State &sysState);
+            App(GPIO::Controller *pGpioCtrl, Sys::State *pSysState);
             ~App();
 
             uint8_t notifyCharacteristicData[NOTIFY_CHARACTERISTIC_VALUE_LENGTH] = {0x00, 0x00};

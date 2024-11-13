@@ -32,13 +32,13 @@ int main()
     /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
     HAL_Init();
 
-    Sys::Controller sysCtrl = new Sys::Controller();
-    Sys::Event_Processor sysEvtP = new Sys::Event_Processor();
-    Sys::State sysState = new Sys::State();
-    GPIO::Controller gpioCtrl = new GPIO::Controller();
-    BLE::App bleApp = new BLE::App(gpioCtrl, sysState);
-    BLE::Gatt_Service myService = new BLE::Gatt_Service(gpioCtrl, sysState);
-    App::Debug_Controller debugCtrl = new App::Debug_Controller();
+    Sys::Controller sysCtrl = Sys::Controller();
+    Sys::Event_Processor sysEvtP = Sys::Event_Processor();
+    Sys::State sysState = Sys::State();
+    GPIO::Controller gpioCtrl = GPIO::Controller();
+    BLE::App bleApp = BLE::App(&gpioCtrl, &sysState);
+    BLE::Gatt_Service myService = BLE::Gatt_Service(&gpioCtrl, &sysState);
+    App::Debug_Controller debugCtrl = App::Debug_Controller();
 
     /* Tune the HSE internal load capacitors - P-NUCLEO-WB55.Nucleo board */
     sysCtrl.Config_HSE();

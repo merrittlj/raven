@@ -204,23 +204,13 @@ void App::Debug_Controller::SetCPU2GpioConfig()
     {
         if(aGpioConfigList[local_loop].enable != 0)
         {
-            switch((uint32_t)aGpioConfigList[local_loop].port)
-            {
-                case (uint32_t)GPIOA:
+            GPIO_TypeDef *prt = aGpioConfigList[local_loop].port;
+            if (prt == GPIOA)
                     gpioa_pin_list |= aGpioConfigList[local_loop].pin;
-                    break;
-
-                case (uint32_t)GPIOB:
+            if (prt == GPIOB)
                     gpiob_pin_list |= aGpioConfigList[local_loop].pin;
-                    break;
-
-                case (uint32_t)GPIOC:
+            if (prt == GPIOC)
                     gpioc_pin_list |= aGpioConfigList[local_loop].pin;
-                    break;
-
-                default:
-                    break;
-            }
         }
     }
 
