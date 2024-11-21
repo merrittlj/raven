@@ -1,5 +1,5 @@
-#ifndef GATT_SERVICE_HPP
-#define GATT_SERVICE_HPP
+#ifndef SERVICE_HPP
+#define SERVICE_HPP
 
 
 #include "gpio/gpio.hpp"
@@ -68,4 +68,4 @@ namespace BLE
 }
 
 
-#endif /* GATT_SERVICE_HPP */
+#endif /* SERVICE_HPP */
