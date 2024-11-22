@@ -37,7 +37,7 @@ int main()
     Sys::State sysState = Sys::State();
     GPIO::Controller gpioCtrl = GPIO::Controller();
     BLE::App bleApp = BLE::App(&gpioCtrl, &sysState);
-    BLE::Gatt_Service myService = BLE::Gatt_Service(&gpioCtrl, &sysState);
+    BLE::SimpleService simpleService = BLE::SimpleService(&gpioCtrl, &sysState);
     App::Debug_Controller debugCtrl = App::Debug_Controller();
 
     /* Tune the HSE internal load capacitors - P-NUCLEO-WB55.Nucleo board */
@@ -73,7 +73,7 @@ int main()
     /* Set the green LED On to indicate that the wireless stack FW is running */
     gpioCtrl.Write_Component(sysState.Fetch_LED_Green(), SET);
 
-    bleApp.Init(myService);
+    bleApp.Init(simpleService);
     bleApp.Advertising(SET);
 
     for(;;)
@@ -92,8 +92,8 @@ int main()
             {
                 prevTick = HAL_GetTick();
                 notifyCharacteristicData[1] ^= 0x01;
-                if (myService.Write_Characteristic_Update(NOTIFY_CHARACTERISTIC_UUID,
-                            NOTIFY_CHARACTERISTIC_VALUE_LENGTH,
+                if (BLE::Write_Characteristic_Update(simpleService.bellNotifyChar.Get_UUID(),
+                            simpleService.bellNotifyChar.Get_Value_Length(),
                             notifyCharacteristicData) != BLE_STATUS_SUCCESS)
                     Sys::Error_Handler(); /* UNEXPECTED */
             }

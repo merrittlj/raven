@@ -31,6 +31,7 @@ namespace BLE
 
             uint16_t Get_Handle() const;
             Char_UUID_t *Get_UUID() const;
+            uint16_t Get_Value_Length() const;
 
             tBleStatus Add(uint16_t pServiceHandle);
     };

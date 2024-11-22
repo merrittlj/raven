@@ -1,5 +1,7 @@
 #include "ble/ble.hpp"
 
+#include "services/simple.hpp"
+
 #include "app/app.hpp"
 #include "sys/sys.hpp"
 
@@ -15,7 +17,7 @@ BLE::~App()
 
 }
 
-void BLE::App::Init(BLE::Gatt_Service gattService)
+void BLE::App::Init(BLE::SimpleService simpleService)
 {
     /* At this point it is still unknown from the app perspective, which wireless stack
        and which version is installed on CPU2. It is expected that a BLE stack is installed.
@@ -32,7 +34,7 @@ void BLE::App::Init(BLE::Gatt_Service gattService)
     /* Initialize My Very Own GATT Service - user may also implement SVCCTL_InitCustomSvc()
        interface function as explained in AN5289. SVCCTL_InitCustomSvc() is called at the end of
        SVCCTL_Init() called from BLE_Init() */
-    gattService.Init();
+    simpleService.Init(this->gpioCtrl, this->sysState);
 
     /* Reset BLUE LED => Will be used by the example */
     this.gpioCtrl.Write_Component(this.sysState.Fetch_LED_Blue(), RESET);

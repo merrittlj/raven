@@ -21,13 +21,19 @@ BLE::Char::Char(uint8_t pUUIDType,
 BLE::Char::~Char()
 {}
 
-uint16_t Get_Handle() const
+uint16_t BLE::Char::Get_Handle() const
 {
     return this->handle;
 }
-Char_UUID_t *Get_UUID() const 
+
+Char_UUID_t *BLE::Char::Get_UUID() const 
 {
     return this->UUID;
+}
+
+uint16_t BLE::Char::Get_Value_Length() const
+{
+    return this->valueLength;
 }
 
 tBleStatus BLE::Char::Add(uint16_t pServiceHandle);
