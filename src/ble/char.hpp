@@ -15,8 +15,9 @@ namespace BLE
     {
         private:
             uint16_t *handle;
-            Char_UUID_t* UUID;
+
             uint8_t UUIDType;
+            Char_UUID_t* UUID;
             uint16_t valueLength;
             uint8_t properties;
             uint8_t permissions;
@@ -25,15 +26,13 @@ namespace BLE
             uint8_t isVariable;
 
         public:
-            Char(uint16_t *pHandle, Char_UUID_t* pUUID, uint8_t pUUIDType, uint16_t pValueLength, uint8_t pProperties, uint8_t pPermissions, uint8_t pGattEvtMask, uint8_t pEncKeySize, uint8_t pIsVariable;
-);
+            Char(uint8_t pUUIDType, Char_UUID_t* pUUID, uint16_t pValueLength, uint8_t pProperties, uint8_t pPermissions, uint8_t pGattEvtMask, uint8_t pEncKeySize, uint8_t pIsVariable);
             ~Char();
 
-            const uint16_t Get_Handle();
-            const Char_UUID_t *Get_UUID();
+            uint16_t Get_Handle() const;
+            Char_UUID_t *Get_UUID() const;
 
-            tBleStatus Add_To_Service(uint16_t pServiceHandle);
-            /* tBleStatus Write_Characteristic_Update(uint16_t UUID, uint16_t newValueLength, uint8_t *pNewValue); */
+            tBleStatus Add(uint16_t pServiceHandle);
     };
 }
 

@@ -2,8 +2,7 @@
 #define SERVICE_HPP
 
 
-#include "gpio/gpio.hpp"
-#include "sys/state.hpp"
+#include "ble/char.hpp"
 
 #include "ble.h"
 #include "ble_common.h"
@@ -16,17 +15,6 @@
 
 #define NOTIFY_CHARACTERISTIC_VALUE_LENGTH     2
 #define WRITE_CHARACTERISTIC_VALUE_LENGTH      2
-
-namespace BLE
-{
-    class Gatt_Service
-    {
-        private:
-            typedef struct {
-                uint16_t Service_Handle;              /**< Service handle */
-                uint16_t Write_Characteristic_Handle;  /**< Write Characteristic handle */
-                uint16_t Notify_Characteristic_Handle; /**< Notify Characteristic handle */
-            } ServiceContext_t;
 
             /* Service and Characteristics UUIDs */
 #define COPY_SERVICE_UUID(uuid_struct)                 COPY_UUID_128(uuid_struct,0x00,0x00,0xfe,0x40,0xcc,0x7a,0x48,0x2a,0x98,0x4a,0x7f,0x2e,0xd5,0xb3,0xe5,0x8f)
@@ -52,18 +40,19 @@ namespace BLE
             }while(0)
 
 
-            ServiceContext_t serviceContext;
-            GPIO::Controller *gpioCtrl;
-            Sys::State *sysState;
+namespace BLE
+{
+    tBleStatus Update_Char_Value(uint16_t UUID, uint16_t newValueLength, uint8_t *pNewValue);
+    class Service
+    {
+        private:
+            uint16_t handle;
 
-            static SVCCTL_EvtAckStatus_t Event_Handler(void *pckt);
+            virtual tBleStatus Add() = 0;
+            virtual SVCCTL_EvtAckStatus_t Event_Handler(void *pckt) = 0;
 
         public:
-            Gatt_Service(GPIO::Controller *pGpioCtrl, Sys::State *pSysState);
-            ~Gatt_Service();
-
-            void Init();
-            tBleStatus Write_Characteristic_Update(uint16_t UUID, uint16_t newValueLength, uint8_t *pNewValue);
+            virtual void Init() = 0;
     };
 }
 
