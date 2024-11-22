@@ -1,5 +1,9 @@
 #include "ble/char.hpp"
 
+
+BLE::Char::Char()
+{}
+
 BLE::Char::Char(uint8_t pUUIDType,
         Char_UUID_t* pUUID,
         uint16_t pValueLength,
@@ -21,7 +25,7 @@ BLE::Char::Char(uint8_t pUUIDType,
 BLE::Char::~Char()
 {}
 
-uint16_t BLE::Char::Get_Handle() const
+uintptr_t BLE::Char::Get_Handle() const
 {
     return this->handle;
 }
@@ -36,10 +40,10 @@ uint16_t BLE::Char::Get_Value_Length() const
     return this->valueLength;
 }
 
-tBleStatus BLE::Char::Add(uint16_t pServiceHandle);
+tBleStatus BLE::Char::Add(uintptr_t pServiceHandle)
 {
-    COPY_WRITE_CHARACTERISTIC_UUID(uuid16.Char_UUID_128);
-    return aci_gatt_add_char(pServiceHandle,
+    uint16_t retHandle;
+    tBleStatus ret = aci_gatt_add_char(pServiceHandle,
             this->UUIDType, this->UUID,
             this->valueLength,                                   
             this->properties,
@@ -47,5 +51,7 @@ tBleStatus BLE::Char::Add(uint16_t pServiceHandle);
             this->gattEvtMask,
             this->encKeySize,
             this->isVariable,
-            &(this->handle));
+            &retHandle);
+    this->handle = (uintptr_t)retHandle;
+    return ret;
 }

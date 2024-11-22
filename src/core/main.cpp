@@ -9,7 +9,7 @@
 #include "hw/conf.hpp"
 #include "gpio/gpio.hpp"
 #include "ble/ble.hpp"
-#include "ble/gatt_service.hpp"
+#include "services/simple.hpp"
 #include "sys/sys.hpp"
 
 

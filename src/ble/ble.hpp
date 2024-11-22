@@ -2,7 +2,7 @@
 #define BLE_HPP
 
 
-#include "ble/gatt_service.hpp"
+#include "services/simple.hpp"
 #include "gpio/gpio.hpp"
 #include "sys/state.hpp"
 
@@ -78,7 +78,7 @@ namespace BLE
 
             uint8_t notifyCharacteristicData[NOTIFY_CHARACTERISTIC_VALUE_LENGTH] = {0x00, 0x00};
 
-            void Init(BLE::Gatt_Service gattService);
+            void Init(BLE::SimpleService simpleService);
             void Advertising(FlagStatus setReset);
     };
 }

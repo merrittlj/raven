@@ -14,10 +14,10 @@ namespace BLE
     class Char
     {
         private:
-            uint16_t *handle;
+            uintptr_t handle;
 
             uint8_t UUIDType;
-            Char_UUID_t* UUID;
+            Char_UUID_t *UUID;
             uint16_t valueLength;
             uint8_t properties;
             uint8_t permissions;
@@ -26,14 +26,15 @@ namespace BLE
             uint8_t isVariable;
 
         public:
+            Char();
             Char(uint8_t pUUIDType, Char_UUID_t* pUUID, uint16_t pValueLength, uint8_t pProperties, uint8_t pPermissions, uint8_t pGattEvtMask, uint8_t pEncKeySize, uint8_t pIsVariable);
             ~Char();
 
-            uint16_t Get_Handle() const;
+            uintptr_t Get_Handle() const;
             Char_UUID_t *Get_UUID() const;
             uint16_t Get_Value_Length() const;
 
-            tBleStatus Add(uint16_t pServiceHandle);
+            tBleStatus Add(uintptr_t pServiceHandle);
     };
 }
 

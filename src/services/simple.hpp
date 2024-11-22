@@ -2,9 +2,10 @@
 #define SIMPLE_HPP
 
 
+#include "ble/service.hpp"
 #include "ble/char.hpp"
 #include "gpio/gpio.hpp"
-#include "sys/sys.hpp"
+#include "sys/state.hpp"
 
 #include "ble.h"
 #include "ble_common.h"
@@ -13,7 +14,7 @@
 
 namespace BLE
 {
-    class SimpleService : Service
+    class SimpleService : BLE::Service
     {
         /* Max_Attribute_Records = 2*no_of_char + 1
          * service_max_attribute_record = 1 for service +
@@ -24,6 +25,9 @@ namespace BLE
 #define SERVICE_MAX_ATT_RECORDS                8
 
 #define CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET              1
+
+        protected:
+            uintptr_t handle;
 
         private:
             GPIO::Controller *gpioCtrl;
@@ -38,6 +42,9 @@ namespace BLE
 
             SimpleService(GPIO::Controller *pGpioCtrl, Sys::State *pSysState);
             ~SimpleService();
+
+            uintptr_t Get_Handle() const;
+            void Set_Handle(uintptr_t pHandle);
 
             void Init();
 

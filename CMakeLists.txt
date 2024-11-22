@@ -53,7 +53,9 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCE_DIR}/gpio/gpio.cpp
 
     ${PROJECT_SOURCE_DIR}/ble/ble.cpp
-    ${PROJECT_SOURCE_DIR}/ble/gatt_service.cpp
+    ${PROJECT_SOURCE_DIR}/ble/uuid.cpp
+    ${PROJECT_SOURCE_DIR}/ble/char.cpp
+    ${PROJECT_SOURCE_DIR}/services/simple.cpp
 )
 
 target_link_directories(${PROJECT_NAME}

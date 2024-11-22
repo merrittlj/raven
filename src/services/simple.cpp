@@ -11,20 +11,24 @@
 
 
 BLE::SimpleService::SimpleService(GPIO::Controller *pGpioCtrl, Sys::State *pSysState)
-    : gpioCtrl(pGpioCtrl),
-    sysState(pSysState)
-{}
+{
+    this->gpioCtrl = pGpioCtrl;
+    this->sysState = pSysState;
+}
 
 BLE::SimpleService::~SimpleService()
 {}
 
 tBleStatus BLE::SimpleService::Add()
 {
-    COPY_SERVICE_UUID(uuid16.Char_UUID_128);
-    return aci_gatt_add_service(UUID_TYPE_128, (Service_UUID_t *)CreateCharUUID({0x00,0x00,0xfe,0x40,0xcc,0x7a,0x48,0x2a,0x98,0x4a,0x7f,0x2e,0xd5,0xb3,0xe5,0x8f}),
+    uint16_t retHandle;
+    Char_UUID_t serviceUUID = BLE::UUID::CreateCharUUID({0x00,0x00,0xfe,0x40,0xcc,0x7a,0x48,0x2a,0x98,0x4a,0x7f,0x2e,0xd5,0xb3,0xe5,0x8f});
+    tBleStatus ret = aci_gatt_add_service(UUID_TYPE_128, (Service_UUID_t *)&serviceUUID,
             PRIMARY_SERVICE,
             SERVICE_MAX_ATT_RECORDS,
-            &(serviceContext.Service_Handle));
+            &retHandle);
+    this->Set_Handle((uintptr_t)retHandle);
+    return ret;
 }
 
 /**
@@ -48,7 +52,7 @@ SVCCTL_EvtAckStatus_t BLE::SimpleService::Event_Handler(void *Event)
                 switch (blecore_evt->ecode) {
                     case ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE:
                         attribute_modified = (aci_gatt_attribute_modified_event_rp0*)blecore_evt->data;
-                        if(attribute_modified->Attr_Handle == (serviceContext.Write_Characteristic_Handle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))
+                        if(attribute_modified->Attr_Handle == (ledWriteChar.Get_Handle() + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))
                         {
                             if (attribute_modified->Attr_Data[1] == 0x01)
                             {
@@ -73,6 +77,16 @@ SVCCTL_EvtAckStatus_t BLE::SimpleService::Event_Handler(void *Event)
     return(return_value);
 }
 
+uintptr_t BLE::SimpleService::Get_Handle() const
+{
+    return this->handle;
+}
+
+void BLE::SimpleService::Set_Handle(uintptr_t pHandle)
+{
+    this->handle = handle;
+}
+
 /**
  * @brief  Service initialization
  * @param  None
@@ -84,29 +98,29 @@ void BLE::SimpleService::Init()
     SVCCTL_RegisterSvcHandler(SimpleService::Event_Handler);
 
     /* Add Service */
-    if (this.Add() != BLE_STATUS_SUCCESS)
+    if (this->Add() != BLE_STATUS_SUCCESS)
         Sys::Error_Handler(); /* UNEXPECTED */
 
     /* Add LED Write Characteristic */
-    ledWriteChar = BLE::Char(UUID_TYPE_128, CreateCharUUID({0x00,0x00,0xfe,0x41,0x8e,0x22,0x45,0x41,0x9d,0x4c,0x21,0xed,0xae,0x82,0xed,0x19}),
+    ledWriteChar = BLE::Char(UUID_TYPE_128, BLE::UUID::CreateCharUUID({0x00,0x00,0xfe,0x41,0x8e,0x22,0x45,0x41,0x9d,0x4c,0x21,0xed,0xae,0x82,0xed,0x19}),
             2,
             CHAR_PROP_WRITE_WITHOUT_RESP|CHAR_PROP_READ,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
             10,
             VALUE_VARIABLE_LENGTH);
-    if (ledWriteChar.Add(this.Get_Handle()) != BLE_STATUS_SUCCESS)
+    if (ledWriteChar.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
         Sys::Error_Handler(); /* UNEXPECTED */
 
     /* Add Notify Characteristic */
-    bellNotifyChar = BLE::Char(UUID_TYPE_128, CreateCharUUID({0x00,0x00,0xfe,0x42,0x8e,0x22,0x45,0x41,0x9d,0x4c,0x21,0xed,0xae,0x82,0xed,0x19}),
+    bellNotifyChar = BLE::Char(UUID_TYPE_128, BLE::UUID::CreateCharUUID({0x00,0x00,0xfe,0x42,0x8e,0x22,0x45,0x41,0x9d,0x4c,0x21,0xed,0xae,0x82,0xed,0x19}),
             2,
             CHAR_PROP_NOTIFY,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
             10,
             VALUE_VARIABLE_LENGTH);
-    if (bellNotifyChar.Add(this.Get_Handle()) != BLE_STATUS_SUCCESS)
+    if (bellNotifyChar.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
         Sys::Error_Handler(); /* UNEXPECTED */
 }
 
@@ -122,10 +136,10 @@ tBleStatus BLE::SimpleService::Update_Char_Value(uint16_t UUID16, uint16_t newVa
 
     switch (UUID16) {
         case BLE::UUID::ExtractUUID16FromLE(bellNotifyChar.Get_UUID()):
-            if (newValueLength <= NOTIFY_CHARACTERISTIC_VALUE_LENGTH)
+            if (newValueLength <= bellNotifyChar.Get_Value_Length())
             {
-                ret = aci_gatt_update_char_value(serviceContext.Service_Handle,
-                        serviceContext.Notify_Characteristic_Handle,
+                ret = aci_gatt_update_char_value(this->Get_Handle(),
+                        bellNotifyChar.Get_Handle(),
                         0, /* charValOffset */
                         newValueLength, /* charValueLen */
                         (uint8_t *)pNewValue);
