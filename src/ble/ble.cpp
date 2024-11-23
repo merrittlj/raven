@@ -6,13 +6,13 @@
 #include "sys/sys.hpp"
 
 
-BLE::App(GPIO::Controller *pGpioCtrl, Sys::State *pSysState);
+BLE::App::App(GPIO::Controller *pGpioCtrl, Sys::State *pSysState)
 {
-    this.gpioCtrl = pGpioCtrl;
-    this.sysState = pSysState
+    this->gpioCtrl = pGpioCtrl;
+    this->sysState = pSysState;
 }
 
-BLE::~App()
+BLE::App::~App()
 {
 
 }
@@ -29,15 +29,15 @@ void BLE::App::Init(BLE::SimpleService simpleService)
     BLE_Init();
 
     /* Set the blue LED On to indicate that the BLE stack is initialized */
-    this.gpioCtrl.Write_Component(this.sysState.Fetch_LED_Blue(), SET);
+    this->gpioCtrl->Write_Component(this->sysState->Fetch_LED_Blue(), SET);
 
     /* Initialize My Very Own GATT Service - user may also implement SVCCTL_InitCustomSvc()
        interface function as explained in AN5289. SVCCTL_InitCustomSvc() is called at the end of
        SVCCTL_Init() called from BLE_Init() */
-    simpleService.Init(this->gpioCtrl, this->sysState);
+    simpleService.Init();
 
     /* Reset BLUE LED => Will be used by the example */
-    this.gpioCtrl.Write_Component(this.sysState.Fetch_LED_Blue(), RESET);
+    this->gpioCtrl->Write_Component(this->sysState->Fetch_LED_Blue(), RESET);
 }
 
 /**
@@ -363,7 +363,7 @@ SVCCTL_UserEvtFlowStatus_t BLE::App::SVCCTL_App_Notification(void *pckt)
             switch (blecore_evt->ecode)
             {
                 case EVT_END_OF_RADIO_ACTIVITY:
-                    /* this.gpioCtrl.Write_Component(this.sysState.Fetch_LED_Green(), TOGGLE); */
+                    /* this->gpioCtrl->Write_Component(this->sysState->Fetch_LED_Green(), TOGGLE); */
                     break; /* EVT_END_OF_RADIO_ACTIVITY */
             }
             break; /* HCI_VENDOR_SPECIFIC_DEBUG_EVT_CODE */

@@ -14,7 +14,7 @@
 
 namespace BLE
 {
-    class SimpleService : BLE::Service
+    class SimpleService : BLE::Service<SimpleService>
     {
         /* Max_Attribute_Records = 2*no_of_char + 1
          * service_max_attribute_record = 1 for service +
@@ -34,6 +34,8 @@ namespace BLE
             Sys::State *sysState;
 
             tBleStatus Add();
+
+            static SVCCTL_EvtAckStatus_t Static_Event_Handler(void *Event);
             SVCCTL_EvtAckStatus_t Event_Handler(void *pckt);
 
         public:

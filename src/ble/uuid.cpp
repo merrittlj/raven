@@ -16,7 +16,7 @@ Char_UUID_t BLE::UUID::CreateCharUUID(std::initializer_list<uint8_t> values128)
     return uuid;
 }
 
-uint16_t BLE::UUID::ExtractUUID16FromLE(Char_UUID_t uuid)
+uint16_t BLE::UUID::ExtractUUID16FromLE(Char_UUID_t *uuid)
 {
-    return ((uint16_t)uuid.Char_UUID_128[13] << 8) | uuid.Char_UUID_128[12];
+    return ((uint16_t)uuid->Char_UUID_128[13] << 8) | uuid->Char_UUID_128[12];
 }

@@ -23,15 +23,15 @@ namespace BLE
             PLACE_IN_SECTION("MB_MEM1") ALIGN(4) static uint8_t SystemSpareEvtBuffer[sizeof(TL_PacketHeader_t) + TL_EVT_HDR_SIZE + 255];
             PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static uint8_t BleSpareEvtBuffer[sizeof(TL_PacketHeader_t) + TL_EVT_HDR_SIZE + 255];
 
-            static uint8_t bd_address_udn[BD_ADDR_SIZE_LOCAL];
+            uint8_t bd_address_udn[BD_ADDR_SIZE_LOCAL];
 
             /* Generic Access GATT Service Characteristics configuration data  */
-            static const char gap_device_name[] = { 'R', 'a', 'v', 'e', 'n', ' ', 'S', 'W' };
-            static const uint16_t gap_appearance = BLE_CFG_GAP_APPEARANCE;
+            const char gap_device_name[8] = { 'R', 'a', 'v', 'e', 'n', ' ', 'S', 'W' };
+            const uint16_t gap_appearance = BLE_CFG_GAP_APPEARANCE;
 
             /* GAP Advertising data */
-            static const char ad_local_name[] = { AD_TYPE_COMPLETE_LOCAL_NAME, 'R', 'a', 'v', 'e', 'n', ' ', 'S', 'W' };
-            static uint8_t ad_manufacturer_specific_data[14] = { /* Manufacturer specific data used to get compliant with ST BLE Sensor smart phone apk */
+            const char ad_local_name[9] = { AD_TYPE_COMPLETE_LOCAL_NAME, 'R', 'a', 'v', 'e', 'n', ' ', 'S', 'W' };
+            uint8_t ad_manufacturer_specific_data[14] = { /* Manufacturer specific data used to get compliant with ST BLE Sensor smart phone apk */
                 sizeof(ad_manufacturer_specific_data)-1,
                 AD_TYPE_MANUFACTURER_SPECIFIC_DATA, 
                 0x01, /* BlueST Protocol version */
@@ -48,7 +48,7 @@ namespace BLE
                 0x00  /* BlueST Device MAC byte 0 */
             };
 
-            static const uint8_t a_MBdAddr[BD_ADDR_SIZE_LOCAL] =
+            const uint8_t a_MBdAddr[BD_ADDR_SIZE_LOCAL] =
             {
                 (uint8_t)((CFG_ADV_BD_ADDRESS & 0x0000000000FF)),
                 (uint8_t)((CFG_ADV_BD_ADDRESS & 0x00000000FF00) >> 8),
@@ -76,7 +76,7 @@ namespace BLE
             App(GPIO::Controller *pGpioCtrl, Sys::State *pSysState);
             ~App();
 
-            uint8_t notifyCharacteristicData[NOTIFY_CHARACTERISTIC_VALUE_LENGTH] = {0x00, 0x00};
+            uint8_t notifyCharacteristicData[2] = {0x00, 0x00};
 
             void Init(BLE::SimpleService simpleService);
             void Advertising(FlagStatus setReset);

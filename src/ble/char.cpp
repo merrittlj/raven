@@ -5,7 +5,7 @@ BLE::Char::Char()
 {}
 
 BLE::Char::Char(uint8_t pUUIDType,
-        Char_UUID_t* pUUID,
+        Char_UUID_t *pUUID,
         uint16_t pValueLength,
         uint8_t pProperties,
         uint8_t pPermissions,

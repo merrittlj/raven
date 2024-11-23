@@ -27,7 +27,7 @@ namespace BLE
 
         public:
             Char();
-            Char(uint8_t pUUIDType, Char_UUID_t* pUUID, uint16_t pValueLength, uint8_t pProperties, uint8_t pPermissions, uint8_t pGattEvtMask, uint8_t pEncKeySize, uint8_t pIsVariable);
+            Char(uint8_t pUUIDType, Char_UUID_t *pUUID, uint16_t pValueLength, uint8_t pProperties, uint8_t pPermissions, uint8_t pGattEvtMask, uint8_t pEncKeySize, uint8_t pIsVariable);
             ~Char();
 
             uintptr_t Get_Handle() const;

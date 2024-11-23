@@ -17,7 +17,7 @@ namespace BLE
         /* Char_UUID_t is big-endian! */
         Char_UUID_t CreateCharUUID(std::initializer_list<uint8_t> values128);
         /* Get big-endian UUID16 from little-endian UUID128 */
-        uint16_t ExtractUUID16FromLE(Char_UUID_t uuid);
+        uint16_t ExtractUUID16FromLE(Char_UUID_t *uuid);
     }
 }
 

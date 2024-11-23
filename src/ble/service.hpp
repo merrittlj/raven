@@ -11,6 +11,7 @@
 
 namespace BLE
 {
+    template <typename T>
     class Service
     {
         protected:
@@ -18,9 +19,15 @@ namespace BLE
 
         private:
             virtual tBleStatus Add() = 0;
+
+            /* Must have a static event handler as well for RegisterSvcHandler! */
             virtual SVCCTL_EvtAckStatus_t Event_Handler(void *pckt) = 0;
 
         public:
+            static T* theInstance;
+            
+            static T* Instance();
+
             virtual uintptr_t Get_Handle() const;
             virtual void Set_Handle(uintptr_t pHandle);
 

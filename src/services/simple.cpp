@@ -31,6 +31,11 @@ tBleStatus BLE::SimpleService::Add()
     return ret;
 }
 
+SVCCTL_EvtAckStatus_t BLE::SimpleService::Static_Event_Handler(void *Event)
+{
+    return BLE::SimpleService::Instance()->Event_Handler(Event);
+}
+
 /**
  * @brief  Event handler
  * @param  Event: Address of the buffer holding the Event
@@ -95,25 +100,29 @@ void BLE::SimpleService::Set_Handle(uintptr_t pHandle)
 void BLE::SimpleService::Init()
 {
     /* Register the event handler to the BLE controller */
-    SVCCTL_RegisterSvcHandler(SimpleService::Event_Handler);
+    SVCCTL_RegisterSvcHandler(BLE::SimpleService::Static_Event_Handler);
 
     /* Add Service */
     if (this->Add() != BLE_STATUS_SUCCESS)
         Sys::Error_Handler(); /* UNEXPECTED */
 
     /* Add LED Write Characteristic */
-    ledWriteChar = BLE::Char(UUID_TYPE_128, BLE::UUID::CreateCharUUID({0x00,0x00,0xfe,0x41,0x8e,0x22,0x45,0x41,0x9d,0x4c,0x21,0xed,0xae,0x82,0xed,0x19}),
+    Char_UUID_t *ledWriteCharUUID = new Char_UUID_t;
+    *ledWriteCharUUID = BLE::UUID::CreateCharUUID({0x00,0x00,0xfe,0x41,0x8e,0x22,0x45,0x41,0x9d,0x4c,0x21,0xed,0xae,0x82,0xed,0x19});
+    ledWriteChar = BLE::Char(UUID_TYPE_128, ledWriteCharUUID,
             2,
             CHAR_PROP_WRITE_WITHOUT_RESP|CHAR_PROP_READ,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
             10,
-            VALUE_VARIABLE_LENGTH);
+            (uint8_t)VALUE_VARIABLE_LENGTH);
     if (ledWriteChar.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
         Sys::Error_Handler(); /* UNEXPECTED */
 
     /* Add Notify Characteristic */
-    bellNotifyChar = BLE::Char(UUID_TYPE_128, BLE::UUID::CreateCharUUID({0x00,0x00,0xfe,0x42,0x8e,0x22,0x45,0x41,0x9d,0x4c,0x21,0xed,0xae,0x82,0xed,0x19}),
+    Char_UUID_t *bellNotifyCharUUID = new Char_UUID_t;
+    *bellNotifyCharUUID = BLE::UUID::CreateCharUUID({0x00,0x00,0xfe,0x42,0x8e,0x22,0x45,0x41,0x9d,0x4c,0x21,0xed,0xae,0x82,0xed,0x19});
+    bellNotifyChar = BLE::Char(UUID_TYPE_128, bellNotifyCharUUID,
             2,
             CHAR_PROP_NOTIFY,
             ATTR_PERMISSION_NONE,
@@ -134,20 +143,15 @@ tBleStatus BLE::SimpleService::Update_Char_Value(uint16_t UUID16, uint16_t newVa
 {
     tBleStatus ret = BLE_STATUS_INVALID_PARAMS;
 
-    switch (UUID16) {
-        case BLE::UUID::ExtractUUID16FromLE(bellNotifyChar.Get_UUID()):
-            if (newValueLength <= bellNotifyChar.Get_Value_Length())
-            {
-                ret = aci_gatt_update_char_value(this->Get_Handle(),
-                        bellNotifyChar.Get_Handle(),
-                        0, /* charValOffset */
-                        newValueLength, /* charValueLen */
-                        (uint8_t *)pNewValue);
-            }
-            break;
-        default:
-            break;
+    if (UUID16 == BLE::UUID::ExtractUUID16FromLE(bellNotifyChar.Get_UUID())) {
+        if (newValueLength <= bellNotifyChar.Get_Value_Length())
+        {
+            ret = aci_gatt_update_char_value(this->Get_Handle(),
+                    bellNotifyChar.Get_Handle(),
+                    0, /* charValOffset */
+                    newValueLength, /* charValueLen */
+                    (uint8_t *)pNewValue);
+        }
     }
-
     return ret;
 }

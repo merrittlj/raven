@@ -9,6 +9,7 @@
 #include "hw/conf.hpp"
 #include "gpio/gpio.hpp"
 #include "ble/ble.hpp"
+#include "ble/uuid.hpp"
 #include "services/simple.hpp"
 #include "sys/sys.hpp"
 
@@ -91,10 +92,10 @@ int main()
             if ((HAL_GetTick() - prevTick) > 1000)
             {
                 prevTick = HAL_GetTick();
-                notifyCharacteristicData[1] ^= 0x01;
-                if (BLE::Write_Characteristic_Update(simpleService.bellNotifyChar.Get_UUID(),
+                bleApp.notifyCharacteristicData[1] ^= 0x01;
+                if (simpleService.Update_Char_Value(BLE::UUID::ExtractUUID16FromLE(simpleService.bellNotifyChar.Get_UUID()),
                             simpleService.bellNotifyChar.Get_Value_Length(),
-                            notifyCharacteristicData) != BLE_STATUS_SUCCESS)
+                            bleApp.notifyCharacteristicData) != BLE_STATUS_SUCCESS)
                     Sys::Error_Handler(); /* UNEXPECTED */
             }
         }
