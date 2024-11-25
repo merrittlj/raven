@@ -14,6 +14,8 @@ BLE::SimpleService::SimpleService(GPIO::Controller *pGpioCtrl, Sys::State *pSysS
 {
     this->gpioCtrl = pGpioCtrl;
     this->sysState = pSysState;
+
+    BLE::SimpleService::Instance(this);
 }
 
 BLE::SimpleService::~SimpleService()

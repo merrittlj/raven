@@ -2,6 +2,8 @@
 #define SYS_HPP
 
 
+#include "sys/state.hpp"
+
 #include "hci_tl.h"
 #include "shci_tl.h"
 
@@ -12,8 +14,11 @@ namespace Sys
 
     class Controller
     {
+        private:
+            Sys::State *sysState;
+
         public:
-            Controller();
+            Controller(Sys::State *state);
             ~Controller();
 
             void Config_SysClk();
@@ -21,20 +26,26 @@ namespace Sys
             void Init_CPU2();
     };
 
+
     class Event_Processor
     {
         private:
-            void Sys_StatusNotificationCallback(SHCI_TL_CmdStatus_t status);
-            void Sys_UserEventReceivedCallback(void *pData);
+            static Event_Processor *theInstance;
 
-            void BLE_StatusNotificationCallback(HCI_TL_CmdStatus_t status);
-            void BLE_UserEventReceivedCallback(void *pData);
+            Sys::State *sysState;
 
         public:
-            Event_Processor();
+            Event_Processor(Sys::State *state);
             ~Event_Processor();
 
+            static Event_Processor *Instance(Event_Processor *cur = nullptr);
+
+            static void Sys_StatusNotificationCallback(SHCI_TL_CmdStatus_t status);
+            static void Sys_UserEventReceivedCallback(void *pData);
             void Sys_ProcessEvent();
+
+            static void BLE_StatusNotificationCallback(HCI_TL_CmdStatus_t status);
+            static void BLE_UserEventReceivedCallback(void *pData);
             void BLE_ProcessEvent();
 
             void shci_notify_asynch_evt(void* pdata);

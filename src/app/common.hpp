@@ -1,11 +1,9 @@
-/* App Common application configuration file for STM32WPAN Middleware. */
-
 #ifndef APP_COMMON_HPP
 #define APP_COMMON_HPP
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
+#include "app/app_conf.h"
+#include "hw/common.hpp"
 
 #include <stdint.h>
 #include <string.h>
@@ -13,10 +11,8 @@ extern "C" {
 #include <stdlib.h>
 #include <stdarg.h>
 
-#include "app/app_conf.h"
 
-
-    /* Basic definitions */
+/* Basic definitions */
 #undef NULL
 #define NULL                    0
 
@@ -70,6 +66,19 @@ extern "C" {
 
 #define BITNSET(w, n, b)   M_BEGIN (w)[(n)/32] |= ((U32)(b))<<((n)%32); M_END
 
+#define VariableBit_Reset_BB(VariableAddress, BitNumber) \
+    (*(volatile uint32_t *) (RAM_BB_BASE | ((VariableAddress - RAM_BASE) << 5) | ((BitNumber) << 2)) = 0)
+#define VariableBit_Set_BB(VariableAddress, BitNumber) \
+    (*(volatile uint32_t *) (RAM_BB_BASE | ((VariableAddress - RAM_BASE) << 5) | ((BitNumber) << 2)) = 1)
+#define VariableBit_Get_BB(VariableAddress, BitNumber) \
+    (*(volatile uint32_t *) (RAM_BB_BASE | ((VariableAddress - RAM_BASE) << 5) | ((BitNumber) << 2)))
+
+template <typename C, typename Arg, void (C::*M)(Arg)>
+void AsFunc(void* p, Arg arg)
+{
+    (static_cast<C*>(p)->*M)(arg);
+}
+
 /* Compiler */
 #define PLACE_IN_SECTION( __x__ )  __attribute__((section (__x__)))
 
@@ -79,8 +88,5 @@ extern "C" {
 #define ALIGN(n)             __attribute__((aligned(n)))
 #endif
 
-#ifdef __cplusplus
-} /* extern "C" */
-#endif
 
 #endif /* APP_COMMON_HPP */

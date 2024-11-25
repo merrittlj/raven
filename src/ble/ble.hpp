@@ -5,24 +5,18 @@
 #include "services/simple.hpp"
 #include "gpio/gpio.hpp"
 #include "sys/state.hpp"
+#include "sys/sys.hpp"
 
 #define EVT_END_OF_RADIO_ACTIVITY           0x0004
 
 #define BD_ADDR_SIZE_LOCAL                  6
 #define APP_BLE_GAP_DEVICE_NAME_LENGTH      sizeof(gap_device_name)
-#define EVENT_POOL_SIZE                    (CFG_TLBLE_EVT_QUEUE_LENGTH*4U*DIVC(( sizeof(TL_PacketHeader_t) + TL_BLE_EVENT_FRAME_SIZE ), 4U))
 
 namespace BLE
 {
     class App
     {
         private:
-            PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static uint8_t EvtPool[EVENT_POOL_SIZE];
-            PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static TL_CmdPacket_t SystemCmdBuffer;
-            PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static TL_CmdPacket_t BleCmdBuffer;
-            PLACE_IN_SECTION("MB_MEM1") ALIGN(4) static uint8_t SystemSpareEvtBuffer[sizeof(TL_PacketHeader_t) + TL_EVT_HDR_SIZE + 255];
-            PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static uint8_t BleSpareEvtBuffer[sizeof(TL_PacketHeader_t) + TL_EVT_HDR_SIZE + 255];
-
             uint8_t bd_address_udn[BD_ADDR_SIZE_LOCAL];
 
             /* Generic Access GATT Service Characteristics configuration data  */
@@ -73,10 +67,10 @@ namespace BLE
             SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *pckt);
 
         public:
+            uint8_t notifyCharacteristicData[2] = {0x00, 0x00};
+
             App(GPIO::Controller *pGpioCtrl, Sys::State *pSysState);
             ~App();
-
-            uint8_t notifyCharacteristicData[2] = {0x00, 0x00};
 
             void Init(BLE::SimpleService simpleService);
             void Advertising(FlagStatus setReset);

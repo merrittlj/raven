@@ -1,9 +1,11 @@
 #include "sys/sys.hpp"
 
-#include "app/app.hpp"
+#include "sys/state.hpp"
 
+#include "shci.h"
 #include "hci_tl.h"
 #include "shci_tl.h"
+#include "otp.h"
 #include "stm32wbxx_hal.h"
 
 
@@ -19,15 +21,13 @@ void Sys::Error_Handler()
     }
 }
 
-void Sys::Controller::Controller()
+Sys::Controller::Controller(Sys::State *state)
 {
-
+    this->sysState = state;
 }
 
-void Sys::Controller::~Controller()
-{
-
-}
+Sys::Controller::~Controller()
+{}
 
 /**
  * @brief System Clock Configuration
@@ -118,14 +118,14 @@ void Sys::Controller::Init_CPU2()
     TL_Init();
 
     /**< System channel initialization */
-    SHci_Tl_Init_Conf.p_cmdbuffer = (uint8_t*)&SystemCmdBuffer;
-    SHci_Tl_Init_Conf.StatusNotCallBack = SYS_StatusNotificationCallback;
-    shci_init(SYS_UserEventReceivedCallback, (void*)&SHci_Tl_Init_Conf);
+    SHci_Tl_Init_Conf.p_cmdbuffer = (uint8_t*)&(this->sysState->SysCmdBuffer);
+    SHci_Tl_Init_Conf.StatusNotCallBack = Sys::Event_Processor::Sys_StatusNotificationCallback;
+    shci_init(Sys::Event_Processor::Sys_UserEventReceivedCallback, (void*)&SHci_Tl_Init_Conf);
 
     /**< Memory Manager channel initialization */
-    tl_mm_config.p_AsynchEvtPool = EvtPool;
-    tl_mm_config.p_BleSpareEvtBuffer = BleSpareEvtBuffer; /* UNUSED, but kept for future compatibility */
-    tl_mm_config.p_SystemSpareEvtBuffer = SystemSpareEvtBuffer; /* UNUSED, but kept for future compatibility, but used by FUS today only */
+    tl_mm_config.p_AsynchEvtPool = this->sysState->EvtPool;
+    tl_mm_config.p_BleSpareEvtBuffer = this->sysState->BLESpareEvtBuffer; /* UNUSED, but kept for future compatibility */
+    tl_mm_config.p_SystemSpareEvtBuffer = this->sysState->SysSpareEvtBuffer; /* UNUSED, but kept for future compatibility, but used by FUS today only */
     tl_mm_config.AsynchEvtPoolSize = EVENT_POOL_SIZE;
     TL_MM_Init(&tl_mm_config);
 
@@ -133,14 +133,22 @@ void Sys::Controller::Init_CPU2()
     TL_Enable();
 }
 
-void Sys::Controller::Controller()
+Sys::Event_Processor::Event_Processor(Sys::State *state)
 {
+    this->sysState = state;
 
+    Sys::Event_Processor::Instance(this);
 }
 
-void Sys::Controller::~Controller()
+Sys::Event_Processor::~Event_Processor()
 {
+    delete theInstance;
+}
 
+Sys::Event_Processor *Sys::Event_Processor::Instance(Event_Processor *cur)
+{
+    if (!theInstance) theInstance = cur;
+    return theInstance;
 }
 
 /**
@@ -170,10 +178,12 @@ void Sys::Event_Processor::Sys_UserEventReceivedCallback(void *pData)
     SHCI_C2_Ready_Evt_t *p_sys_ready_event;
     SCHI_SystemErrCode_t *p_sys_error_code;
 
+    Sys::State *state = Sys::Event_Processor::Instance()->sysState;
+
     p_sys_event = (TL_AsynchEvt_t*)(((tSHCI_UserEvtRxParam*)pData)->pckt->evtserial.evt.payload);
 
     /* We have received some event from CPU2, so CPU2 to be considered as running and responding */
-    APP_FLAG_SET(APP_FLAG_CPU2_INITIALIZED);
+    state->App_Flag_Set(Sys::State::App_Flag::CPU2_INITIALIZED);
 
     switch(p_sys_event->subevtcode)
     {
@@ -181,31 +191,31 @@ void Sys::Event_Processor::Sys_UserEventReceivedCallback(void *pData)
             p_sys_ready_event = (SHCI_C2_Ready_Evt_t*)p_sys_event->payload;
             if (p_sys_ready_event->sysevt_ready_rsp == WIRELESS_FW_RUNNING)
             {
-                APP_FLAG_RESET(APP_FLAG_FUS_FW_RUNNING);
-                APP_FLAG_SET(APP_FLAG_WIRELESS_FW_RUNNING);
+                state->App_Flag_Reset(Sys::State::App_Flag::FUS_FW_RUNNING);
+                state->App_Flag_Set(Sys::State::App_Flag::WIRELESS_FW_RUNNING);
                 /* RF stack installed and ready */
             }
             else if (p_sys_ready_event->sysevt_ready_rsp == FUS_FW_RUNNING)
             {
-                APP_FLAG_SET(APP_FLAG_FUS_FW_RUNNING);
-                APP_FLAG_RESET(APP_FLAG_WIRELESS_FW_RUNNING);
+                state->App_Flag_Set(Sys::State::App_Flag::FUS_FW_RUNNING);
+                state->App_Flag_Reset(Sys::State::App_Flag::WIRELESS_FW_RUNNING);
 
                 /* No RF stack installed most probably */
                 Error_Handler(); /* UNEXPECTED */
             }
             else {
-                APP_FLAG_SET(APP_FLAG_CPU2_ERROR);
+                state->App_Flag_Set(Sys::State::App_Flag::CPU2_ERROR);
                 Error_Handler(); /* UNEXPECTED */
             }
             break; /* SHCI_SUB_EVT_CODE_READY */
         case SHCI_SUB_EVT_ERROR_NOTIF:
-            APP_FLAG_SET(APP_FLAG_CPU2_ERROR);
+            state->App_Flag_Set(Sys::State::App_Flag::CPU2_ERROR);
 
             p_sys_error_code = (SCHI_SystemErrCode_t*)p_sys_event->payload;
             if (p_sys_error_code == ERR_BLE_INIT)
             {
                 /* Error during BLE stack initialization */
-                APP_FLAG_SET(APP_FLAG_BLE_INITIALIZATION_ERROR);
+                state->App_Flag_Set(Sys::State::App_Flag::BLE_INITIALIZATION_ERROR);
                 Error_Handler(); /* UNEXPECTED */
             }
             else {
@@ -317,9 +327,9 @@ void Sys::Event_Processor::BLE_StatusNotificationCallback(HCI_TL_CmdStatus_t sta
  */
 void Sys::Event_Processor::Sys_ProcessEvent()
 {
-    if (APP_FLAG_GET(APP_FLAG_SHCI_EVENT_PENDING) == 1)
+    if (this->sysState->App_Flag_Get(Sys::State::App_Flag::SHCI_EVENT_PENDING) == Sys::State::Flag_Val::SET)
     {
-        APP_FLAG_RESET(APP_FLAG_SHCI_EVENT_PENDING);
+        this->sysState->App_Flag_Reset(Sys::State::App_Flag::SHCI_EVENT_PENDING);
         shci_user_evt_proc();
     }
 }
@@ -331,9 +341,9 @@ void Sys::Event_Processor::Sys_ProcessEvent()
  */
 void Sys::Event_Processor::BLE_ProcessEvent()
 {
-    if (APP_FLAG_GET(APP_FLAG_HCI_EVENT_PENDING) == 1)
+    if (this->sysState->App_Flag_Get(Sys::State::App_Flag::HCI_EVENT_PENDING) == Sys::State::Flag_Val::SET)
     {
-        APP_FLAG_RESET(APP_FLAG_HCI_EVENT_PENDING);
+        this->sysState->App_Flag_Reset(Sys::State::App_Flag::HCI_EVENT_PENDING);
         hci_user_evt_proc();
     }
 }
@@ -353,7 +363,7 @@ void Sys::Event_Processor::BLE_ProcessEvent()
  */
 void Sys::Event_Processor::shci_notify_asynch_evt(void* pdata)
 {
-    APP_FLAG_SET(APP_FLAG_SHCI_EVENT_PENDING);
+    this->sysState->App_Flag_Set(Sys::State::App_Flag::SHCI_EVENT_PENDING);
     return;
 }
 
@@ -372,6 +382,6 @@ void Sys::Event_Processor::shci_notify_asynch_evt(void* pdata)
  */
 void Sys::Event_Processor::hci_notify_asynch_evt(void* pdata)
 {
-    APP_FLAG_SET(APP_FLAG_HCI_EVENT_PENDING);
+    this->sysState->App_Flag_Set(Sys::State::App_Flag::HCI_EVENT_PENDING);
     return;
 }

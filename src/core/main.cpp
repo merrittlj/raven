@@ -3,7 +3,6 @@
 #include "main.hpp"
 
 #include "core/main.hpp"
-#include "app/app.hpp"
 #include "app/common.hpp"
 #include "app/debug.hpp"
 #include "hw/conf.hpp"
@@ -12,6 +11,7 @@
 #include "ble/uuid.hpp"
 #include "services/simple.hpp"
 #include "sys/sys.hpp"
+#include "sys/state.hpp"
 
 
 extern "C" void _init(){} /* To avoid linker errors */
@@ -33,9 +33,9 @@ int main()
     /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
     HAL_Init();
 
-    Sys::Controller sysCtrl = Sys::Controller();
-    Sys::Event_Processor sysEvtP = Sys::Event_Processor();
     Sys::State sysState = Sys::State();
+    Sys::Controller sysCtrl = Sys::Controller(&sysState);
+    Sys::Event_Processor sysEvtP = Sys::Event_Processor(&sysState);
     GPIO::Controller gpioCtrl = GPIO::Controller();
     BLE::App bleApp = BLE::App(&gpioCtrl, &sysState);
     BLE::SimpleService simpleService = BLE::SimpleService(&gpioCtrl, &sysState);
@@ -58,8 +58,8 @@ int main()
     gpioCtrl.Write_Component(sysState.Fetch_LED_Red(), SET);
 
     /* Wait until the CPU2 gets initialized */
-    while((APP_FLAG_GET(APP_FLAG_CPU2_INITIALIZED) == 0) \
-            || (APP_FLAG_GET(APP_FLAG_WIRELESS_FW_RUNNING) == 0))
+    while((sysState.App_Flag_Get(Sys::State::App_Flag::CPU2_INITIALIZED) == Sys::State::Flag_Val::NOT_SET) \
+            || (sysState.App_Flag_Get(Sys::State::App_Flag::WIRELESS_FW_RUNNING) == Sys::State::Flag_Val::NOT_SET))
     {
         /* Process pending SYSTEM event coming from CPU2 (if any) */
         sysEvtP.Sys_ProcessEvent();
@@ -87,7 +87,7 @@ int main()
         /* Update the Notify Characteristic every ~1 second and only if BLE connected.
            It might be also done only after the GATT client enables the notifications,
            but that is out of scope of this basic example */
-        if (APP_FLAG_GET(APP_FLAG_BLE_CONNECTED) != 0x00)
+        if (sysState.App_Flag_Get(Sys::State::App_Flag::BLE_CONNECTED) == Sys::State::Flag_Val::SET)
         {
             if ((HAL_GetTick() - prevTick) > 1000)
             {

@@ -1,9 +1,12 @@
 #include "ble/ble.hpp"
 
+#include "app/common.hpp"
 #include "services/simple.hpp"
-
-#include "app/app.hpp"
 #include "sys/sys.hpp"
+#include "sys/state.hpp"
+
+#include "shci.h"
+#include "otp.h"
 
 
 BLE::App::App(GPIO::Controller *pGpioCtrl, Sys::State *pSysState)
@@ -51,7 +54,7 @@ void BLE::App::Advertising(FlagStatus newState)
 
     if (newState == SET)
     {
-        if (APP_FLAG_GET(APP_FLAG_BLE_ADVERTISING) == 0)
+        if (this->sysState->App_Flag_Get(Sys::State::App_Flag::BLE_ADVERTISING) == Sys::State::Flag_Val::NOT_SET)
         {
             /* Put(set) the device in a advertising & connectable mode. */
             ret = aci_gap_set_discoverable(ADV_IND,                                       /*< Advertise as connectable, undirected. */
@@ -69,14 +72,14 @@ void BLE::App::Advertising(FlagStatus newState)
             ret = aci_gap_update_adv_data(sizeof(ad_manufacturer_specific_data), (uint8_t*)ad_manufacturer_specific_data);
             if (ret != BLE_STATUS_SUCCESS)
                 Sys::Error_Handler(); /* UNEXPECTED */
-            APP_FLAG_SET(APP_FLAG_BLE_ADVERTISING);
+            this->sysState->App_Flag_Set(Sys::State::App_Flag::BLE_ADVERTISING);
         }
     } else {
         /* Stop(reset) device advertising. */
         ret = aci_gap_set_non_discoverable();
         if (ret != BLE_STATUS_SUCCESS)
             Sys::Error_Handler(); /* UNEXPECTED */
-        APP_FLAG_RESET(APP_FLAG_BLE_ADVERTISING);
+        this->sysState->App_Flag_Reset(Sys::State::App_Flag::BLE_ADVERTISING);
     }
 }
 
@@ -156,9 +159,10 @@ void BLE::App::Tl_Init()
     HCI_TL_HciInitConf_t Hci_Tl_Init_Conf;
 
     /**< BLE channel initialization */
-    Hci_Tl_Init_Conf.p_cmdbuffer = (uint8_t*)&BleCmdBuffer;
-    Hci_Tl_Init_Conf.StatusNotCallBack = StatusNotificationCallback;
-    hci_init(UserEventReceivedCallback, (void*)&Hci_Tl_Init_Conf);
+    Hci_Tl_Init_Conf.p_cmdbuffer = (uint8_t *)&(this->sysState->BLECmdBuffer);
+    Hci_Tl_Init_Conf.StatusNotCallBack = Sys::Event_Processor::BLE_StatusNotificationCallback;
+
+    hci_init(Sys::Event_Processor::BLE_UserEventReceivedCallback, (void*)&Hci_Tl_Init_Conf);
 }
 
 /**
@@ -342,17 +346,17 @@ SVCCTL_UserEvtFlowStatus_t BLE::App::SVCCTL_App_Notification(void *pckt)
     switch (event_pckt->evt)
     {
         case HCI_DISCONNECTION_COMPLETE_EVT_CODE:
-            APP_FLAG_RESET(APP_FLAG_BLE_CONNECTED);
+            this->sysState->App_Flag_Reset(Sys::State::App_Flag::BLE_CONNECTED);
             /* Start advertising */
-            BLE_Advertising(SET);
+            this->Advertising(SET);
             break; /* HCI_DISCONNECTION_COMPLETE_EVT_CODE */
         case HCI_LE_META_EVT_CODE:
             le_meta_evt = (evt_le_meta_event *)(event_pckt->data);
             switch (le_meta_evt->subevent)
             {
                 case HCI_LE_CONNECTION_COMPLETE_SUBEVT_CODE:
-                    APP_FLAG_RESET(APP_FLAG_BLE_ADVERTISING);
-                    APP_FLAG_SET(APP_FLAG_BLE_CONNECTED);
+                    this->sysState->App_Flag_Reset(Sys::State::App_Flag::BLE_ADVERTISING);
+                    this->sysState->App_Flag_Set(Sys::State::App_Flag::BLE_CONNECTED);
                     break; /* HCI_LE_CONNECTION_COMPLETE_SUBEVT_CODE */
                 default:
                     break;

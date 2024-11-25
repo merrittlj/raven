@@ -1,16 +1,29 @@
 #include "sys/state.hpp"
 
+#include "app/common.hpp"
+
 #include <cstdint>
 
 
 Sys::State::State()
-{
-
-}
+{}
 
 Sys::State::~State()
-{
+{}
 
+Sys::State::Flag_Val Sys::State::App_Flag_Get(App_Flag flag)
+{
+    return (Sys::State::Flag_Val)VariableBit_Get_BB((uint32_t)&(this->App_State), (uint8_t)flag);
+}
+
+void Sys::State::App_Flag_Set(App_Flag flag)
+{
+    VariableBit_Set_BB((uint32_t)&(this->App_State), (uint8_t)flag);
+}
+
+void Sys::State::App_Flag_Reset(App_Flag flag)
+{
+    VariableBit_Reset_BB((uint32_t)&(this->App_State), (uint8_t)flag);
 }
 
 void Sys::State::Register_LED_Red(uint32_t pIndex)

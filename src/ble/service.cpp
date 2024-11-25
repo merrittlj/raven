@@ -1,8 +1,8 @@
 #include "service.hpp"
 
-static T* BLE::Service::Instance()
+T* BLE::Service::Instance(T* cur)
 {
-    if (!theInstance) theInstance = new T();
+    if (!theInstance) theInstance = cur;
     return theInstance;
 }
 
