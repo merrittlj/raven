@@ -17,6 +17,8 @@ namespace BLE
     class App
     {
         private:
+            inline static App *theInstance;
+
             uint8_t bd_address_udn[BD_ADDR_SIZE_LOCAL];
 
             /* Generic Access GATT Service Characteristics configuration data  */
@@ -64,18 +66,21 @@ namespace BLE
             void Hci_Gap_Gatt_Init();
             const uint8_t* GetBdAddress();
 
-            SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *pckt);
-
         public:
             uint8_t notifyCharacteristicData[2] = {0x00, 0x00};
+
+            static App *Instance(App *cur = nullptr);
 
             App(GPIO::Controller *pGpioCtrl, Sys::State *pSysState);
             ~App();
 
             void Init(BLE::SimpleService simpleService);
             void Advertising(FlagStatus setReset);
+
+            SVCCTL_UserEvtFlowStatus_t SVCCTL_Notification_Handler(void *pckt);
     };
 }
+SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *pckt);
 
 
 #endif /* BLE_HPP */

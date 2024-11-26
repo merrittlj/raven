@@ -30,7 +30,7 @@ namespace Sys
     class Event_Processor
     {
         private:
-            static Event_Processor *theInstance;
+            inline static Event_Processor *theInstance;
 
             Sys::State *sysState;
 
@@ -48,10 +48,14 @@ namespace Sys
             static void BLE_UserEventReceivedCallback(void *pData);
             void BLE_ProcessEvent();
 
-            void shci_notify_asynch_evt(void* pdata);
-            void hci_notify_asynch_evt(void* pdata);
+            void SHCI_Notify_Event_Handler(void *pdata);
+            void HCI_Notify_Event_Handler(void *pdata);
     };
 }
+
+/* As the library requires these functions globally??? */
+void shci_notify_asynch_evt(void *pdata);
+void hci_notify_asynch_evt(void *pdata);
 
 
 #endif /* SYS_HPP */

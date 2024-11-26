@@ -69,4 +69,5 @@ include_directories(
     ${stm32cubewb_SOURCE_DIR}/Middlewares/ST/STM32_WPAN # stm32_wpan_common.h
     ${stm32cubewb_SOURCE_DIR}/Middlewares/ST/STM32_WPAN/ble # ble_common.h
     ${stm32cubewb_SOURCE_DIR}/Middlewares/ST/STM32_WPAN/ble/core/template # ble_const.h
+    ${stm32cubewb_SOURCE_DIR}/Middlewares/ST/STM32_WPAN/ble/svc/Inc # svc_ctl.h
 )

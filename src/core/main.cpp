@@ -9,9 +9,9 @@
 #include "gpio/gpio.hpp"
 #include "ble/ble.hpp"
 #include "ble/uuid.hpp"
-#include "services/simple.hpp"
 #include "sys/sys.hpp"
 #include "sys/state.hpp"
+#include "services/simple.hpp"
 
 
 extern "C" void _init(){} /* To avoid linker errors */

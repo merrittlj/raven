@@ -26,11 +26,11 @@ namespace Sys
             uint32_t LED_Blue_Index;
         public:
             /* PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static uint8_t EvtPool[EVENT_POOL_SIZE]; */
-            PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static uint8_t EvtPool[EVENT_POOL_SIZE];
-            PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static TL_CmdPacket_t SysCmdBuffer;
-            PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static TL_CmdPacket_t BLECmdBuffer;
-            PLACE_IN_SECTION("MB_MEM1") ALIGN(4) static uint8_t SysSpareEvtBuffer[sizeof(TL_PacketHeader_t) + TL_EVT_HDR_SIZE + 255];
-            PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static uint8_t BLESpareEvtBuffer[sizeof(TL_PacketHeader_t) + TL_EVT_HDR_SIZE + 255];
+            PLACE_IN_SECTION("MB_MEM2") ALIGN(4) inline static uint8_t EvtPool[EVENT_POOL_SIZE];
+            PLACE_IN_SECTION("MB_MEM2") ALIGN(4) inline static TL_CmdPacket_t SysCmdBuffer;
+            PLACE_IN_SECTION("MB_MEM2") ALIGN(4) inline static TL_CmdPacket_t BLECmdBuffer;
+            PLACE_IN_SECTION("MB_MEM1") ALIGN(4) inline static uint8_t SysSpareEvtBuffer[sizeof(TL_PacketHeader_t) + TL_EVT_HDR_SIZE + 255];
+            PLACE_IN_SECTION("MB_MEM2") ALIGN(4) inline static uint8_t BLESpareEvtBuffer[sizeof(TL_PacketHeader_t) + TL_EVT_HDR_SIZE + 255];
 
             enum class App_Flag : uint8_t {
                 CPU2_INITIALIZED = 0,

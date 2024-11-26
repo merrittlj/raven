@@ -13,11 +13,19 @@ BLE::App::App(GPIO::Controller *pGpioCtrl, Sys::State *pSysState)
 {
     this->gpioCtrl = pGpioCtrl;
     this->sysState = pSysState;
+
+    BLE::App::Instance(this);
 }
 
 BLE::App::~App()
 {
+    delete theInstance;
+}
 
+BLE::App *BLE::App::Instance(App *cur)
+{
+    if (!theInstance) theInstance = cur;
+    return theInstance;
 }
 
 void BLE::App::Init(BLE::SimpleService simpleService)
@@ -335,7 +343,7 @@ const uint8_t* BLE::App::GetBdAddress()
  * @param  pckt: The user event received from the BLE core device
  * @retval None
  */
-SVCCTL_UserEvtFlowStatus_t BLE::App::SVCCTL_App_Notification(void *pckt)
+SVCCTL_UserEvtFlowStatus_t BLE::App::SVCCTL_Notification_Handler(void *pckt)
 {
     hci_event_pckt *event_pckt;
     evt_blecore_aci *blecore_evt;
@@ -379,4 +387,7 @@ SVCCTL_UserEvtFlowStatus_t BLE::App::SVCCTL_App_Notification(void *pckt)
     return (SVCCTL_UserEvtFlowEnable);
 }
 
-
+SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *pckt)
+{
+    return BLE::App::Instance()->SVCCTL_Notification_Handler(pckt);
+}

@@ -7,6 +7,7 @@
 #include "shci_tl.h"
 #include "otp.h"
 #include "stm32wbxx_hal.h"
+#include "svc_ctl.h"
 
 
 /**
@@ -16,7 +17,7 @@
 void Sys::Error_Handler()
 {
     for(;;) {
-        /* Toggle RED LED */
+        /* TODO: Toggle RED LED */
         HAL_Delay(250);
     }
 }
@@ -212,7 +213,7 @@ void Sys::Event_Processor::Sys_UserEventReceivedCallback(void *pData)
             state->App_Flag_Set(Sys::State::App_Flag::CPU2_ERROR);
 
             p_sys_error_code = (SCHI_SystemErrCode_t*)p_sys_event->payload;
-            if (p_sys_error_code == ERR_BLE_INIT)
+            if (*p_sys_error_code == ERR_BLE_INIT)
             {
                 /* Error during BLE stack initialization */
                 state->App_Flag_Set(Sys::State::App_Flag::BLE_INITIALIZATION_ERROR);
@@ -361,7 +362,7 @@ void Sys::Event_Processor::BLE_ProcessEvent()
  * @param  pdata: Pointer to the packet or event data
  * @retval None
  */
-void Sys::Event_Processor::shci_notify_asynch_evt(void* pdata)
+void Sys::Event_Processor::SHCI_Notify_Event_Handler(void* pdata)
 {
     this->sysState->App_Flag_Set(Sys::State::App_Flag::SHCI_EVENT_PENDING);
     return;
@@ -380,8 +381,18 @@ void Sys::Event_Processor::shci_notify_asynch_evt(void* pdata)
  * @param  pdata: Pointer to the packet or event data
  * @retval None
  */
-void Sys::Event_Processor::hci_notify_asynch_evt(void* pdata)
+void Sys::Event_Processor::HCI_Notify_Event_Handler(void* pdata)
 {
     this->sysState->App_Flag_Set(Sys::State::App_Flag::HCI_EVENT_PENDING);
     return;
+}
+
+void shci_notify_asynch_evt(void *pdata)
+{
+    return Sys::Event_Processor::Instance()->SHCI_Notify_Event_Handler(pdata);
+}
+
+void hci_notify_asynch_evt(void *pdata)
+{
+    return Sys::Event_Processor::Instance()->HCI_Notify_Event_Handler(pdata);
 }
