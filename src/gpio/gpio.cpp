@@ -11,20 +11,17 @@ GPIO_InitTypeDef GPIO::Types::LED = {
 };
 
 GPIO::Pin::Pin()
-{
-
-}
+{}
 
 GPIO::Pin::Pin(GPIO_TypeDef *pBank, uint32_t pPinNum)
 {
     this->Bank = pBank;
     this->PinNum = pPinNum;
+    this->FormattedPinNum = (uint16_t)(1 << pPinNum);
 }
 
 GPIO::Component::Component()
-{
-
-}
+{}
 
 GPIO::Component::Component(GPIO::Pin pPin, GPIO_InitTypeDef pType)
 {
@@ -42,27 +39,28 @@ void GPIO::Component::Config()
 void GPIO::Component::Init()
 {
     GPIO_InitTypeDef GPIOInit = this->Type;
-    GPIOInit.Pin = (uint16_t)(1 << (this->Pin.PinNum - 1));
+    GPIOInit.Pin = this->Pin.FormattedPinNum;
     HAL_GPIO_Init(this->Pin.Bank, &GPIOInit);
 }
 
 void GPIO::Component::Write(FlagStatus pStatus)
 {
     if (pStatus == SET)
-        HAL_GPIO_WritePin(this->Pin.Bank, this->Pin.PinNum, GPIO_PIN_SET); 
+        HAL_GPIO_WritePin(this->Pin.Bank, this->Pin.FormattedPinNum, GPIO_PIN_SET); 
     if (pStatus == RESET)
-        HAL_GPIO_WritePin(this->Pin.Bank, this->Pin.PinNum, GPIO_PIN_RESET); 
+        HAL_GPIO_WritePin(this->Pin.Bank, this->Pin.FormattedPinNum, GPIO_PIN_RESET); 
 }
 
-GPIO::Controller::Controller(std::vector<GPIO::Component> pComponents)
+GPIO::Controller::Controller()
+{}
+
+GPIO::Controller::Controller(std::array<GPIO::Component, 1> pComponents)
 {
-    this->Components = pComponents;
+    this->components = pComponents;
 }
 
 GPIO::Controller::~Controller()
-{
-
-}
+{}
 
 /**
  * @brief Configure GPIO controller
@@ -71,23 +69,25 @@ GPIO::Controller::~Controller()
  */
 void GPIO::Controller::Config(void)
 {
-    for (GPIO::Component c : this->Components)
+    for (GPIO::Component c : this->components)
         c.Config();
 }
 
 void GPIO::Controller::Init(void)
 {
-    for (GPIO::Component c : this->Components)
+    for (GPIO::Component c : this->components)
         c.Init();
 }
 
 uint32_t GPIO::Controller::Add_Component(GPIO::Component pComponent)
 {
-    this->Components.push_back(pComponent);
-    return this->Components.size() - 1;
+    uint32_t addedPos = this->cmpPos;
+    this->components.at(this->cmpPos) = pComponent;
+    ++(this->cmpPos);
+    return addedPos;
 }
 
 void GPIO::Controller::Write_Component(uint32_t pIndex, FlagStatus pStatus)
 {
-    this->Components.at(pIndex).Write(pStatus);
+    this->components.at(pIndex).Write(pStatus);
 }

@@ -118,14 +118,10 @@ static const APPD_GpioConfig_t aRfConfigList[GPIO_NBR_OF_RF_SIGNALS] =
 #endif
 
 App::Debug_Controller::Debug_Controller()
-{
-
-}
+{}
 
 App::Debug_Controller::~Debug_Controller()
-{
-
-}
+{}
 
 void App::Debug_Controller::Init()
 {

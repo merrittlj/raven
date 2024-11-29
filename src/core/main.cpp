@@ -33,29 +33,32 @@ int main()
     /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
     HAL_Init();
 
+    /* Tune the HSE internal load capacitors - P-NUCLEO-WB55.Nucleo board */
     Sys::State sysState = Sys::State();
     Sys::Controller sysCtrl = Sys::Controller(&sysState);
-    Sys::Event_Processor sysEvtP = Sys::Event_Processor(&sysState);
-    GPIO::Controller gpioCtrl = GPIO::Controller();
-    BLE::App bleApp = BLE::App(&gpioCtrl, &sysState);
-    BLE::SimpleService simpleService = BLE::SimpleService(&gpioCtrl, &sysState);
-    App::Debug_Controller debugCtrl = App::Debug_Controller();
-
-    /* Tune the HSE internal load capacitors - P-NUCLEO-WB55.Nucleo board */
     sysCtrl.Config_HSE();
 
-    sysState.Register_LED_Red(gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 1), GPIO::Types::LED)));
-    gpioCtrl.Config();
-    gpioCtrl.Init();
+    App::Debug_Controller debugCtrl = App::Debug_Controller();
+    GPIO::Controller gpioCtrl = GPIO::Controller();
+    Sys::Event_Processor sysEvtP = Sys::Event_Processor(&sysState);
+    BLE::App bleApp = BLE::App(&gpioCtrl, &sysState);
+    BLE::SimpleService simpleService = BLE::SimpleService(&gpioCtrl, &sysState);
 
+    __disable_irq();
     /* Configure the debug support if needed */
     debugCtrl.Init();
 
     sysCtrl.Config_SysClk();
     sysCtrl.Init_CPU2();
 
+    GPIO::Component redCmp = GPIO::Component(GPIO::Pin(GPIOB, 1), GPIO::Types::LED);
+    sysState.Register_LED_Red(gpioCtrl.Add_Component(redCmp));
+    gpioCtrl.Config();
+    gpioCtrl.Init();
+
     /* Set the red LED On to indicate that the CPU2 is initializing */
     gpioCtrl.Write_Component(sysState.Fetch_LED_Red(), SET);
+    __enable_irq(); /* DANGER ZONE */
 
     /* Wait until the CPU2 gets initialized */
     while((sysState.App_Flag_Get(Sys::State::App_Flag::CPU2_INITIALIZED) == Sys::State::Flag_Val::NOT_SET) \

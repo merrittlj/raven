@@ -5,7 +5,7 @@
 #include "hw/if.hpp"
 
 #include <cstdint>
-#include <vector>
+#include <array>
 
 
 namespace GPIO
@@ -14,6 +14,8 @@ namespace GPIO
     {
         GPIO_TypeDef *Bank;
         uint32_t PinNum;
+        /* HAL usually wants pins using their macros of GPIO_PIN_x, so we have to do some bit manipulation rather than passing in just the pin num */
+        uint16_t FormattedPinNum;
 
         Pin();
         Pin(GPIO_TypeDef *pBank, uint32_t pPinNum);
@@ -26,7 +28,7 @@ namespace GPIO
 
         Component();
         Component(GPIO::Pin pPin, GPIO_InitTypeDef pType);
-        
+
         void Config();
         void Init();
 
@@ -41,9 +43,11 @@ namespace GPIO
     class Controller
     {
         private:
-            std::vector<GPIO::Component> Components;
+            uint8_t cmpPos = 0;
+            std::array<GPIO::Component, 1> components;
         public:
-            Controller(std::vector<GPIO::Component> pComponents = std::vector<GPIO::Component>());
+            Controller();
+            Controller(std::array<GPIO::Component, 1> pComponents);
             ~Controller();
 
             void Config();
