@@ -44,10 +44,10 @@ namespace GPIO
     {
         private:
             uint8_t cmpPos = 0;
-            std::array<GPIO::Component, 1> components;
+            std::array<GPIO::Component, 128> components;
         public:
             Controller();
-            Controller(std::array<GPIO::Component, 1> pComponents);
+            Controller(std::array<GPIO::Component, 128> pComponents);
             ~Controller();
 
             void Config();

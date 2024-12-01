@@ -44,21 +44,20 @@ int main()
     BLE::App bleApp = BLE::App(&gpioCtrl, &sysState);
     BLE::SimpleService simpleService = BLE::SimpleService(&gpioCtrl, &sysState);
 
-    __disable_irq();
     /* Configure the debug support if needed */
     debugCtrl.Init();
 
     sysCtrl.Config_SysClk();
     sysCtrl.Init_CPU2();
 
-    GPIO::Component redCmp = GPIO::Component(GPIO::Pin(GPIOB, 1), GPIO::Types::LED);
-    sysState.Register_LED_Red(gpioCtrl.Add_Component(redCmp));
+    sysState.Register_LED_Red(gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 1), GPIO::Types::LED)));
+    sysState.Register_LED_Green(gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 0), GPIO::Types::LED)));
+    sysState.Register_LED_Blue(gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 5), GPIO::Types::LED)));
     gpioCtrl.Config();
     gpioCtrl.Init();
 
     /* Set the red LED On to indicate that the CPU2 is initializing */
     gpioCtrl.Write_Component(sysState.Fetch_LED_Red(), SET);
-    __enable_irq(); /* DANGER ZONE */
 
     /* Wait until the CPU2 gets initialized */
     while((sysState.App_Flag_Get(Sys::State::App_Flag::CPU2_INITIALIZED) == Sys::State::Flag_Val::NOT_SET) \

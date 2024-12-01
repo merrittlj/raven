@@ -54,7 +54,7 @@ void GPIO::Component::Write(FlagStatus pStatus)
 GPIO::Controller::Controller()
 {}
 
-GPIO::Controller::Controller(std::array<GPIO::Component, 1> pComponents)
+GPIO::Controller::Controller(std::array<GPIO::Component, 128> pComponents)
 {
     this->components = pComponents;
 }
@@ -69,14 +69,14 @@ GPIO::Controller::~Controller()
  */
 void GPIO::Controller::Config(void)
 {
-    for (GPIO::Component c : this->components)
-        c.Config();
+    for (uint8_t i = 0; i < cmpPos; ++i)
+        components.at(i).Config();
 }
 
 void GPIO::Controller::Init(void)
 {
-    for (GPIO::Component c : this->components)
-        c.Init();
+    for (uint8_t i = 0; i < cmpPos; ++i)
+        components.at(i).Init();
 }
 
 uint32_t GPIO::Controller::Add_Component(GPIO::Component pComponent)
@@ -89,5 +89,6 @@ uint32_t GPIO::Controller::Add_Component(GPIO::Component pComponent)
 
 void GPIO::Controller::Write_Component(uint32_t pIndex, FlagStatus pStatus)
 {
-    this->components.at(pIndex).Write(pStatus);
+    if (pIndex < cmpPos)
+        this->components.at(pIndex).Write(pStatus);
 }
