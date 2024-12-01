@@ -51,6 +51,11 @@ void GPIO::Component::Write(FlagStatus pStatus)
         HAL_GPIO_WritePin(this->Pin.Bank, this->Pin.FormattedPinNum, GPIO_PIN_RESET); 
 }
 
+void GPIO::Component::Toggle()
+{
+    HAL_GPIO_WritePin(Pin.Bank, Pin.FormattedPinNum, (GPIO_PinState)(HAL_GPIO_ReadPin(Pin.Bank, Pin.FormattedPinNum) ^ 1));
+}
+
 GPIO::Controller::Controller()
 {}
 
@@ -91,4 +96,10 @@ void GPIO::Controller::Write_Component(uint32_t pIndex, FlagStatus pStatus)
 {
     if (pIndex < cmpPos)
         this->components.at(pIndex).Write(pStatus);
+}
+
+void GPIO::Controller::Toggle_Component(uint32_t pIndex)
+{
+    if (pIndex < cmpPos)
+        components.at(pIndex).Toggle();
 }

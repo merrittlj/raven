@@ -76,7 +76,7 @@ int main()
     /* Set the green LED On to indicate that the wireless stack FW is running */
     gpioCtrl.Write_Component(sysState.Fetch_LED_Green(), SET);
 
-    bleApp.Init(simpleService);
+    bleApp.Init(&simpleService);
     bleApp.Advertising(SET);
 
     for(;;)

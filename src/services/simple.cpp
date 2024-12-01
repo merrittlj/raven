@@ -91,7 +91,7 @@ uintptr_t BLE::SimpleService::Get_Handle() const
 
 void BLE::SimpleService::Set_Handle(uintptr_t pHandle)
 {
-    this->handle = handle;
+    this->handle = pHandle;
 }
 
 /**
@@ -118,7 +118,9 @@ void BLE::SimpleService::Init()
             GATT_NOTIFY_ATTRIBUTE_WRITE,
             10,
             (uint8_t)VALUE_VARIABLE_LENGTH);
-    if (ledWriteChar.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
+    /* BLE_STATUS_INVALID_HANDLE */
+    tBleStatus t = ledWriteChar.Add(this->Get_Handle());
+    if (t != BLE_STATUS_SUCCESS)
         Sys::Error_Handler(); /* UNEXPECTED */
 
     /* Add Notify Characteristic */

@@ -74,7 +74,7 @@ namespace BLE
             App(GPIO::Controller *pGpioCtrl, Sys::State *pSysState);
             ~App();
 
-            void Init(BLE::SimpleService simpleService);
+            void Init(BLE::SimpleService *simpleService);
             void Advertising(FlagStatus setReset);
 
             SVCCTL_UserEvtFlowStatus_t SVCCTL_Notification_Handler(void *pckt);

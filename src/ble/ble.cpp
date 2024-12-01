@@ -28,7 +28,7 @@ BLE::App *BLE::App::Instance(App *cur)
     return theInstance;
 }
 
-void BLE::App::Init(BLE::SimpleService simpleService)
+void BLE::App::Init(BLE::SimpleService *simpleService)
 {
     /* At this point it is still unknown from the app perspective, which wireless stack
        and which version is installed on CPU2. It is expected that a BLE stack is installed.
@@ -45,7 +45,7 @@ void BLE::App::Init(BLE::SimpleService simpleService)
     /* Initialize My Very Own GATT Service - user may also implement SVCCTL_InitCustomSvc()
        interface function as explained in AN5289. SVCCTL_InitCustomSvc() is called at the end of
        SVCCTL_Init() called from BLE_Init() */
-    simpleService.Init();
+    simpleService->Init();
 
     /* Reset BLUE LED => Will be used by the example */
     this->gpioCtrl->Write_Component(this->sysState->Fetch_LED_Blue(), RESET);
@@ -375,7 +375,7 @@ SVCCTL_UserEvtFlowStatus_t BLE::App::SVCCTL_Notification_Handler(void *pckt)
             switch (blecore_evt->ecode)
             {
                 case EVT_END_OF_RADIO_ACTIVITY:
-                    /* this->gpioCtrl->Write_Component(this->sysState->Fetch_LED_Green(), TOGGLE); */
+                    this->gpioCtrl->Toggle_Component(this->sysState->Fetch_LED_Green());
                     break; /* EVT_END_OF_RADIO_ACTIVITY */
             }
             break; /* HCI_VENDOR_SPECIFIC_DEBUG_EVT_CODE */

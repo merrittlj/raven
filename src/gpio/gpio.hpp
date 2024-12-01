@@ -33,6 +33,7 @@ namespace GPIO
         void Init();
 
         void Write(FlagStatus pStatus);
+        void Toggle();
     };
 
     namespace Types
@@ -55,6 +56,7 @@ namespace GPIO
 
             uint32_t Add_Component(GPIO::Component pComponent);
             void Write_Component(uint32_t pIndex, FlagStatus pStatus);
+            void Toggle_Component(uint32_t pIndex);
     };
 }
 
