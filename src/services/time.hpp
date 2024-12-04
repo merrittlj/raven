@@ -1,5 +1,5 @@
-#ifndef SIMPLE_HPP
-#define SIMPLE_HPP
+#ifndef TIME_HPP
+#define TIME_HPP
 
 
 #include "ble/service.hpp"
@@ -14,7 +14,7 @@
 
 namespace BLE
 {
-    class SimpleService : BLE::Service<SimpleService>
+    class TimeService : BLE::Service<TimeService>
     {
         /* Max_Attribute_Records = 2*no_of_char + 1
          * service_max_attribute_record = 1 for service +
@@ -39,11 +39,12 @@ namespace BLE
             SVCCTL_EvtAckStatus_t Event_Handler(void *pckt);
 
         public:
-            BLE::Char ledWriteChar;
-            BLE::Char bellNotifyChar;
+            /* Following the CTS(Current Time Service) spec: */
+            BLE::Char currentTime;
+            BLE::Char localTime;
 
-            SimpleService(GPIO::Controller *pGpioCtrl, Sys::State *pSysState);
-            ~SimpleService();
+            TimeService(GPIO::Controller *pGpioCtrl, Sys::State *pSysState);
+            ~TimeService();
 
             uintptr_t Get_Handle() const;
             void Set_Handle(uintptr_t pHandle);
@@ -55,4 +56,4 @@ namespace BLE
 }
 
 
-#endif /* SIMPLE_HPP */
+#endif /* TIME_HPP */

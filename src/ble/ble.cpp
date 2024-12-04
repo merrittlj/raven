@@ -1,7 +1,7 @@
 #include "ble/ble.hpp"
 
 #include "app/common.hpp"
-#include "services/simple.hpp"
+#include "services/time.hpp"
 #include "sys/sys.hpp"
 #include "sys/state.hpp"
 
@@ -28,7 +28,7 @@ BLE::App *BLE::App::Instance(App *cur)
     return theInstance;
 }
 
-void BLE::App::Init(BLE::SimpleService *simpleService)
+void BLE::App::Init(BLE::TimeService *timeService)
 {
     /* At this point it is still unknown from the app perspective, which wireless stack
        and which version is installed on CPU2. It is expected that a BLE stack is installed.
@@ -45,7 +45,7 @@ void BLE::App::Init(BLE::SimpleService *simpleService)
     /* Initialize My Very Own GATT Service - user may also implement SVCCTL_InitCustomSvc()
        interface function as explained in AN5289. SVCCTL_InitCustomSvc() is called at the end of
        SVCCTL_Init() called from BLE_Init() */
-    simpleService->Init();
+    timeService->Init();
 
     /* Reset BLUE LED => Will be used by the example */
     this->gpioCtrl->Write_Component(this->sysState->Fetch_LED_Blue(), RESET);
@@ -76,10 +76,6 @@ void BLE::App::Advertising(FlagStatus newState)
             if (ret != BLE_STATUS_SUCCESS)
                 Sys::Error_Handler(); /* UNEXPECTED */
 
-            /* Update the advertising data. */
-            ret = aci_gap_update_adv_data(sizeof(ad_manufacturer_specific_data), (uint8_t*)ad_manufacturer_specific_data);
-            if (ret != BLE_STATUS_SUCCESS)
-                Sys::Error_Handler(); /* UNEXPECTED */
             this->sysState->App_Flag_Set(Sys::State::App_Flag::BLE_ADVERTISING);
         }
     } else {
@@ -197,16 +193,6 @@ void BLE::App::Hci_Gap_Gatt_Init()
     aci_hal_write_config_data(CONFIG_DATA_PUBADDR_OFFSET,
             CONFIG_DATA_PUBADDR_LEN,
             (uint8_t*) bd_address);
-
-    /**
-     * Put the BD address in the manufacturer specific advertising data (for iOS devices)
-     */
-    ad_manufacturer_specific_data[sizeof(ad_manufacturer_specific_data)-6] = bd_address[5];
-    ad_manufacturer_specific_data[sizeof(ad_manufacturer_specific_data)-5] = bd_address[4];
-    ad_manufacturer_specific_data[sizeof(ad_manufacturer_specific_data)-4] = bd_address[3];
-    ad_manufacturer_specific_data[sizeof(ad_manufacturer_specific_data)-3] = bd_address[2];
-    ad_manufacturer_specific_data[sizeof(ad_manufacturer_specific_data)-2] = bd_address[1];
-    ad_manufacturer_specific_data[sizeof(ad_manufacturer_specific_data)-1] = bd_address[0];
 
     /**
      * Static random Address

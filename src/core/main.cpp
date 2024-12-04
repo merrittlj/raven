@@ -11,7 +11,7 @@
 #include "ble/uuid.hpp"
 #include "sys/sys.hpp"
 #include "sys/state.hpp"
-#include "services/simple.hpp"
+#include "services/time.hpp"
 
 
 extern "C" void _init(){} /* To avoid linker errors */
@@ -42,7 +42,7 @@ int main()
     GPIO::Controller gpioCtrl = GPIO::Controller();
     Sys::Event_Processor sysEvtP = Sys::Event_Processor(&sysState);
     BLE::App bleApp = BLE::App(&gpioCtrl, &sysState);
-    BLE::SimpleService simpleService = BLE::SimpleService(&gpioCtrl, &sysState);
+    BLE::TimeService timeService = BLE::TimeService(&gpioCtrl, &sysState);
 
     /* Configure the debug support if needed */
     debugCtrl.Init();
@@ -76,7 +76,7 @@ int main()
     /* Set the green LED On to indicate that the wireless stack FW is running */
     gpioCtrl.Write_Component(sysState.Fetch_LED_Green(), SET);
 
-    bleApp.Init(&simpleService);
+    bleApp.Init(&timeService);
     bleApp.Advertising(SET);
 
     for(;;)
@@ -91,14 +91,14 @@ int main()
            but that is out of scope of this basic example */
         if (sysState.App_Flag_Get(Sys::State::App_Flag::BLE_CONNECTED) == Sys::State::Flag_Val::SET)
         {
-            if ((HAL_GetTick() - prevTick) > 1000)
+            if ((HAL_GetTick() - prevTick) > 5000)
             {
                 prevTick = HAL_GetTick();
-                bleApp.notifyCharacteristicData[1] ^= 0x01;
-                if (simpleService.Update_Char_Value(BLE::UUID::ExtractUUID16FromLE(simpleService.bellNotifyChar.Get_UUID()),
-                            simpleService.bellNotifyChar.Get_Value_Length(),
-                            bleApp.notifyCharacteristicData) != BLE_STATUS_SUCCESS)
-                    Sys::Error_Handler(); /* UNEXPECTED */
+                /* bleApp.notifyCharacteristicData[1] ^= 0x01; */
+                /* if (timeService.Update_Char_Value(BLE::UUID::ExtractUUID16FromLE(timeService.syncNotifyChar.Get_UUID()), */
+                /*             timeService.syncNotifyChar.Get_Value_Length(), */
+                /*             bleApp.notifyCharacteristicData) != BLE_STATUS_SUCCESS) */
+                /*     Sys::Error_Handler(); /1* UNEXPECTED *1/ */
             }
         }
     }

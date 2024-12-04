@@ -2,7 +2,7 @@
 #define BLE_HPP
 
 
-#include "services/simple.hpp"
+#include "services/time.hpp"
 #include "gpio/gpio.hpp"
 #include "sys/state.hpp"
 #include "sys/sys.hpp"
@@ -22,28 +22,22 @@ namespace BLE
             uint8_t bd_address_udn[BD_ADDR_SIZE_LOCAL];
 
             /* Generic Access GATT Service Characteristics configuration data  */
-            const char gap_device_name[8] = { 'R', 'a', 'v', 'e', 'n', ' ', 'S', 'W' };
+            const char gap_device_name[10] = { 'R', 'a', 'v', 'e', 'n', ' ', 'V', '0', '.', '3' };
             const uint16_t gap_appearance = BLE_CFG_GAP_APPEARANCE;
 
             /* GAP Advertising data */
-            const char ad_local_name[9] = { AD_TYPE_COMPLETE_LOCAL_NAME, 'R', 'a', 'v', 'e', 'n', ' ', 'S', 'W' };
-            uint8_t ad_manufacturer_specific_data[14] = { /* Manufacturer specific data used to get compliant with ST BLE Sensor smart phone apk */
-                sizeof(ad_manufacturer_specific_data)-1,
-                AD_TYPE_MANUFACTURER_SPECIFIC_DATA, 
-                0x01, /* BlueST Protocol version */
-                0x83, /* BlueST Device Id: 0x83 - P2PServer1 - for more details please see BLE_p2pServer example project */
-                0x00, /* BlueST Feature Mask bits 24~31 */
-                0x00, /* BlueST Feature Mask bits 16~23 */
-                0x00, /* BlueST Feature Mask bits 8~15 */
-                0x00, /* BlueST Feature Mask bits 0~7 */
-                0x00, /* BlueST Device MAC byte 5 */
-                0x00, /* BlueST Device MAC byte 4 */
-                0x00, /* BlueST Device MAC byte 3 */
-                0x00, /* BlueST Device MAC byte 2 */
-                0x00, /* BlueST Device MAC byte 1 */
-                0x00  /* BlueST Device MAC byte 0 */
-            };
-
+            /* There's no specific limit on the name length, but there is on the advertising data as a whole. 
+             * That limit is 31 bytes: 6 bytes are taken up by the Tx power and flags fields (3 bytes each),
+             * a further 14 by the manuf_data[] array, 
+             * and the remaining 11 are what's left for the name. 
+             * As there's a 2-byte overhead on that (one for field length, one for field type), 
+             * you've got a limit of 9 characters for the name itself.
+             * If you don't need the manuf_data[] to be advertised in your application,
+             * you can safely omit it and get those 14 bytes back.
+             *
+             * Here, we do not use manufacturer data, freeing space for the name */ 
+            const char ad_local_name[11] = { AD_TYPE_COMPLETE_LOCAL_NAME, 'R', 'a', 'v', 'e', 'n', ' ', 'V', '0', '.', '3' };
+            
             const uint8_t a_MBdAddr[BD_ADDR_SIZE_LOCAL] =
             {
                 (uint8_t)((CFG_ADV_BD_ADDRESS & 0x0000000000FF)),
@@ -74,7 +68,7 @@ namespace BLE
             App(GPIO::Controller *pGpioCtrl, Sys::State *pSysState);
             ~App();
 
-            void Init(BLE::SimpleService *simpleService);
+            void Init(BLE::TimeService *timeService);
             void Advertising(FlagStatus setReset);
 
             SVCCTL_UserEvtFlowStatus_t SVCCTL_Notification_Handler(void *pckt);
