@@ -21,17 +21,20 @@ namespace Sys
     class SPIController
     {
         private:
+            SPI_HandleTypeDef *spi;
             GPIO::Controller *gpioCtrl;
             SPIManager manager;
 
         public:
             SPIController();
-            SPIController(GPIO::Controller *gpio, SPIManager spiM);
+            SPIController(SPI_HandleTypeDef *handle, GPIO::Controller *gpio, SPIManager spiM);
 
+            void WriteByte(uint8_t value);
+            void WriteBytes(uint8_t *value, uint16_t len);
             void SendCommand(uint8_t reg);
             void SendData(uint8_t data);
-            void ResetDevice();
-            void DelayBusy();
+            void Reset();
+            void BlockBusy();
     };
 }
 

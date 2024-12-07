@@ -61,13 +61,12 @@ int main()
     uint8_t dc = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 1), GPIO::Types::SPI));
     uint8_t cs = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 2), GPIO::Types::SPI));
     uint8_t pwr = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 3), GPIO::Types::SPI));
-    Sys::SPIController spiCtrl = Sys::SPIController(&gpioCtrl, Sys::SPIManager{busy,rst,dc,cs,pwr});
 
     gpioCtrl.Config();
     gpioCtrl.Init();
-
-    sysCtrl.Config_SPI();
-
+    SPI_HandleTypeDef *spi = sysCtrl.Config_SPI();
+    Sys::SPIController spiCtrl = Sys::SPIController(spi, &gpioCtrl, Sys::SPIManager{busy,rst,dc,cs,pwr});
+    
     /* Set the red LED On to indicate that the CPU2 is initializing */
     gpioCtrl.Write_Component(sysState.Fetch_LED_Red(), SET);
 
@@ -92,6 +91,11 @@ int main()
     bleApp.Advertising(SET);
 
     Display::EInk eInk = Display::EInk(spiCtrl);
+    eInk.Init();
+    eInk.Clear();
+    HAL_Delay(500);
+    uint8_t image[25] = { 0 };
+    eInk.Display(image);
 
     for(;;)
     {
