@@ -11,7 +11,9 @@
 #include "ble/uuid.hpp"
 #include "sys/sys.hpp"
 #include "sys/state.hpp"
+#include "sys/spi.hpp"
 #include "services/time.hpp"
+#include "display/display.hpp"
 
 
 extern "C" void _init(){} /* To avoid linker errors */
@@ -53,8 +55,18 @@ int main()
     sysState.Register_LED_Red(gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 1), GPIO::Types::LED)));
     sysState.Register_LED_Green(gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 0), GPIO::Types::LED)));
     sysState.Register_LED_Blue(gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 5), GPIO::Types::LED)));
+
+    uint8_t busy = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 3), { .Mode = GPIO_MODE_INPUT, .Pull = GPIO_NOPULL, }));
+    uint8_t rst = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 0), GPIO::Types::SPI));
+    uint8_t dc = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 1), GPIO::Types::SPI));
+    uint8_t cs = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 2), GPIO::Types::SPI));
+    uint8_t pwr = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 3), GPIO::Types::SPI));
+    Sys::SPIController spiCtrl = Sys::SPIController(&gpioCtrl, Sys::SPIManager{busy,rst,dc,cs,pwr});
+
     gpioCtrl.Config();
     gpioCtrl.Init();
+
+    sysCtrl.Config_SPI();
 
     /* Set the red LED On to indicate that the CPU2 is initializing */
     gpioCtrl.Write_Component(sysState.Fetch_LED_Red(), SET);
@@ -78,6 +90,8 @@ int main()
 
     bleApp.Init(&timeService);
     bleApp.Advertising(SET);
+
+    Display::EInk eInk = Display::EInk(spiCtrl);
 
     for(;;)
     {

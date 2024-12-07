@@ -19,6 +19,7 @@ add_library(STM32CubeWB
     ${stm32cubewb_SOURCE_DIR}/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_rcc_ex.c
     ${stm32cubewb_SOURCE_DIR}/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_cortex.c
     ${stm32cubewb_SOURCE_DIR}/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_gpio.c
+    ${stm32cubewb_SOURCE_DIR}/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_spi.c
 
     ${stm32cubewb_SOURCE_DIR}/Middlewares/ST/STM32_WPAN/ble/core/auto/ble_gatt_aci.c 
     ${stm32cubewb_SOURCE_DIR}/Middlewares/ST/STM32_WPAN/ble/core/template/osal.c

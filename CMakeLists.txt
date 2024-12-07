@@ -45,6 +45,7 @@ add_executable(${PROJECT_NAME}
 
     ${PROJECT_SOURCE_DIR}/sys/sys.cpp
     ${PROJECT_SOURCE_DIR}/sys/state.cpp
+    ${PROJECT_SOURCE_DIR}/sys/spi.cpp
 
     ${PROJECT_SOURCE_DIR}/stm32/stm32wbxx_it.cpp
 
@@ -57,6 +58,8 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCE_DIR}/ble/char.cpp
 
     ${PROJECT_SOURCE_DIR}/services/time.cpp
+
+    ${PROJECT_SOURCE_DIR}/display/display.cpp
 )
 
 target_link_directories(${PROJECT_NAME}

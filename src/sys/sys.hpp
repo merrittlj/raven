@@ -6,6 +6,7 @@
 
 #include "hci_tl.h"
 #include "shci_tl.h"
+#include "stm32wbxx_hal.h"
 
 
 namespace Sys
@@ -16,6 +17,7 @@ namespace Sys
     {
         private:
             Sys::State *sysState;
+            SPI_HandleTypeDef spi1;
 
         public:
             Controller(Sys::State *state);
@@ -23,6 +25,7 @@ namespace Sys
 
             void Config_SysClk();
             void Config_HSE();
+            SPI_HandleTypeDef *Config_SPI();
             void Init_CPU2();
     };
 

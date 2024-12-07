@@ -32,6 +32,7 @@ namespace GPIO
         void Config();
         void Init();
 
+        FlagStatus Read();
         void Write(FlagStatus pStatus);
         void Toggle();
     };
@@ -39,6 +40,7 @@ namespace GPIO
     namespace Types
     {
         extern GPIO_InitTypeDef LED;
+        extern GPIO_InitTypeDef SPI;
     }
 
     class Controller
@@ -55,6 +57,7 @@ namespace GPIO
             void Init();
 
             uint32_t Add_Component(GPIO::Component pComponent);
+            FlagStatus Read_Component(uint32_t index);
             void Write_Component(uint32_t pIndex, FlagStatus pStatus);
             void Toggle_Component(uint32_t pIndex);
     };

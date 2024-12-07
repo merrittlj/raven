@@ -10,6 +10,12 @@ GPIO_InitTypeDef GPIO::Types::LED = {
     .Speed = GPIO_SPEED_FREQ_HIGH,
 };
 
+GPIO_InitTypeDef GPIO::Types::SPI = {
+    .Mode = GPIO_MODE_OUTPUT_PP,
+    .Pull = GPIO_NOPULL,
+    .Speed = GPIO_SPEED_FREQ_LOW,
+};
+
 GPIO::Pin::Pin()
 {}
 
@@ -41,6 +47,11 @@ void GPIO::Component::Init()
     GPIO_InitTypeDef GPIOInit = this->Type;
     GPIOInit.Pin = this->Pin.FormattedPinNum;
     HAL_GPIO_Init(this->Pin.Bank, &GPIOInit);
+}
+
+FlagStatus GPIO::Component::Read()
+{
+    return (FlagStatus)(HAL_GPIO_ReadPin(Pin.Bank, Pin.FormattedPinNum));
 }
 
 void GPIO::Component::Write(FlagStatus pStatus)
@@ -90,6 +101,13 @@ uint32_t GPIO::Controller::Add_Component(GPIO::Component pComponent)
     this->components.at(this->cmpPos) = pComponent;
     ++(this->cmpPos);
     return addedPos;
+}
+
+FlagStatus GPIO::Controller::Read_Component(uint32_t index)
+{
+    if (index < cmpPos)
+        return components.at(index).Read();
+    return RESET;
 }
 
 void GPIO::Controller::Write_Component(uint32_t pIndex, FlagStatus pStatus)
