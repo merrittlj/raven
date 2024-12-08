@@ -4,26 +4,31 @@
 
 #include "sys/spi.hpp"
 
+#include <vector>
 
-#define DISPLAY_HEIGHT 200
-#define DISPLAY_WIDTH 200
 
 namespace Display
 {
     class EInk
     {
         private:
+            uint16_t width;
+            uint16_t height;
+
             Sys::SPIController spi;
 
             void SetWindows(uint16_t Xstart, uint16_t Ystart, uint16_t Xend, uint16_t Yend);
-            void SetCursor(uint16_t Xstart, uint16_t Ystart);
+            void SetCursor(uint16_t x, uint16_t y);
 
             /* Lookup table */
             void WriteLUT(uint8_t *value);
             void InitRegisters(uint8_t *lut);
 
         public:
-            EInk(Sys::SPIController ctrl);
+            EInk(uint16_t displayWidth, uint16_t displayHeight, Sys::SPIController ctrl);
+
+            uint16_t Get_Width_Bytes();
+            uint16_t Get_Buffer_Size();
 
             void TurnOnDisplay();
             void TurnOnDisplayPart();
@@ -31,11 +36,10 @@ namespace Display
             void Init();
             void Init_Partial();
             void Clear();
-            void Display(uint8_t *image);
-            void DisplayPartBaseImage(uint8_t *image);
-            void DisplayPart(uint8_t *image);
+            void Display(std::vector<uint8_t> const &image);
+            void DisplayPartBaseImage(std::vector<uint8_t> const &image);
+            void DisplayPart(std::vector<uint8_t> const &image);
             void Sleep();
-            void Test();
     };
 }
 

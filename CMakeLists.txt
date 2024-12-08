@@ -5,7 +5,7 @@ set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/toolchain.cmake")
 set(CMAKE_GENERATOR Ninja)
 
 project(raven
-		VERSION 0.2
+		VERSION 0.4
 		DESCRIPTION "Smartwatch"
 		LANGUAGES C CXX)
 
@@ -40,6 +40,7 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCE_DIR}/core/main.cpp
     ${PROJECT_SOURCE_DIR}/core/syscalls.c
     ${PROJECT_SOURCE_DIR}/core/sysmem.c
+    ${PROJECT_SOURCE_DIR}/core/img.cpp
 
     ${PROJECT_SOURCE_DIR}/hw/ipcc.cpp
 

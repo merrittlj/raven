@@ -3,6 +3,7 @@
 #include "main.hpp"
 
 #include "core/main.hpp"
+#include "core/img.hpp"
 #include "app/common.hpp"
 #include "app/debug.hpp"
 #include "hw/conf.hpp"
@@ -59,8 +60,8 @@ int main()
     uint8_t busy = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 2), { .Mode = GPIO_MODE_INPUT, .Pull = GPIO_NOPULL, }));
     uint8_t rst = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 3), GPIO::Types::SPI));
     uint8_t dc = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 4), GPIO::Types::SPI));
-    uint8_t cs = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 5), GPIO::Types::SPI));
-    uint8_t pwr = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 6), GPIO::Types::SPI));
+    uint8_t cs = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 6), GPIO::Types::SPI));
+    uint8_t pwr = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 8), GPIO::Types::SPI));
 
     gpioCtrl.Config();
     gpioCtrl.Init();
@@ -90,12 +91,11 @@ int main()
     bleApp.Init(&timeService);
     bleApp.Advertising(SET);
 
-    Display::EInk eInk = Display::EInk(spiCtrl);
+    Display::EInk eInk = Display::EInk(200, 200, spiCtrl);
     eInk.Init();
     eInk.Clear();
-    HAL_Delay(500);
-    uint8_t image[25] = { 0 };
-    eInk.Test();
+    /* std::vector<uint8_t> image(eInk.Get_Buffer_Size(), 0); /1* For all black image *1/ */
+    std::vector<uint8_t> image(homeExImage, homeExImage + eInk.Get_Buffer_Size());
     eInk.Display(image);
 
     for(;;)

@@ -4,6 +4,8 @@
 
 #include "stm32wbxx_hal.h"
 
+#include <vector>
+
 
 static unsigned char WaveformFullRefresh[159] = {											
     0x80,	0x48,	0x40,	0x0,	0x0,	0x0,	0x0,	0x0,	0x0,	0x0,	0x0,	0x0,
@@ -49,9 +51,21 @@ static unsigned char WaveformPartialRefresh[159] = {
     0x02,0x17,0x41,0xB0,0x32,0x28,
 };
 
-Display::EInk::EInk(Sys::SPIController ctrl)
+Display::EInk::EInk(uint16_t displayWidth, uint16_t displayHeight, Sys::SPIController ctrl)
 {
+    this->width = displayWidth;
+    this->height = displayHeight;
     this->spi = ctrl;
+}
+
+uint16_t Display::EInk::Get_Width_Bytes()
+{
+    return (width % 8 == 0) ? (width / 8) : (width / 8 + 1);
+}
+
+uint16_t Display::EInk::Get_Buffer_Size()
+{
+    return Get_Width_Bytes() * height;
 }
 
 void Display::EInk::SetWindows(uint16_t Xstart, uint16_t Ystart, uint16_t Xend, uint16_t Yend)
@@ -67,16 +81,15 @@ void Display::EInk::SetWindows(uint16_t Xstart, uint16_t Ystart, uint16_t Xend, 
     spi.SendData((Yend >> 8) & 0xFF);
 }
 
-void Display::EInk::SetCursor(uint16_t Xstart, uint16_t Ystart)
+void Display::EInk::SetCursor(uint16_t x, uint16_t y)
 {
-    spi.SendCommand(0x4E);  /* SET_RAM_X_ADDRESS_COUNTER */
-    spi.SendData(Xstart & 0xFF);
-
-    spi.SendCommand(0x4F);  /* SET_RAM_Y_ADDRESS_COUNTER */
-    /* spi.SendData(Ystart & 0xFF); */
-    /* spi.SendData((Ystart >> 8) & 0xFF); */
-    spi.SendData(0xC7);
-    spi.SendData(0x00);
+    spi.SendCommand(0x4E);
+    /* x point must be the multiple of 8 or the last 3 bits will be ignored */
+    spi.SendData((x >> 3) & 0xFF);
+    spi.SendCommand(0x4F);
+    spi.SendData(y & 0xFF);
+    spi.SendData((y >> 8) & 0xFF);
+    spi.BlockBusy();
 }
 
 void Display::EInk::WriteLUT(uint8_t *value)
@@ -133,12 +146,12 @@ void Display::EInk::Init()
     spi.SendCommand(0x01);  /* Driver output control */
     spi.SendData(0xC7);
     spi.SendData(0x00);
-    spi.SendData(0x01);
+    spi.SendData(0x00);
 
     spi.SendCommand(0x11);  /* Data entry mode */
-    spi.SendData(0x01);
+    spi.SendData(0x03);
 
-    SetWindows(0, DISPLAY_HEIGHT - 1, DISPLAY_WIDTH - 1, 0);
+    SetWindows(0, 0, width - 1, height - 1);
 
     spi.SendCommand(0x3C);  /* BorderWavefrom */
     spi.SendData(0x01);
@@ -150,7 +163,11 @@ void Display::EInk::Init()
     spi.SendData(0xB1);
     spi.SendCommand(0x20);  /* Display update activation */
 
-    SetCursor(0, DISPLAY_HEIGHT - 1);
+    spi.SendCommand(0x4E);   // set RAM x address count to 0;
+    spi.SendData(0x00);
+    spi.SendCommand(0x4F);   // set RAM y address count to 0X199;
+    spi.SendData(0xC7);
+    spi.SendData(0x00);
     spi.BlockBusy();
 
     WriteLUT(WaveformFullRefresh);
@@ -185,71 +202,65 @@ void Display::EInk::Init_Partial()
 
 void Display::EInk::Clear()
 {
-    uint16_t width = (DISPLAY_WIDTH % 8 == 0)? (DISPLAY_WIDTH / 8 ): (DISPLAY_WIDTH / 8 + 1);
-    uint16_t height = DISPLAY_HEIGHT;
+    uint16_t widthBytes = Get_Width_Bytes();
 
     spi.SendCommand(0x24);  /* Write RAM(BW) */
     for (uint16_t j = 0; j < height; j++)
-        for (uint16_t i = 0; i < width; i++)
+        for (uint16_t i = 0; i < widthBytes; i++)
             spi.SendData(0xFF);
     spi.SendCommand(0x26);  /* Write RAM(RED)? */
 
     for (uint16_t j = 0; j < height; j++)
-        for (uint16_t i = 0; i < width; i++)
+        for (uint16_t i = 0; i < widthBytes; i++)
             spi.SendData(0xFF);
     TurnOnDisplay();
 }
 
-void Display::EInk::Display(uint8_t *image)
+/* image is not malloced or passed in correctly, */
+/* either allocate or pass in differently, any reads past image[0] go ballistic */
+void Display::EInk::Display(std::vector<uint8_t> const &image)
 {
-    uint16_t width = (DISPLAY_WIDTH % 8 == 0)? (DISPLAY_WIDTH / 8 ): (DISPLAY_WIDTH / 8 + 1);
-    uint16_t height = DISPLAY_HEIGHT;
+    uint16_t widthBytes = Get_Width_Bytes();
 
-    uint32_t addr = 0;
+    SetWindows(0, 0, width - 1, height - 1);
+    SetCursor(0, 0);
+
     spi.SendCommand(0x24);  /* Write RAM(BW) */
     for (uint16_t j = 0; j < height; j++) {
-        for (uint16_t i = 0; i < width; i++) {
-            addr = i + j * width;
-            spi.SendData(image[addr]);
+        for (uint16_t i = 0; i < widthBytes; i++) {
+            spi.SendData(image.at(i + (j * widthBytes)));
         }
     }
     TurnOnDisplay();
 }
 
-void Display::EInk::DisplayPartBaseImage(uint8_t *image)
+void Display::EInk::DisplayPartBaseImage(std::vector<uint8_t> const &image)
 {
-    uint16_t width = (DISPLAY_WIDTH % 8 == 0)? (DISPLAY_WIDTH / 8 ): (DISPLAY_WIDTH / 8 + 1);
-    uint16_t height = DISPLAY_HEIGHT;
+    uint16_t widthBytes = Get_Width_Bytes();
 
-    uint32_t addr = 0;
     spi.SendCommand(0x24);  /* Write RAM(BW) */
     for (uint16_t j = 0; j < height; j++) {
-        for (uint16_t i = 0; i < width; i++) {
-            addr = i + j * width;
-            spi.SendData(image[addr]);
+        for (uint16_t i = 0; i < widthBytes; i++) {
+            spi.SendData(image.at(i + (j * widthBytes)));
         }
     }
     spi.SendCommand(0x26);  /* Write RAM(RED)? */
     for (uint16_t j = 0; j < height; j++) {
-        for (uint16_t i = 0; i < width; i++) {
-            addr = i + j * width;
-            spi.SendData(image[addr]);
+        for (uint16_t i = 0; i < widthBytes; i++) {
+            spi.SendData(image.at(i + (j * widthBytes)));
         }
     }
     TurnOnDisplayPart();
 }
 
-void Display::EInk::DisplayPart(uint8_t *image)
+void Display::EInk::DisplayPart(std::vector<uint8_t> const &image)
 {
-    uint16_t width = (DISPLAY_WIDTH % 8 == 0)? (DISPLAY_WIDTH / 8 ): (DISPLAY_WIDTH / 8 + 1);
-    uint16_t height = DISPLAY_HEIGHT;
+    uint16_t widthBytes = Get_Width_Bytes();
 
-    uint32_t addr = 0;
     spi.SendCommand(0x24);  /* Write RAM(BW) */
     for (uint16_t j = 0; j < height; j++) {
-        for (uint16_t i = 0; i < width; i++) {
-            addr = i + j * width;
-            spi.SendData(image[addr]);
+        for (uint16_t i = 0; i < widthBytes; i++) {
+            spi.SendData(image.at(i + (j * widthBytes)));
         }
     }
     TurnOnDisplayPart();
@@ -260,11 +271,4 @@ void Display::EInk::Sleep()
     spi.SendCommand(0x10);  /* Deep sleep mode control */
     spi.SendData(0x01);
     HAL_Delay(100);
-}
-
-void Display::EInk::Test()
-{
-    spi.Reset();
-    spi.SendCommand(0x3C);
-    spi.SendData(0x80);
 }

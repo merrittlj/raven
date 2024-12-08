@@ -53,11 +53,11 @@ void Sys::SPIController::SendData(uint8_t data)
 void Sys::SPIController::Reset()
 {
     gpioCtrl->Write_Component(manager.rst, SET);
-    HAL_Delay(200);
+    HAL_Delay(20);
     gpioCtrl->Write_Component(manager.rst, RESET);
-    HAL_Delay(2);
+    HAL_Delay(5);
     gpioCtrl->Write_Component(manager.rst, SET);
-    HAL_Delay(200);
+    HAL_Delay(20);
 }
 
 void Sys::SPIController::BlockBusy()
@@ -86,10 +86,11 @@ extern "C" {
               PA1     ------> SPI1_SCK
               PA7     ------> SPI1_MOSI
               */
-            GPIO_InitStruct.Pin = GPIO_PIN_1|GPIO_PIN_7;
+            GPIO_InitStruct.Pin = GPIO_PIN_5|GPIO_PIN_7;
             GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-            GPIO_InitStruct.Pull = GPIO_NOPULL;
-            GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+            GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+            /* GPIO_InitStruct.Pull = GPIO_NOPULL; */
+            /* GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW; */
             GPIO_InitStruct.Alternate = GPIO_AF5_SPI1;
             HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
         }
@@ -112,7 +113,7 @@ extern "C" {
               PA1     ------> SPI1_SCK
               PA7     ------> SPI1_MOSI
               */
-            HAL_GPIO_DeInit(GPIOA, GPIO_PIN_1|GPIO_PIN_7);
+            HAL_GPIO_DeInit(GPIOA, GPIO_PIN_5|GPIO_PIN_7);
         }
     }
 }
