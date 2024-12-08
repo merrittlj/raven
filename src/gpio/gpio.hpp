@@ -57,6 +57,7 @@ namespace GPIO
             void Init();
 
             uint32_t Add_Component(GPIO::Component pComponent);
+            GPIO::Component Get_Component(uint32_t index);
             FlagStatus Read_Component(uint32_t index);
             void Write_Component(uint32_t pIndex, FlagStatus pStatus);
             void Toggle_Component(uint32_t pIndex);

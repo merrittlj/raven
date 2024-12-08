@@ -37,9 +37,8 @@ GPIO::Component::Component(GPIO::Pin pPin, GPIO_InitTypeDef pType)
 
 void GPIO::Component::Config()
 {
-    /* Avoid LL calls, just use ifs */
-    if (this->Pin.Bank == GPIOB)
-        __HAL_RCC_GPIOB_CLK_ENABLE();
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    __HAL_RCC_GPIOB_CLK_ENABLE();
 }
 
 void GPIO::Component::Init()
@@ -101,6 +100,11 @@ uint32_t GPIO::Controller::Add_Component(GPIO::Component pComponent)
     this->components.at(this->cmpPos) = pComponent;
     ++(this->cmpPos);
     return addedPos;
+}
+
+GPIO::Component GPIO::Controller::Get_Component(uint32_t index)
+{
+    return components.at(index);
 }
 
 FlagStatus GPIO::Controller::Read_Component(uint32_t index)

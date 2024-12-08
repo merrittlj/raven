@@ -56,16 +56,17 @@ int main()
     sysState.Register_LED_Green(gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 0), GPIO::Types::LED)));
     sysState.Register_LED_Blue(gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 5), GPIO::Types::LED)));
 
-    uint8_t busy = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 3), { .Mode = GPIO_MODE_INPUT, .Pull = GPIO_NOPULL, }));
-    uint8_t rst = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 0), GPIO::Types::SPI));
-    uint8_t dc = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 1), GPIO::Types::SPI));
-    uint8_t cs = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 2), GPIO::Types::SPI));
-    uint8_t pwr = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 3), GPIO::Types::SPI));
+    uint8_t busy = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 2), { .Mode = GPIO_MODE_INPUT, .Pull = GPIO_NOPULL, }));
+    uint8_t rst = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 3), GPIO::Types::SPI));
+    uint8_t dc = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 4), GPIO::Types::SPI));
+    uint8_t cs = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 5), GPIO::Types::SPI));
+    uint8_t pwr = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 6), GPIO::Types::SPI));
 
     gpioCtrl.Config();
     gpioCtrl.Init();
     SPI_HandleTypeDef *spi = sysCtrl.Config_SPI();
     Sys::SPIController spiCtrl = Sys::SPIController(spi, &gpioCtrl, Sys::SPIManager{busy,rst,dc,cs,pwr});
+    GPIO::Component g = gpioCtrl.Get_Component(busy);
     
     /* Set the red LED On to indicate that the CPU2 is initializing */
     gpioCtrl.Write_Component(sysState.Fetch_LED_Red(), SET);
