@@ -73,8 +73,10 @@ void Display::EInk::SetCursor(uint16_t Xstart, uint16_t Ystart)
     spi.SendData(Xstart & 0xFF);
 
     spi.SendCommand(0x4F);  /* SET_RAM_Y_ADDRESS_COUNTER */
-    spi.SendData(Ystart & 0xFF);
-    spi.SendData((Ystart >> 8) & 0xFF);
+    /* spi.SendData(Ystart & 0xFF); */
+    /* spi.SendData((Ystart >> 8) & 0xFF); */
+    spi.SendData(0xC7);
+    spi.SendData(0x00);
 }
 
 void Display::EInk::WriteLUT(uint8_t *value)
@@ -258,4 +260,11 @@ void Display::EInk::Sleep()
     spi.SendCommand(0x10);  /* Deep sleep mode control */
     spi.SendData(0x01);
     HAL_Delay(100);
+}
+
+void Display::EInk::Test()
+{
+    spi.Reset();
+    spi.SendCommand(0x3C);
+    spi.SendData(0x80);
 }

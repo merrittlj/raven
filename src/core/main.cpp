@@ -66,7 +66,6 @@ int main()
     gpioCtrl.Init();
     SPI_HandleTypeDef *spi = sysCtrl.Config_SPI();
     Sys::SPIController spiCtrl = Sys::SPIController(spi, &gpioCtrl, Sys::SPIManager{busy,rst,dc,cs,pwr});
-    GPIO::Component g = gpioCtrl.Get_Component(busy);
     
     /* Set the red LED On to indicate that the CPU2 is initializing */
     gpioCtrl.Write_Component(sysState.Fetch_LED_Red(), SET);
@@ -96,6 +95,7 @@ int main()
     eInk.Clear();
     HAL_Delay(500);
     uint8_t image[25] = { 0 };
+    eInk.Test();
     eInk.Display(image);
 
     for(;;)

@@ -38,5 +38,10 @@ namespace Sys
     };
 }
 
+extern "C" {
+    void HAL_SPI_MspInit(SPI_HandleTypeDef *spiHandle);
+    void HAL_SPI_MspDeInit(SPI_HandleTypeDef *spiHandle);
+}
+
 
 #endif /* SPI_HPP */

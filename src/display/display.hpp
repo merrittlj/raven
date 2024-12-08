@@ -35,6 +35,7 @@ namespace Display
             void DisplayPartBaseImage(uint8_t *image);
             void DisplayPart(uint8_t *image);
             void Sleep();
+            void Test();
     };
 }
 

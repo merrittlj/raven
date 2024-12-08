@@ -108,6 +108,7 @@ void Sys::Controller::Config_HSE()
 
 SPI_HandleTypeDef *Sys::Controller::Config_SPI()
 {
+    spi1 = { 0 };
     spi1.Instance = SPI1;
     spi1.Init.Mode = SPI_MODE_MASTER;
     spi1.Init.Direction = SPI_DIRECTION_2LINES;
