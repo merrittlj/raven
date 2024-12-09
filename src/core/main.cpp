@@ -3,7 +3,6 @@
 #include "main.hpp"
 
 #include "core/main.hpp"
-#include "core/img.hpp"
 #include "app/common.hpp"
 #include "app/debug.hpp"
 #include "hw/conf.hpp"
@@ -91,12 +90,8 @@ int main()
     bleApp.Init(&timeService);
     bleApp.Advertising(SET);
 
-    Display::EInk eInk = Display::EInk(200, 200, spiCtrl);
-    eInk.Init();
-    eInk.Clear();
-    /* std::vector<uint8_t> image(eInk.Get_Buffer_Size(), 0); /1* For all black image *1/ */
-    std::vector<uint8_t> image(homeExImage, homeExImage + eInk.Get_Buffer_Size());
-    eInk.Display(image);
+    Display::Controller displayCtrl = Display::Controller(200, 200, spiCtrl);
+    displayCtrl.Init();
 
     for(;;)
     {
@@ -104,6 +99,8 @@ int main()
         sysEvtP.BLE_ProcessEvent();
         /* Process pending SYSTEM event coming from CPU2 (if any) */
         sysEvtP.Sys_ProcessEvent();
+
+        displayCtrl.Process();
 
         /* Update the Notify Characteristic every ~1 second and only if BLE connected.
            It might be also done only after the GATT client enables the notifications,

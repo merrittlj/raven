@@ -4,18 +4,31 @@
 
 #include "sys/spi.hpp"
 
+#include "lvgl.h"
+
 #include <vector>
 
 
 namespace Display
 {
+    class EInk;
+    struct Manager
+    {
+        uint16_t width;
+        uint16_t height;
+
+        EInk *displayCallback;
+
+        uint16_t Width_Bytes();
+        uint16_t Buffer_Size();
+    };
+
     class EInk
     {
         private:
-            uint16_t width;
-            uint16_t height;
-
+            Display::Manager manager;
             Sys::SPIController spi;
+            std::vector<uint8_t> buf;
 
             void SetWindows(uint16_t Xstart, uint16_t Ystart, uint16_t Xend, uint16_t Yend);
             void SetCursor(uint16_t x, uint16_t y);
@@ -25,10 +38,10 @@ namespace Display
             void InitRegisters(uint8_t *lut);
 
         public:
-            EInk(uint16_t displayWidth, uint16_t displayHeight, Sys::SPIController ctrl);
+            EInk();
+            EInk(Display::Manager man, Sys::SPIController ctrl);
 
-            uint16_t Get_Width_Bytes();
-            uint16_t Get_Buffer_Size();
+            std::vector<uint8_t> *GetBuf();
 
             void TurnOnDisplay();
             void TurnOnDisplayPart();
@@ -36,10 +49,46 @@ namespace Display
             void Init();
             void Init_Partial();
             void Clear();
-            void Display(std::vector<uint8_t> const &image);
-            void DisplayPartBaseImage(std::vector<uint8_t> const &image);
-            void DisplayPart(std::vector<uint8_t> const &image);
+            void Display();
+            void DisplayPartBaseImage();
+            void DisplayPart();
             void Sleep();
+    };
+
+    class LVGL
+    {
+        private:
+            Display::Manager manager;
+            std::vector<uint8_t> buf1;
+
+        public:
+            LVGL();
+            LVGL(Display::Manager man);
+
+            void Init();
+            void Create();
+            static void Flush(lv_display_t *display, const lv_area_t *area, uint8_t *px_map);
+    };
+
+    class Controller
+    {
+        private:
+            inline static Controller *theInstance;
+
+            Display::Manager manager;
+
+            Display::EInk display;
+            Display::LVGL lvgl;
+
+        public:
+            Controller(uint16_t displayWidth, uint16_t displayHeight, Sys::SPIController ctrl);
+            ~Controller();
+
+            static Controller *Instance(Controller *cur = nullptr);
+            Manager Get_Manager();
+
+            void Init();
+            void Process();
     };
 }
 

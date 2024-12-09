@@ -4,10 +4,10 @@ set(LV_CONF_PATH
     ${PROJECT_SOURCE_DIR}/lv_conf.h
     CACHE STRING "" FORCE)
 
-# v9.1.0
+# v9.2.2
 FetchContent_Declare(lvgl
     GIT_REPOSITORY https://github.com/lvgl/lvgl.git
-    GIT_TAG v9.1.0
+    GIT_TAG v9.2.2
 )
 FetchContent_MakeAvailable(lvgl)
 
@@ -19,6 +19,7 @@ target_compile_options(lvgl
         -Wno-sign-conversion
         -Wno-type-limits
         -Wno-unused-parameter
+        -Wno-undef
 )
 set_source_files_properties(${LV_CONF_PATH} PROPERTIES COMPILE_FLAGS "-Wno-conversion -Wno-sign-conversion")
 

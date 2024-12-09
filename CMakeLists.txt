@@ -40,7 +40,6 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCE_DIR}/core/main.cpp
     ${PROJECT_SOURCE_DIR}/core/syscalls.c
     ${PROJECT_SOURCE_DIR}/core/sysmem.c
-    ${PROJECT_SOURCE_DIR}/core/img.cpp
 
     ${PROJECT_SOURCE_DIR}/hw/ipcc.cpp
 
