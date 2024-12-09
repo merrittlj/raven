@@ -95,28 +95,10 @@ int main()
 
     for(;;)
     {
-        /* Process pending BLE event coming from CPU2 (if any) */
         sysEvtP.BLE_ProcessEvent();
-        /* Process pending SYSTEM event coming from CPU2 (if any) */
         sysEvtP.Sys_ProcessEvent();
 
         displayCtrl.Process();
-
-        /* Update the Notify Characteristic every ~1 second and only if BLE connected.
-           It might be also done only after the GATT client enables the notifications,
-           but that is out of scope of this basic example */
-        if (sysState.App_Flag_Get(Sys::State::App_Flag::BLE_CONNECTED) == Sys::State::Flag_Val::SET)
-        {
-            if ((HAL_GetTick() - prevTick) > 5000)
-            {
-                prevTick = HAL_GetTick();
-                /* bleApp.notifyCharacteristicData[1] ^= 0x01; */
-                /* if (timeService.Update_Char_Value(BLE::UUID::ExtractUUID16FromLE(timeService.syncNotifyChar.Get_UUID()), */
-                /*             timeService.syncNotifyChar.Get_Value_Length(), */
-                /*             bleApp.notifyCharacteristicData) != BLE_STATUS_SUCCESS) */
-                /*     Sys::Error_Handler(); /1* UNEXPECTED *1/ */
-            }
-        }
     }
 }
 

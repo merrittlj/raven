@@ -13,10 +13,18 @@
 
 namespace Sys
 {
+    struct Time {
+        uint8_t hours;
+        uint8_t minutes;
+        uint8_t seconds;
+    };
+
     class State
     {
         private:
             volatile uint32_t App_State = 0x00000000;
+
+            Time Current_Time;
 
             /* Component index of the Red LED */
             uint32_t LED_Red_Index;
@@ -56,6 +64,10 @@ namespace Sys
             Flag_Val App_Flag_Get(App_Flag flag);
             void App_Flag_Set(App_Flag flag);
             void App_Flag_Reset(App_Flag flag);
+
+            /* Setting time, vs updating(setting & displaying) */
+            void Set_Time(Time value);
+            void Update_Time(Time value);
 
             void Register_LED_Red(uint32_t pIndex);
             uint32_t Fetch_LED_Red();

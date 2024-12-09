@@ -6,6 +6,7 @@
 #include "lvgl.h"
 
 #include <vector>
+#include <string>
 
 
 static unsigned char WaveformFullRefresh[159] = {											
@@ -316,9 +317,9 @@ namespace Display
         lv_style_set_text_color(&texts, lv_color_hex(0x000000));
         lv_style_set_text_font(&texts, &lv_font_montserrat_28);
 
-        lv_obj_t *time = lv_label_create(lv_screen_active());
+        time = lv_label_create(lv_screen_active());
         lv_obj_add_style(time, &texts, 0);
-        lv_label_set_text(time, "21:17");
+        lv_label_set_text(time, "00:00");
         lv_obj_align(time, LV_ALIGN_CENTER, 0, -50);
 
         lv_obj_t *title = lv_label_create(lv_screen_active());
@@ -334,7 +335,6 @@ namespace Display
 
     void LVGL::Flush(lv_display_t *display, const lv_area_t *area, uint8_t *px_map)
     {
-        /* WARNING: px_map MAY BE REVERSED */
         Manager man = Controller::Instance()->Get_Manager();
 
         uint8_t *screen_data = px_map + 8;
@@ -342,15 +342,13 @@ namespace Display
         std::vector<uint8_t> *handlingBuffer = man.displayCallback->GetBuf();
         *handlingBuffer = std::vector<uint8_t>(screen_data, screen_data + man.Buffer_Size());
 
-        /* for (uint8_t i = 0; i < handlingBuffer->size(); ++i) { */
-        /*     uint8_t byte = handlingBuffer->at(i); */
-        /*     byte = (byte & 0xF0) >> 4 | (byte & 0x0F) << 4; /1* Swap nibbles *1/ */
-        /*     byte = (byte & 0xCC) >> 2 | (byte & 0x33) << 2; /1* Swap pairs *1/ */
-        /*     byte = (byte & 0xAA) >> 1 | (byte & 0x55) << 1; /1* Swap individual bits *1/ */
-        /*     handlingBuffer->at(i) = byte; */
-        /* } */
         man.displayCallback->Display();
         lv_display_flush_ready(display);
+    }
+
+    void LVGL::Time(Sys::Time value)
+    {
+        lv_label_set_text(time, (std::to_string(value.hours) + ":" + std::to_string(value.minutes)).c_str());
     }
 
     Controller::Controller(uint16_t displayWidth, uint16_t displayHeight, Sys::SPIController ctrl)
@@ -393,5 +391,10 @@ namespace Display
     void Controller::Process()
     {
         lv_timer_periodic_handler();
+    }
+
+    void Controller::Update_Time(Sys::Time value)
+    {
+        lvgl.Time(value);
     }
 }

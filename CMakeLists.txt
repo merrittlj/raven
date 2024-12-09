@@ -5,7 +5,7 @@ set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/toolchain.cmake")
 set(CMAKE_GENERATOR Ninja)
 
 project(raven
-		VERSION 0.4
+		VERSION 0.5
 		DESCRIPTION "Smartwatch"
 		LANGUAGES C CXX)
 

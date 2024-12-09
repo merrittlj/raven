@@ -3,6 +3,7 @@
 
 
 #include "sys/spi.hpp"
+#include "sys/state.hpp"
 
 #include "lvgl.h"
 
@@ -61,6 +62,8 @@ namespace Display
             Display::Manager manager;
             std::vector<uint8_t> buf1;
 
+            lv_obj_t *time;
+
         public:
             LVGL();
             LVGL(Display::Manager man);
@@ -68,6 +71,8 @@ namespace Display
             void Init();
             void Create();
             static void Flush(lv_display_t *display, const lv_area_t *area, uint8_t *px_map);
+
+            void Time(Sys::Time value);
     };
 
     class Controller
@@ -89,6 +94,8 @@ namespace Display
 
             void Init();
             void Process();
+
+            void Update_Time(Sys::Time value);
     };
 }
 

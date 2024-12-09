@@ -1,6 +1,7 @@
 #include "sys/state.hpp"
 
 #include "app/common.hpp"
+#include "display/display.hpp"
 
 #include <cstdint>
 
@@ -24,6 +25,17 @@ void Sys::State::App_Flag_Set(App_Flag flag)
 void Sys::State::App_Flag_Reset(App_Flag flag)
 {
     VariableBit_Reset_BB((uint32_t)&(this->App_State), (uint8_t)flag);
+}
+
+void Sys::State::Set_Time(Time value)
+{
+    Current_Time = value;
+}
+
+void Sys::State::Update_Time(Time value)
+{
+    Set_Time(value);
+    Display::Controller::Instance()->Update_Time(value);
 }
 
 void Sys::State::Register_LED_Red(uint32_t pIndex)
