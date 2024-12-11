@@ -18,9 +18,9 @@ GPIO_InitTypeDef GPIO::Types::SPI = {
 
 GPIO_InitTypeDef GPIO::Types::Button = {
     .Mode = GPIO_MODE_INPUT,
-    .Pull = GPIO_PULL_UP,
+    .Pull = GPIO_PULLUP,
     .Speed = GPIO_SPEED_FREQ_HIGH,
-}
+};
 
 GPIO::Pin::Pin()
 {}

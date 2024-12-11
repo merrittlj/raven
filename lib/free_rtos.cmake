@@ -10,8 +10,6 @@ add_library(lib::free_rtos ALIAS freertos_config)
 target_include_directories(freertos_config SYSTEM
 INTERFACE
 ${PROJECT_SOURCE_DIR}
-${freertos_kernel_SOURCE_DIR}/include
-${freertos_kernel_SOURCE_DIR}/portable/GCC/ARM_CM4F
 )
 
 target_compile_definitions(freertos_config
@@ -27,3 +25,8 @@ if (CMAKE_CROSSCOMPILING)
 endif()
 
 FetchContent_MakeAvailable(freertos_kernel)
+
+include_directories(
+    ${freertos_kernel_SOURCE_DIR}/include
+    ${freertos_kernel_SOURCE_DIR}/portable/GCC/ARM_CM4F
+)

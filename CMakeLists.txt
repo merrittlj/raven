@@ -62,8 +62,10 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCE_DIR}/services/notify.cpp
 
     ${PROJECT_SOURCE_DIR}/display/display.cpp
+    ${PROJECT_SOURCE_DIR}/display/controller.cpp
     ${PROJECT_SOURCE_DIR}/display/lvgl.cpp
     ${PROJECT_SOURCE_DIR}/display/eink.cpp
+
     ${PROJECT_SOURCE_DIR}/display/gloock_18_date.c
     ${PROJECT_SOURCE_DIR}/display/gloock_75_time.c
     ${PROJECT_SOURCE_DIR}/display/axel_22_ui.c

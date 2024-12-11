@@ -1,5 +1,7 @@
 #include "display/lvgl.hpp"
 
+#include "display/controller.hpp"
+
 #include "sys/state.hpp"
 
 #include "stm32wbxx_hal.h"
@@ -189,7 +191,7 @@ namespace Display
     {
         /* Alert screen: shortcut to alert list */
         if (lv_screen_active() == alertScreen) {
-            lv_src_load(alertList);
+            lv_scr_load(alertsList);
         }
         /* Active screen: scroll down */
         else if (lv_screen_active() == activeScreen) {

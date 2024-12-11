@@ -1,7 +1,7 @@
 #include "sys/state.hpp"
 
 #include "app/common.hpp"
-#include "display/display.hpp"
+#include "display/controller.hpp"
 
 #include <cstdint>
 

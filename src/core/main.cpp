@@ -14,7 +14,12 @@
 #include "sys/spi.hpp"
 #include "services/time.hpp"
 #include "services/notify.hpp"
-#include "display/display.hpp"
+#include "display/controller.hpp"
+
+#include "FreeRTOS.h" /* Must come first. */
+#include "task.h" /* RTOS task related API prototypes. */
+#include "queue.h" /* RTOS queue related API prototypes. */
+#include "timers.h" /* Software timer related API prototypes. */
 
 #include "button_debounce.h"
 
@@ -101,10 +106,10 @@ int main()
     notifyService.Init();
     bleApp.Advertising(SET);
 
-    Display::Controller displayCtrl = Display::Controller(200, 200, spiCtrl);
+    Display::Controller displayCtrl = Display::Controller(200, 200, spiCtrl, &sysState);
     displayCtrl.Init();
 
-    btnPort = Debouncer(BUTTON_PIN_1 | BUTTON_PIN_2 | BUTTON_PIN_3 | BUTTON_PIN_4);
+    Debouncer btnPort(BUTTON_PIN_1 | BUTTON_PIN_2 | BUTTON_PIN_3 | BUTTON_PIN_4);
 
     for(;;)
     {
@@ -113,10 +118,10 @@ int main()
 
         displayCtrl.Process();
 
-        if (HAL_GetTick() - prevTick) >= 1) {
+        if ((HAL_GetTick() - prevTick) >= 1) {
             prevTick = HAL_GetTick();
 
-            btnPort.ButtonProcess((HAL_GPIO_ReadPin(GPIOA, 1) << 7) | (HAL_GPIO_ReadPin(GPIOB, 2), << 6) | (HAL_GPIO_ReadPin(GPIOB, 3), << 5) | (HAL_GPIO_ReadPin(GPIOB, 4) << 4));
+            btnPort.ButtonProcess((HAL_GPIO_ReadPin(GPIOA, 1) << 7) | (HAL_GPIO_ReadPin(GPIOB, 2) << 6) | (HAL_GPIO_ReadPin(GPIOB, 3) << 5) | (HAL_GPIO_ReadPin(GPIOB, 4) << 4));
             if (btnPort.ButtonPressed(BUTTON_PIN_1)) {
                 displayCtrl.Button_One();
             }

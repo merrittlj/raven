@@ -1,5 +1,5 @@
-#ifndef LVGL_HPP
-#define LVGL_HPP
+#ifndef EINK_HPP
+#define EINK_HPP
 
 
 #include "display/display.hpp"
@@ -15,7 +15,7 @@ namespace Display
     class EInk
     {
         private:
-            Display::Manager manager;
+            Manager manager;
             Sys::SPIController spi;
             std::vector<uint8_t> buf;
 
@@ -44,3 +44,6 @@ namespace Display
             void Sleep();
     };
 }
+
+
+#endif  /* EINK_HPP */

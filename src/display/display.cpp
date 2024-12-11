@@ -7,60 +7,13 @@
 
 namespace Display
 {
-    Controller::~Controller()
+    uint16_t Manager::Width_Bytes()
     {
-        delete theInstance;
+        return (width % 8 == 0) ? (width / 8) : (width / 8 + 1);
     }
 
-    Controller *Controller::Instance(Controller *cur)
+    uint16_t Manager::Buffer_Size()
     {
-        if (!theInstance) theInstance = cur;
-        return theInstance;
-    }
-
-    Manager Controller::Get_Manager()
-    {
-        return manager;
-    }
-
-    void Controller::Init()
-    {
-        display.Init();
-        lvgl.Init();
-        lvgl.Create();
-    }
-
-    void Controller::Process()
-    {
-        lv_timer_periodic_handler();
-    }
-
-    void Controller::Update_Time(Sys::Time value)
-    {
-        lvgl.Time(value);
-    }
-
-    void Controller::Alert_Send(Sys::Alert alert)
-    {
-        lvgl.Alert(alert);
-    }
-
-    void Controller::Button_One()
-    {
-        lvgl.Button_One();
-    }
-
-    void Controller::Button_Two()
-    {
-        lvgl.Button_Two();
-    }
-
-    void Controller::Button_Three()
-    {
-        lvgl.Button_Three();
-    }
-    void Controller::Button_Four()
-    {
-        lvgl.Button_Four();
+        return (Width_Bytes() * height);
     }
 }
