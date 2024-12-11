@@ -61,6 +61,12 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCE_DIR}/services/notify.cpp
 
     ${PROJECT_SOURCE_DIR}/display/display.cpp
+    ${PROJECT_SOURCE_DIR}/display/gloock_18_date.c
+    ${PROJECT_SOURCE_DIR}/display/gloock_80_time.c
+    ${PROJECT_SOURCE_DIR}/display/axel_22_ui.c
+    ${PROJECT_SOURCE_DIR}/display/axel_20_text.c
+    # ${PROJECT_SOURCE_DIR}/display/lato_18.c
+    # ${PROJECT_SOURCE_DIR}/display/sunflower_80.c
 )
 
 target_link_directories(${PROJECT_NAME}

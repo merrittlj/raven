@@ -131,7 +131,7 @@ void BLE::NotifyService::Init()
 
     Char_UUID_t titleUUID = BLE::UUID::CreateCharUUID({0x68,0x4A,0x49,0x62,0xB6,0xA6,0x11,0xEF,0xBE,0x87,0x08,0x00,0x20,0x0C,0x9A,0x66});
     title = BLE::Char(UUID_TYPE_128, &titleUUID,
-            1 + 35,
+            1 + 15,
             CHAR_PROP_READ | CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
@@ -142,7 +142,7 @@ void BLE::NotifyService::Init()
 
     Char_UUID_t bodyUUID = BLE::UUID::CreateCharUUID({0x68,0x4A,0x49,0x63,0xB6,0xA6,0x11,0xEF,0xBE,0x87,0x08,0x00,0x20,0x0C,0x9A,0x66});
     body = BLE::Char(UUID_TYPE_128, &bodyUUID,
-            1 + 50,
+            1 + 70,
             CHAR_PROP_READ | CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,

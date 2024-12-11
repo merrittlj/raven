@@ -64,6 +64,7 @@ namespace Display
 
             lv_obj_t *faceScreen;
             lv_obj_t *time;
+            lv_obj_t *date;
 
             lv_obj_t *alertScreen;
             lv_obj_t *source;
