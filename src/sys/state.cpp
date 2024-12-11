@@ -40,23 +40,30 @@ void Sys::State::Update_Time(Time value)
 
 void Sys::State::Alert_Build_Source(std::string str)
 {
-    Current_Alert.source = str;
+    Alert_Builder.source = str;
 }
 
 void Sys::State::Alert_Build_Title(std::string str)
 {
-    Current_Alert.title = str;
+    Alert_Builder.title = str;
 }
 
 void Sys::State::Alert_Build_Body(std::string str)
 {
-    Current_Alert.body = str;
+    Alert_Builder.body = str;
 }
 
 void Sys::State::Alert_Send()
 {
-    Display::Controller::Instance()->Alert_Send(Current_Alert);
-    Current_Alert = {"", "", ""};
+    alerts.push_back(Alert_Builder);
+    Display::Controller::Instance()->Alert_Send(alerts.back());
+    Alert_Builder = {"", "", ""};
+}
+
+
+void Sys::State::Alert_Dismiss()
+{
+    alerts.pop_back();
 }
 
 void Sys::State::Register_LED_Red(uint32_t pIndex)

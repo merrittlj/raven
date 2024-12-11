@@ -2,17 +2,14 @@
 #define DISPLAY_HPP
 
 
-#include "sys/spi.hpp"
-#include "sys/state.hpp"
+#include "display/eink.hpp"
+#include "display/lvgl.hpp"
 
-#include "lvgl.h"
-
-#include <vector>
+#include <cstdint>
 
 
 namespace Display
 {
-    class EInk;
     struct Manager
     {
         uint16_t width;
@@ -24,66 +21,7 @@ namespace Display
         uint16_t Buffer_Size();
     };
 
-    class EInk
-    {
-        private:
-            Display::Manager manager;
-            Sys::SPIController spi;
-            std::vector<uint8_t> buf;
-
-            void SetWindows(uint16_t Xstart, uint16_t Ystart, uint16_t Xend, uint16_t Yend);
-            void SetCursor(uint16_t x, uint16_t y);
-
-            /* Lookup table */
-            void WriteLUT(uint8_t *value);
-            void InitRegisters(uint8_t *lut);
-
-        public:
-            EInk();
-            EInk(Display::Manager man, Sys::SPIController ctrl);
-
-            std::vector<uint8_t> *GetBuf();
-
-            void TurnOnDisplay();
-            void TurnOnDisplayPart();
-
-            void Init();
-            void Init_Partial();
-            void Clear();
-            void Display();
-            void DisplayPartBaseImage();
-            void DisplayPart();
-            void Sleep();
-    };
-
-    class LVGL
-    {
-        private:
-            Display::Manager manager;
-            std::vector<uint8_t> buf1;
-
-            lv_obj_t *faceScreen;
-            lv_obj_t *time;
-            lv_obj_t *date;
-
-            lv_obj_t *alertScreen;
-            lv_obj_t *source;
-            lv_obj_t *title;
-            lv_obj_t *body;
-
-        public:
-            LVGL();
-            LVGL(Display::Manager man);
-
-            void Init();
-            void Create();
-            static void Flush(lv_display_t *display, const lv_area_t *area, uint8_t *px_map);
-
-            void Time(Sys::Time value);
-            void Alert(Sys::Alert alert);
-    };
-
-    class Controller
+        class Controller
     {
         private:
             inline static Controller *theInstance;
@@ -94,7 +32,7 @@ namespace Display
             Display::LVGL lvgl;
 
         public:
-            Controller(uint16_t displayWidth, uint16_t displayHeight, Sys::SPIController ctrl);
+            Controller(uint16_t displayWidth, uint16_t displayHeight, Sys::SPIController ctrl, Sys::State *sysState);
             ~Controller();
 
             static Controller *Instance(Controller *cur = nullptr);
@@ -105,6 +43,11 @@ namespace Display
 
             void Update_Time(Sys::Time value);
             void Alert_Send(Sys::Alert alert);
+
+            void Button_One();
+            void Button_Two();
+            void Button_Three();
+            void Button_Four();
     };
 }
 

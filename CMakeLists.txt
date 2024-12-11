@@ -26,6 +26,7 @@ endif()
 ###############################
 
 include(${PROJECT_LIBRARY_DIR}/stm_cube.cmake) # STM32 CMSIS/HAL/Drivers, Arm CMSIS/RTOS
+include(${PROJECT_LIBRARY_DIR}/free_rtos.cmake)
 include(${PROJECT_LIBRARY_DIR}/debouncer.cmake)
 include(${PROJECT_LIBRARY_DIR}/lvgl.cmake)
 
@@ -61,8 +62,10 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCE_DIR}/services/notify.cpp
 
     ${PROJECT_SOURCE_DIR}/display/display.cpp
+    ${PROJECT_SOURCE_DIR}/display/lvgl.cpp
+    ${PROJECT_SOURCE_DIR}/display/eink.cpp
     ${PROJECT_SOURCE_DIR}/display/gloock_18_date.c
-    ${PROJECT_SOURCE_DIR}/display/gloock_80_time.c
+    ${PROJECT_SOURCE_DIR}/display/gloock_75_time.c
     ${PROJECT_SOURCE_DIR}/display/axel_22_ui.c
     ${PROJECT_SOURCE_DIR}/display/axel_20_text.c
     # ${PROJECT_SOURCE_DIR}/display/lato_18.c
@@ -77,6 +80,7 @@ target_link_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
 		lib::stm_cube
+        lib::free_rtos
         lib::debouncer
         lib::lvgl
 )

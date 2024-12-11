@@ -41,6 +41,7 @@ namespace GPIO
     {
         extern GPIO_InitTypeDef LED;
         extern GPIO_InitTypeDef SPI;
+        extern GPIO_InitTypeDef Button;
     }
 
     class Controller

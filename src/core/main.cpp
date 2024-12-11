@@ -16,6 +16,8 @@
 #include "services/notify.hpp"
 #include "display/display.hpp"
 
+#include "button_debounce.h"
+
 
 extern "C" void _init(){} /* To avoid linker errors */
 
@@ -64,6 +66,11 @@ int main()
     uint8_t cs = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 6), GPIO::Types::SPI));
     uint8_t pwr = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 8), GPIO::Types::SPI));
 
+    uint8_t btn1 = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 1), GPIO::Types::Button));
+    uint8_t btn2 = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 2), GPIO::Types::Button));
+    uint8_t btn3 = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 3), GPIO::Types::Button));
+    uint8_t btn4 = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 4), GPIO::Types::Button));
+
     gpioCtrl.Config();
     gpioCtrl.Init();
     SPI_HandleTypeDef *spi = sysCtrl.Config_SPI();
@@ -97,12 +104,32 @@ int main()
     Display::Controller displayCtrl = Display::Controller(200, 200, spiCtrl);
     displayCtrl.Init();
 
+    btnPort = Debouncer(BUTTON_PIN_1 | BUTTON_PIN_2 | BUTTON_PIN_3 | BUTTON_PIN_4);
+
     for(;;)
     {
         sysEvtP.BLE_ProcessEvent();
         sysEvtP.Sys_ProcessEvent();
 
         displayCtrl.Process();
+
+        if (HAL_GetTick() - prevTick) >= 1) {
+            prevTick = HAL_GetTick();
+
+            btnPort.ButtonProcess((HAL_GPIO_ReadPin(GPIOA, 1) << 7) | (HAL_GPIO_ReadPin(GPIOB, 2), << 6) | (HAL_GPIO_ReadPin(GPIOB, 3), << 5) | (HAL_GPIO_ReadPin(GPIOB, 4) << 4));
+            if (btnPort.ButtonPressed(BUTTON_PIN_1)) {
+                displayCtrl.Button_One();
+            }
+            if (btnPort.ButtonPressed(BUTTON_PIN_2)) {
+                displayCtrl.Button_Two();
+            }
+            if (btnPort.ButtonPressed(BUTTON_PIN_3)) {
+                displayCtrl.Button_Three();
+            }
+            if (btnPort.ButtonPressed(BUTTON_PIN_4)) {
+                displayCtrl.Button_Four();
+            }
+        }
     }
 }
 

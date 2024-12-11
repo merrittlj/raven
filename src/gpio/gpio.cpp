@@ -13,8 +13,14 @@ GPIO_InitTypeDef GPIO::Types::LED = {
 GPIO_InitTypeDef GPIO::Types::SPI = {
     .Mode = GPIO_MODE_OUTPUT_PP,
     .Pull = GPIO_NOPULL,
-    .Speed = GPIO_SPEED_FREQ_LOW,
+    .Speed = GPIO_SPEED_FREQ_HIGH,
 };
+
+GPIO_InitTypeDef GPIO::Types::Button = {
+    .Mode = GPIO_MODE_INPUT,
+    .Pull = GPIO_PULL_UP,
+    .Speed = GPIO_SPEED_FREQ_HIGH,
+}
 
 GPIO::Pin::Pin()
 {}

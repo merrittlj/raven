@@ -8,6 +8,7 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
 
 
 #define EVENT_POOL_SIZE                    (CFG_TLBLE_EVT_QUEUE_LENGTH*4U*DIVC(( sizeof(TL_PacketHeader_t) + TL_BLE_EVENT_FRAME_SIZE ), 4U))
@@ -36,7 +37,8 @@ namespace Sys
 
             Time Current_Time;
 
-            Alert Current_Alert;
+            std::vector<Alert> alerts;
+            Alert Alert_Builder;
 
             /* Component index of the Red LED */
             uint32_t LED_Red_Index;
@@ -85,6 +87,7 @@ namespace Sys
             void Alert_Build_Title(std::string str);
             void Alert_Build_Body(std::string str);
             void Alert_Send();
+            void Alert_Dismiss();
 
             void Register_LED_Red(uint32_t pIndex);
             uint32_t Fetch_LED_Red();
