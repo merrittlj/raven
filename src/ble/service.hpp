@@ -9,6 +9,8 @@
 #include "ble_types.h"
 
 
+#define CHAR_VALUE_OFFSET 1
+
 namespace BLE
 {
     template <typename T>

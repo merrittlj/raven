@@ -5,7 +5,7 @@ set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/toolchain.cmake")
 set(CMAKE_GENERATOR Ninja)
 
 project(raven
-		VERSION 0.5
+		VERSION 0.6
 		DESCRIPTION "Smartwatch"
 		LANGUAGES C CXX)
 
@@ -58,6 +58,7 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCE_DIR}/ble/char.cpp
 
     ${PROJECT_SOURCE_DIR}/services/time.cpp
+    ${PROJECT_SOURCE_DIR}/services/notify.cpp
 
     ${PROJECT_SOURCE_DIR}/display/display.cpp
 )

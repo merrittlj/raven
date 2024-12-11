@@ -13,6 +13,7 @@
 #include "sys/state.hpp"
 #include "sys/spi.hpp"
 #include "services/time.hpp"
+#include "services/notify.hpp"
 #include "display/display.hpp"
 
 
@@ -45,6 +46,7 @@ int main()
     Sys::Event_Processor sysEvtP = Sys::Event_Processor(&sysState);
     BLE::App bleApp = BLE::App(&gpioCtrl, &sysState);
     BLE::TimeService timeService = BLE::TimeService(&gpioCtrl, &sysState);
+    BLE::NotifyService notifyService = BLE::NotifyService(&gpioCtrl, &sysState);
 
     /* Configure the debug support if needed */
     debugCtrl.Init();
@@ -87,7 +89,9 @@ int main()
     /* Set the green LED On to indicate that the wireless stack FW is running */
     gpioCtrl.Write_Component(sysState.Fetch_LED_Green(), SET);
 
-    bleApp.Init(&timeService);
+    bleApp.Init();
+    timeService.Init();
+    notifyService.Init();
     bleApp.Advertising(SET);
 
     Display::Controller displayCtrl = Display::Controller(200, 200, spiCtrl);

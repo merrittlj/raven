@@ -38,6 +38,27 @@ void Sys::State::Update_Time(Time value)
     Display::Controller::Instance()->Update_Time(value);
 }
 
+void Sys::State::Alert_Build_Source(std::string str)
+{
+    Current_Alert.source = str;
+}
+
+void Sys::State::Alert_Build_Title(std::string str)
+{
+    Current_Alert.title = str;
+}
+
+void Sys::State::Alert_Build_Body(std::string str)
+{
+    Current_Alert.body = str;
+}
+
+void Sys::State::Alert_Send()
+{
+    Display::Controller::Instance()->Alert_Send(Current_Alert);
+    Current_Alert = {"", "", ""};
+}
+
 void Sys::State::Register_LED_Red(uint32_t pIndex)
 {
     this->LED_Red_Index = pIndex;

@@ -61,9 +61,13 @@ SVCCTL_EvtAckStatus_t BLE::TimeService::Event_Handler(void *Event)
                 switch (blecore_evt->ecode) {
                     case ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE:
                         attribute_modified = (aci_gatt_attribute_modified_event_rp0*)blecore_evt->data;
-                        if (attribute_modified->Attr_Handle == (currentTime.Get_Handle() + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET)) {
-                            sysState->Update_Time(Sys::Time{attribute_modified->Attr_Data[4], attribute_modified->Attr_Data[5], attribute_modified->Attr_Data[6]});
+                        uint8_t *data;
+                        data = attribute_modified->Attr_Data;
+                        if (attribute_modified->Attr_Handle == (currentTime.Get_Handle() + CHAR_VALUE_OFFSET)) {
+                            sysState->Update_Time(Sys::Time{data[4], data[5], data[6]});
                             gpioCtrl->Write_Component(this->sysState->Fetch_LED_Blue(), SET);
+                            HAL_Delay(50);
+                            gpioCtrl->Write_Component(this->sysState->Fetch_LED_Blue(), RESET);
                         }
                         break;
 

@@ -7,6 +7,7 @@
 #include "tl.h"
 
 #include <cstdint>
+#include <string>
 
 
 #define EVENT_POOL_SIZE                    (CFG_TLBLE_EVT_QUEUE_LENGTH*4U*DIVC(( sizeof(TL_PacketHeader_t) + TL_BLE_EVENT_FRAME_SIZE ), 4U))
@@ -19,12 +20,20 @@ namespace Sys
         uint8_t seconds;
     };
 
+    struct Alert {
+        std::string source;
+        std::string title;
+        std::string body;
+    };
+
     class State
     {
         private:
             volatile uint32_t App_State = 0x00000000;
 
             Time Current_Time;
+
+            Alert Current_Alert;
 
             /* Component index of the Red LED */
             uint32_t LED_Red_Index;
@@ -68,6 +77,11 @@ namespace Sys
             /* Setting time, vs updating(setting & displaying) */
             void Set_Time(Time value);
             void Update_Time(Time value);
+
+            void Alert_Build_Source(std::string str);
+            void Alert_Build_Title(std::string str);
+            void Alert_Build_Body(std::string str);
+            void Alert_Send();
 
             void Register_LED_Red(uint32_t pIndex);
             uint32_t Fetch_LED_Red();

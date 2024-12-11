@@ -16,20 +16,16 @@ namespace BLE
 {
     class NotifyService : BLE::Service<NotifyService>
     {
-        /* Max_Attribute_Records = 2*no_of_char + 1
-         * service_max_attribute_record = 1 for service +
-         *                                2 for Write characteristic +
-         *                                2 for Notify characteristic +
-         *                                1 for client char configuration descriptor +
-         */
-#define SERVICE_MAX_ATT_RECORDS                8
-
-#define CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET              1
-
         protected:
             uintptr_t handle;
 
         private:
+            /* Max_Attribute_Records = 2*no_of_char + 2
+             * service_max_attribute_record = 1 for service +
+             *                                2 for each Write/Notify characteristic +
+             *                                1 for client char configuration descriptor + */
+            const uint8_t SERVICE_MAX_ATT_RECORDS = 10;
+
             GPIO::Controller *gpioCtrl;
             Sys::State *sysState;
 
@@ -42,6 +38,7 @@ namespace BLE
             BLE::Char source;
             BLE::Char title;
             BLE::Char body;
+            BLE::Char send;
 
             NotifyService(GPIO::Controller *pGpioCtrl, Sys::State *pSysState);
             ~NotifyService();

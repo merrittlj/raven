@@ -312,6 +312,8 @@ namespace Display
         /*Change the active screen's background color*/
         lv_obj_set_style_bg_color(lv_screen_active(), lv_color_hex(0xffffff), LV_PART_MAIN);
 
+        faceScreen = lv_screen_active();
+
         static lv_style_t texts;
         lv_style_init(&texts);
         lv_style_set_text_color(&texts, lv_color_hex(0x000000));
@@ -322,15 +324,39 @@ namespace Display
         lv_label_set_text(time, "00:00");
         lv_obj_align(time, LV_ALIGN_CENTER, 0, -50);
 
-        lv_obj_t *title = lv_label_create(lv_screen_active());
-        lv_obj_add_style(title, &texts, 0);
-        lv_label_set_text(title, "Raven V0.5");
-        lv_obj_align(title, LV_ALIGN_CENTER, 0, 0);
+        lv_obj_t *name = lv_label_create(lv_screen_active());
+        lv_obj_add_style(name, &texts, 0);
+        lv_label_set_text(name, "Raven V0.6");
+        lv_obj_align(name, LV_ALIGN_CENTER, 0, 0);
 
         lv_obj_t *desc = lv_label_create(lv_screen_active());
         lv_obj_add_style(desc, &texts, 0);
         lv_label_set_text(desc, "Mosaic Labs");
         lv_obj_align(desc, LV_ALIGN_CENTER, 0, 50);
+
+
+        alertScreen = lv_obj_create(NULL);
+
+        source = lv_label_create(alertScreen);
+        lv_obj_add_style(source, &texts, 0);
+        lv_label_set_text(source, "Alert Source");
+        lv_obj_set_style_text_font(source, &lv_font_montserrat_20, 0);
+        lv_obj_set_style_max_width(source, 175, 0);
+        lv_obj_align(source, LV_ALIGN_CENTER, 0, -75);
+
+        title = lv_label_create(alertScreen);
+        lv_obj_add_style(title, &texts, 0);
+        lv_label_set_text(title, "Alert Title");
+        lv_obj_set_style_text_font(title, &lv_font_montserrat_20, 0);
+        lv_obj_set_style_max_width(title, 175, 0);
+        lv_obj_align(title, LV_ALIGN_CENTER, 0, -50);
+
+        body = lv_label_create(alertScreen);
+        lv_obj_add_style(body, &texts, 0);
+        lv_label_set_text(body, "Alert Body");
+        lv_obj_set_style_text_font(body, &lv_font_montserrat_14, 0);
+        lv_obj_set_style_max_width(body, 150, 0);
+        lv_obj_align(body, LV_ALIGN_CENTER, 0, 0);
     }
 
     void LVGL::Flush(lv_display_t *display, const lv_area_t *area, uint8_t *px_map)
@@ -348,7 +374,16 @@ namespace Display
 
     void LVGL::Time(Sys::Time value)
     {
-        lv_label_set_text(time, (std::to_string(value.hours) + ":" + std::to_string(value.minutes)).c_str());
+        lv_label_set_text(time, ((value.hours < 10 ? "0" : "") + std::to_string(value.hours) + ":" + (value.minutes < 10 ? "0" : "") + std::to_string(value.minutes)).c_str());
+    }
+
+    void LVGL::Alert(Sys::Alert alert)
+    {
+        lv_label_set_text(source, alert.source.c_str());
+        lv_label_set_text(title, alert.title.c_str());
+        lv_label_set_text(body, alert.body.c_str());
+
+        lv_scr_load(alertScreen);
     }
 
     Controller::Controller(uint16_t displayWidth, uint16_t displayHeight, Sys::SPIController ctrl)
@@ -396,5 +431,10 @@ namespace Display
     void Controller::Update_Time(Sys::Time value)
     {
         lvgl.Time(value);
+    }
+
+    void Controller::Alert_Send(Sys::Alert alert)
+    {
+        lvgl.Alert(alert);
     }
 }

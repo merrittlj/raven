@@ -62,7 +62,13 @@ namespace Display
             Display::Manager manager;
             std::vector<uint8_t> buf1;
 
+            lv_obj_t *faceScreen;
             lv_obj_t *time;
+
+            lv_obj_t *alertScreen;
+            lv_obj_t *source;
+            lv_obj_t *title;
+            lv_obj_t *body;
 
         public:
             LVGL();
@@ -73,6 +79,7 @@ namespace Display
             static void Flush(lv_display_t *display, const lv_area_t *area, uint8_t *px_map);
 
             void Time(Sys::Time value);
+            void Alert(Sys::Alert alert);
     };
 
     class Controller
@@ -96,6 +103,7 @@ namespace Display
             void Process();
 
             void Update_Time(Sys::Time value);
+            void Alert_Send(Sys::Alert alert);
     };
 }
 

@@ -60,13 +60,24 @@ SVCCTL_EvtAckStatus_t BLE::NotifyService::Event_Handler(void *Event)
                 switch (blecore_evt->ecode) {
                     case ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE:
                         attribute_modified = (aci_gatt_attribute_modified_event_rp0*)blecore_evt->data;
-                        if (attribute_modified->Attr_Handle == (source.Get_Handle() + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET)) {
-                            sysState->Build_Alert_Source();
-                            sysState->Update_Time(Sys::Time{attribute_modified->Attr_Data[4], attribute_modified->Attr_Data[5], attribute_modified->Attr_Data[6]});
-                            gpioCtrl->Write_Component(this->sysState->Fetch_LED_Blue(), SET);
+                        uint8_t *data;
+                        uint16_t length;
+                        data = attribute_modified->Attr_Data;
+                        length = attribute_modified->Attr_Data_Length;
+                        if (attribute_modified->Attr_Handle == (source.Get_Handle() + CHAR_VALUE_OFFSET)) {
+                            sysState->Alert_Build_Source(std::string((const char *)data, (size_t)length));
                         }
-                        if (attribute_modified->Attr_Handle == (send.Get_Handle() + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET)) {
-                            sysState->Send_Alert();
+                        if (attribute_modified->Attr_Handle == (title.Get_Handle() + CHAR_VALUE_OFFSET)) {
+                            sysState->Alert_Build_Title(std::string((const char *)data, (size_t)length));
+                        }
+                        if (attribute_modified->Attr_Handle == (body.Get_Handle() + CHAR_VALUE_OFFSET)) {
+                            sysState->Alert_Build_Body(std::string((const char *)data, (size_t)length));
+                        }
+                        if (attribute_modified->Attr_Handle == (send.Get_Handle() + CHAR_VALUE_OFFSET)) {
+                            sysState->Alert_Send();
+                            gpioCtrl->Write_Component(this->sysState->Fetch_LED_Red(), SET);
+                            HAL_Delay(50);
+                            gpioCtrl->Write_Component(this->sysState->Fetch_LED_Red(), RESET);
                         }
                         break;
 
@@ -109,8 +120,8 @@ void BLE::NotifyService::Init()
 
     Char_UUID_t sourceUUID = BLE::UUID::CreateCharUUID({0x68,0x4A,0x49,0x61,0xB6,0xA6,0x11,0xEF,0xBE,0x87,0x08,0x00,0x20,0x0C,0x9A,0x66});
     source = BLE::Char(UUID_TYPE_128, &sourceUUID,
-            15,
-            CHAR_PROP_READ | CHAR_PROP_WRITE
+            1 + 15,
+            CHAR_PROP_READ | CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
             10,
@@ -120,7 +131,7 @@ void BLE::NotifyService::Init()
 
     Char_UUID_t titleUUID = BLE::UUID::CreateCharUUID({0x68,0x4A,0x49,0x62,0xB6,0xA6,0x11,0xEF,0xBE,0x87,0x08,0x00,0x20,0x0C,0x9A,0x66});
     title = BLE::Char(UUID_TYPE_128, &titleUUID,
-            35,
+            1 + 35,
             CHAR_PROP_READ | CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
@@ -131,13 +142,25 @@ void BLE::NotifyService::Init()
 
     Char_UUID_t bodyUUID = BLE::UUID::CreateCharUUID({0x68,0x4A,0x49,0x63,0xB6,0xA6,0x11,0xEF,0xBE,0x87,0x08,0x00,0x20,0x0C,0x9A,0x66});
     body = BLE::Char(UUID_TYPE_128, &bodyUUID,
-            50,
+            1 + 50,
             CHAR_PROP_READ | CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
             10,
             (uint8_t)VALUE_VARIABLE_LENGTH);
     if (body.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
+        Sys::Error_Handler(); /* UNEXPECTED */
+
+    Char_UUID_t sendUUID = BLE::UUID::CreateCharUUID({0x68,0x4A,0x49,0x64,0xB6,0xA6,0x11,0xEF,0xBE,0x87,0x08,0x00,0x20,0x0C,0x9A,0x66});
+    send = BLE::Char(UUID_TYPE_128, &sendUUID,
+            1 + 1,
+            CHAR_PROP_READ | CHAR_PROP_WRITE,
+            ATTR_PERMISSION_NONE,
+            GATT_NOTIFY_ATTRIBUTE_WRITE,
+            10,
+            (uint8_t)VALUE_VARIABLE_LENGTH);
+    tBleStatus ret = send.Add(this->Get_Handle());
+    if (ret != BLE_STATUS_SUCCESS)
         Sys::Error_Handler(); /* UNEXPECTED */
 }
 

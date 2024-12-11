@@ -29,7 +29,6 @@ namespace Sys
             void Init_CPU2();
     };
 
-
     class Event_Processor
     {
         private:
