@@ -5,7 +5,7 @@ set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/toolchain.cmake")
 set(CMAKE_GENERATOR Ninja)
 
 project(raven
-		VERSION 0.6
+		VERSION 0.7
 		DESCRIPTION "Smartwatch"
 		LANGUAGES C CXX)
 
@@ -67,7 +67,7 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCE_DIR}/display/eink.cpp
 
     ${PROJECT_SOURCE_DIR}/display/gloock_18_date.c
-    ${PROJECT_SOURCE_DIR}/display/gloock_75_time.c
+    ${PROJECT_SOURCE_DIR}/display/gloock_70_time.c
     ${PROJECT_SOURCE_DIR}/display/axel_22_ui.c
     ${PROJECT_SOURCE_DIR}/display/axel_20_text.c
     # ${PROJECT_SOURCE_DIR}/display/lato_18.c

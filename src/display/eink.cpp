@@ -62,7 +62,6 @@ namespace Display
         spi = ctrl;
     }
 
-
     std::vector<uint8_t> *EInk::GetBuf()
     {
         return &buf;
@@ -137,6 +136,7 @@ namespace Display
 
     void EInk::Init()
     {
+        spi.Enable();
         spi.Reset();
 
         spi.BlockBusy();
@@ -232,6 +232,7 @@ namespace Display
             }
         }
         TurnOnDisplay();
+        Sleep();
     }
 
     void EInk::DisplayPartBaseImage()

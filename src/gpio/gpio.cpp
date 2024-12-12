@@ -18,7 +18,7 @@ GPIO_InitTypeDef GPIO::Types::SPI = {
 
 GPIO_InitTypeDef GPIO::Types::Button = {
     .Mode = GPIO_MODE_INPUT,
-    .Pull = GPIO_PULLUP,
+    .Pull = GPIO_NOPULL,
     .Speed = GPIO_SPEED_FREQ_HIGH,
 };
 
@@ -45,8 +45,6 @@ void GPIO::Component::Config()
 {
     __HAL_RCC_GPIOA_CLK_ENABLE();
     __HAL_RCC_GPIOB_CLK_ENABLE();
-
-    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2|GPIO_PIN_3|GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6, GPIO_PIN_RESET);
 }
 
 void GPIO::Component::Init()

@@ -71,10 +71,10 @@ int main()
     uint8_t cs = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 6), GPIO::Types::SPI));
     uint8_t pwr = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 8), GPIO::Types::SPI));
 
-    uint8_t btn1 = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 1), GPIO::Types::Button));
-    uint8_t btn2 = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 2), GPIO::Types::Button));
-    uint8_t btn3 = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 3), GPIO::Types::Button));
-    uint8_t btn4 = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 4), GPIO::Types::Button));
+    uint8_t btn1 = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 12), GPIO::Types::Button));
+    uint8_t btn2 = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 13), GPIO::Types::Button));
+    uint8_t btn3 = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 14), GPIO::Types::Button));
+    uint8_t btn4 = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 15), GPIO::Types::Button));
 
     gpioCtrl.Config();
     gpioCtrl.Init();
@@ -109,7 +109,7 @@ int main()
     Display::Controller displayCtrl = Display::Controller(200, 200, spiCtrl, &sysState);
     displayCtrl.Init();
 
-    Debouncer btnPort(BUTTON_PIN_1 | BUTTON_PIN_2 | BUTTON_PIN_3 | BUTTON_PIN_4);
+    Debouncer btnPort(BUTTON_PIN_0 | BUTTON_PIN_1 | BUTTON_PIN_2 | BUTTON_PIN_3);
 
     for(;;)
     {
@@ -121,17 +121,18 @@ int main()
         if ((HAL_GetTick() - prevTick) >= 1) {
             prevTick = HAL_GetTick();
 
-            btnPort.ButtonProcess((HAL_GPIO_ReadPin(GPIOA, 1) << 7) | (HAL_GPIO_ReadPin(GPIOB, 2) << 6) | (HAL_GPIO_ReadPin(GPIOB, 3) << 5) | (HAL_GPIO_ReadPin(GPIOB, 4) << 4));
-            if (btnPort.ButtonPressed(BUTTON_PIN_1)) {
+            btnPort.ButtonProcess(gpioCtrl.Read_Component(btn1) | (gpioCtrl.Read_Component(btn2) << 1) | (gpioCtrl.Read_Component(btn3) << 2) | (gpioCtrl.Read_Component(btn4) << 3));
+            if (btnPort.ButtonPressed(BUTTON_PIN_0)) {
+                gpioCtrl.Write_Component(sysState.Fetch_LED_Red(), SET);
                 displayCtrl.Button_One();
-            }
-            if (btnPort.ButtonPressed(BUTTON_PIN_2)) {
+            } else gpioCtrl.Write_Component(sysState.Fetch_LED_Red(), RESET);
+            if (btnPort.ButtonPressed(BUTTON_PIN_1)) {
                 displayCtrl.Button_Two();
             }
-            if (btnPort.ButtonPressed(BUTTON_PIN_3)) {
+            if (btnPort.ButtonPressed(BUTTON_PIN_2)) {
                 displayCtrl.Button_Three();
             }
-            if (btnPort.ButtonPressed(BUTTON_PIN_4)) {
+            if (btnPort.ButtonPressed(BUTTON_PIN_3)) {
                 displayCtrl.Button_Four();
             }
         }

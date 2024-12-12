@@ -35,6 +35,9 @@ namespace Sys
             void SendData(uint8_t data);
             void Reset();
             void BlockBusy();
+
+            void Enable();
+            void Disable();
     };
 }
 

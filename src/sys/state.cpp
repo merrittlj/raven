@@ -66,6 +66,11 @@ void Sys::State::Alert_Dismiss()
     alerts.pop_back();
 }
 
+std::vector<Sys::Alert> *Sys::State::Get_Alerts()
+{
+    return &alerts;
+}
+
 void Sys::State::Register_LED_Red(uint32_t pIndex)
 {
     this->LED_Red_Index = pIndex;

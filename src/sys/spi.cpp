@@ -66,6 +66,16 @@ void Sys::SPIController::BlockBusy()
         HAL_Delay(10);
 }
 
+void Sys::SPIController::Enable()
+{
+    gpioCtrl->Write_Component(manager.pwr, SET);
+}
+
+void Sys::SPIController::Disable()
+{
+    gpioCtrl->Write_Component(manager.pwr, RESET);
+}
+
 extern "C" {
     /**
      * @brief SPI MSP Initialization

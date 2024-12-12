@@ -31,7 +31,11 @@ namespace Display
             lv_obj_t *body;
 
             lv_obj_t *activeScreen;
+
             lv_obj_t *alertsList;
+            lv_obj_t *alerts;
+
+            void Create_Alerts_List();
 
         public:
             LVGL();
@@ -43,6 +47,7 @@ namespace Display
 
             void Time(Sys::Time value);
             void Alert(Sys::Alert alert);
+            void Alert_Screen();
 
             /* [1 - - - 3]
              * |  - - -  |

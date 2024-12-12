@@ -12,7 +12,7 @@
 
 
 LV_FONT_DECLARE(gloock_18_date)
-LV_FONT_DECLARE(gloock_75_time)
+LV_FONT_DECLARE(gloock_70_time)
 LV_FONT_DECLARE(axel_22_ui)
 LV_FONT_DECLARE(axel_20_text)
 /* LV_FONT_DECLARE(lato_18) */
@@ -42,6 +42,14 @@ namespace Display
         lv_display_set_flush_cb(eInk, Flush);
     }
 
+    void LVGL::Create_Alerts_List()
+    {
+        alerts = lv_list_create(alertsList);
+        lv_obj_set_size(alerts, 200, 200);
+        lv_obj_align(alerts, LV_ALIGN_TOP_LEFT, 0, 0);
+        lv_list_add_text(alerts, "Alerts");
+    }
+
     void LVGL::Create()
     {
         /*Change the active screen's background color*/
@@ -52,7 +60,7 @@ namespace Display
         static lv_style_t texts;
         lv_style_init(&texts);
         lv_style_set_text_color(&texts, lv_color_hex(0x000000));
-        lv_style_set_text_font(&texts, &gloock_75_time);
+        lv_style_set_text_font(&texts, &gloock_70_time);
 
         time = lv_label_create(lv_screen_active());
         lv_obj_add_style(time, &texts, 0);
@@ -121,9 +129,15 @@ namespace Display
 
 
         activeScreen = lv_obj_create(NULL);
+        lv_obj_t *activeTitle = lv_label_create(activeScreen);
+        lv_obj_add_style(activeTitle, &texts, 0);
+        lv_label_set_text(activeTitle, "Active Screens");
+        lv_obj_set_style_text_font(activeTitle, &axel_22_ui, 0);
+        lv_obj_align(activeTitle, LV_ALIGN_CENTER, 0, 0);
 
 
         alertsList = lv_obj_create(NULL);
+        Create_Alerts_List();
     }
 
     void LVGL::Flush(lv_display_t *display, const lv_area_t *area, uint8_t *px_map)
@@ -135,6 +149,7 @@ namespace Display
         std::vector<uint8_t> *handlingBuffer = man.displayCallback->GetBuf();
         *handlingBuffer = std::vector<uint8_t>(screen_data, screen_data + man.Buffer_Size());
 
+        man.displayCallback->Init();
         man.displayCallback->Display();
         lv_display_flush_ready(display);
     }
@@ -157,6 +172,16 @@ namespace Display
         lv_label_set_text(title, alert.title.c_str());
         lv_label_set_text(body, alert.body.c_str());
 
+        Alert_Screen();
+    }
+
+    void LVGL::Alert_Screen()
+    {
+        std::vector<Sys::Alert> *stateAlerts = state->Get_Alerts();
+        Create_Alerts_List();
+        for (Sys::Alert alert : *stateAlerts) {
+            lv_list_add_button(alerts, NULL, (alert.source).c_str());
+        }
         lv_scr_load(alertScreen);
     }
 

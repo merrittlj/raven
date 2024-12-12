@@ -88,6 +88,7 @@ namespace Sys
             void Alert_Build_Body(std::string str);
             void Alert_Send();
             void Alert_Dismiss();
+            std::vector<Alert> *Get_Alerts();
 
             void Register_LED_Red(uint32_t pIndex);
             uint32_t Fetch_LED_Red();
