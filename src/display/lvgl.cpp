@@ -53,13 +53,13 @@ namespace Display
     void LVGL::Create()
     {
         /*Change the active screen's background color*/
-        lv_obj_set_style_bg_color(lv_screen_active(), lv_color_hex(0xffffff), LV_PART_MAIN);
+        lv_obj_set_style_bg_color(lv_screen_active(), state->Get_Pref()->userWhite, LV_PART_MAIN);
 
         faceScreen = lv_screen_active();
 
         static lv_style_t texts;
         lv_style_init(&texts);
-        lv_style_set_text_color(&texts, lv_color_hex(0x000000));
+        lv_style_set_text_color(&texts, state->Get_Pref()->userBlack);
         lv_style_set_text_font(&texts, &gloock_70_time);
 
         time = lv_label_create(lv_screen_active());
@@ -77,8 +77,8 @@ namespace Display
         alertScreen = lv_obj_create(NULL);
         static lv_style_t box;
         lv_style_set_border_width(&box, 3);
-        lv_style_set_border_color(&box, lv_color_hex(0x000000));
-        lv_style_set_bg_color(&box, lv_color_hex(0xffffff));
+        lv_style_set_border_color(&box, state->Get_Pref()->userBlack);
+        lv_style_set_bg_color(&box, state->Get_Pref()->userWhite);
         lv_style_set_radius(&box, 5);
 
         lv_obj_t *sourceBox = lv_obj_create(alertScreen);
@@ -172,17 +172,22 @@ namespace Display
         lv_label_set_text(title, alert.title.c_str());
         lv_label_set_text(body, alert.body.c_str());
 
-        Alert_Screen();
+        lv_scr_load(alertScreen);
     }
 
-    void LVGL::Alert_Screen()
+    void LVGL::Alerts_List_Screen()
     {
         std::vector<Sys::Alert> *stateAlerts = state->Get_Alerts();
         Create_Alerts_List();
         for (Sys::Alert alert : *stateAlerts) {
             lv_list_add_button(alerts, NULL, (alert.source).c_str());
         }
-        lv_scr_load(alertScreen);
+        lv_scr_load(alertsList);
+    }
+
+    uint16_t LVGL::List_Handler(uint8_t group, uint8_t item)
+    {
+        return (group - 1) * 2 + (item - 1);
     }
 
     void LVGL::Button_One()
@@ -211,16 +216,49 @@ namespace Display
         else if (lv_screen_active() == activeScreen) {
             /* Scroll up */
         }
+        /* Alerts list: Group/item selector */
+        else if (lv_screen_active() == alertsList) {
+            /* If the group has been selected */
+            if (prevButton > 0) {
+                uint16_t index = List_Handler(prevButton, 1);
+                prevButton = 0;
+                std::vector<Sys::Alert> *stateAlerts = state->Get_Alerts();
+                if (index < stateAlerts->size())
+                    Alert(stateAlerts->at(index));
+            }
+            else prevButton = 1;
+        }
     }
+
     void LVGL::Button_Four()
     {
         /* Alert screen: shortcut to alert list */
         if (lv_screen_active() == alertScreen) {
-            lv_scr_load(alertsList);
+            Alerts_List_Screen();
         }
         /* Active screen: scroll down */
         else if (lv_screen_active() == activeScreen) {
             /* Scroll down */
+        }
+        else if (lv_screen_active() == alertsList) {
+            /* If the group has been selected */
+            if (prevButton > 0) {
+                uint16_t index = List_Handler(prevButton, 2);
+                prevButton = 0;
+                std::vector<Sys::Alert> *stateAlerts = state->Get_Alerts();
+                if (index < stateAlerts->size())
+                    Alert(stateAlerts->at(index));
+            }
+            else prevButton = 2;
+        }
+    }
+    
+    void LVGL::Button_Double()
+    {
+        if (lv_screen_active() == alertsList) {
+            /* We only have two items so double selector only applies for groups */
+            if (prevButton == 0)
+                prevButton = 3;
         }
     }
 }

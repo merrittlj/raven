@@ -21,6 +21,8 @@ namespace Display
             Display::Manager manager;
             std::vector<uint8_t> buf1;
 
+            uint8_t prevButton;
+
             lv_obj_t *faceScreen;
             lv_obj_t *time;
             lv_obj_t *date;
@@ -47,12 +49,14 @@ namespace Display
 
             void Time(Sys::Time value);
             void Alert(Sys::Alert alert);
-            void Alert_Screen();
+            void Alerts_List_Screen();
 
             /* [1 - - - 3]
              * |  - - -  |
              * |  - - -  |
-             * [2 - - - 4]
+             * [2 - - - 4] */
+            /* Handles lists with groups(first button press) and items(second button press) */
+            uint16_t LVGL::List_Handler(uint8_t group, uint8_t item);
             /* Button One: Universal return to face button */
             void Button_One();
             /* Button Two: Open active screens/tasks */
@@ -61,6 +65,8 @@ namespace Display
             void Button_Three();
             /* Button Four: Multi-purpose #2, cancel, scroll down, etc. */
             void Button_Four();
+            /* Button Double: Multiple-purpose #1 and #2 pressed simultaneously, group 3 selector */
+            void Button_Double();
     };
 }
 

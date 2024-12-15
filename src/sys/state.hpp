@@ -30,10 +30,24 @@ namespace Sys
         std::string body;
     };
 
+    enum class Scheme {
+        LIGHT,
+        DARK
+    }
+    struct Preferences {
+        /* Flipped/inverted when using dark mode */
+        lv_color userWhite;
+        lv_color userBlack;
+
+        void Color_Scheme(Scheme scheme);
+    };
+
     class State
     {
         private:
             volatile uint32_t App_State = 0x00000000;
+
+            Preferences pref;
 
             Time Current_Time;
 
@@ -78,6 +92,8 @@ namespace Sys
             Flag_Val App_Flag_Get(App_Flag flag);
             void App_Flag_Set(App_Flag flag);
             void App_Flag_Reset(App_Flag flag);
+
+            Preferences *Get_Pref();
 
             /* Setting time, vs updating(setting & displaying) */
             void Set_Time(Time value);

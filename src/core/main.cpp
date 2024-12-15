@@ -14,6 +14,7 @@
 #include "sys/spi.hpp"
 #include "services/time.hpp"
 #include "services/notify.hpp"
+#include "services/pref.hpp"
 #include "display/controller.hpp"
 
 #include "FreeRTOS.h" /* Must come first. */
@@ -54,6 +55,7 @@ int main()
     BLE::App bleApp = BLE::App(&gpioCtrl, &sysState);
     BLE::TimeService timeService = BLE::TimeService(&gpioCtrl, &sysState);
     BLE::NotifyService notifyService = BLE::NotifyService(&gpioCtrl, &sysState);
+    BLE::PrefService prefService = BLE::PrefService(&gpioCtrl, &sysState);
 
     /* Configure the debug support if needed */
     debugCtrl.Init();
@@ -104,6 +106,7 @@ int main()
     bleApp.Init();
     timeService.Init();
     notifyService.Init();
+    prefService.Init();
     bleApp.Advertising(SET);
 
     Display::Controller displayCtrl = Display::Controller(200, 200, spiCtrl, &sysState);

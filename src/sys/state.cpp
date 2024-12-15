@@ -6,8 +6,21 @@
 #include <cstdint>
 
 
+void Sys::Preferences::Color_Scheme(Scheme scheme)
+{
+    if (scheme == Scheme::LIGHT) {
+        userWhite = lv_color_hex(0xffffff);
+        userBlack = lv_color_hex(0x000000);
+    } else if (scheme == Scheme::DARK) {
+        userWhite = lv_color_hex(0x000000);
+        userBlack = lv_color_hex(0xffffff);
+    }
+}
+
 Sys::State::State()
-{}
+{
+    pref.Color_Scheme(Scheme::LIGHT);
+}
 
 Sys::State::~State()
 {}
@@ -25,6 +38,11 @@ void Sys::State::App_Flag_Set(App_Flag flag)
 void Sys::State::App_Flag_Reset(App_Flag flag)
 {
     VariableBit_Reset_BB((uint32_t)&(this->App_State), (uint8_t)flag);
+}
+
+Preferences *Sys::State::Get_Pref()
+{
+    return &pref;
 }
 
 void Sys::State::Set_Time(Time value)

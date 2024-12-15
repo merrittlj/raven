@@ -36,8 +36,9 @@ namespace Display
     void Controller::Init()
     {
         display.Init();
-        lvgl.Init();
-        lvgl.Create();
+        display.Clear();
+        /* lvgl.Init(); */
+        /* lvgl.Create(); */
     }
 
     void Controller::Process()
