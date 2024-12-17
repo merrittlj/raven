@@ -3,6 +3,8 @@
 #include "app/common.hpp"
 #include "display/controller.hpp"
 
+#include "lvgl.h"
+
 #include <cstdint>
 
 
@@ -40,7 +42,7 @@ void Sys::State::App_Flag_Reset(App_Flag flag)
     VariableBit_Reset_BB((uint32_t)&(this->App_State), (uint8_t)flag);
 }
 
-Preferences *Sys::State::Get_Pref()
+Sys::Preferences *Sys::State::Get_Pref()
 {
     return &pref;
 }

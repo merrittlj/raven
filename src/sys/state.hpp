@@ -5,6 +5,7 @@
 #include "app/common.hpp"
 
 #include "tl.h"
+#include "lvgl.h"
 
 #include <cstdint>
 #include <string>
@@ -33,11 +34,11 @@ namespace Sys
     enum class Scheme {
         LIGHT,
         DARK
-    }
+    };
     struct Preferences {
         /* Flipped/inverted when using dark mode */
-        lv_color userWhite;
-        lv_color userBlack;
+        lv_color_t userWhite;
+        lv_color_t userBlack;
 
         void Color_Scheme(Scheme scheme);
     };

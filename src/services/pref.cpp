@@ -26,7 +26,7 @@ tBleStatus BLE::PrefService::Add()
 {
     uint16_t retHandle;
     Char_UUID_t serviceUUID = BLE::UUID::CreateCharUUID({0xbd,0x77,0x11,0xb0,0xbb,0x11,0x11,0xef,0x99,0x08,0x08,0x00,0x20,0x0c,0x9a,0x66});
-    tBleStatus ret = aci_gatt_add_service(UUID_TYPE_16, (Service_UUID_t *)&serviceUUID,
+    tBleStatus ret = aci_gatt_add_service(UUID_TYPE_128, (Service_UUID_t *)&serviceUUID,
             PRIMARY_SERVICE,
             SERVICE_MAX_ATT_RECORDS,
             &retHandle);

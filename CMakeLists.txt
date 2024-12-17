@@ -60,6 +60,9 @@ add_executable(${PROJECT_NAME}
 
     ${PROJECT_SOURCE_DIR}/services/time.cpp
     ${PROJECT_SOURCE_DIR}/services/notify.cpp
+    ${PROJECT_SOURCE_DIR}/services/pref.cpp
+    ${PROJECT_SOURCE_DIR}/services/nav.cpp
+    ${PROJECT_SOURCE_DIR}/services/music.cpp
 
     ${PROJECT_SOURCE_DIR}/display/display.cpp
     ${PROJECT_SOURCE_DIR}/display/controller.cpp

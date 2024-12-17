@@ -138,6 +138,16 @@ namespace Display
 
         alertsList = lv_obj_create(NULL);
         Create_Alerts_List();
+
+
+        navScreen = lv_obj_create(NULL);
+        /* See notebook */
+
+
+        musicScreen = lv_obj_create(NULL);
+        /* Top: Track name, axel_22_ui */
+        /* Right below top: Artist name, axel_20_text */
+        /* Bottom: Album name, axel_20_text */
     }
 
     void LVGL::Flush(lv_display_t *display, const lv_area_t *area, uint8_t *px_map)

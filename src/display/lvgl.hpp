@@ -37,6 +37,10 @@ namespace Display
             lv_obj_t *alertsList;
             lv_obj_t *alerts;
 
+            lv_obj_t *navScreen;
+
+            lv_obj_t *musicScreen;
+
             void Create_Alerts_List();
 
         public:
@@ -56,7 +60,7 @@ namespace Display
              * |  - - -  |
              * [2 - - - 4] */
             /* Handles lists with groups(first button press) and items(second button press) */
-            uint16_t LVGL::List_Handler(uint8_t group, uint8_t item);
+            uint16_t List_Handler(uint8_t group, uint8_t item);
             /* Button One: Universal return to face button */
             void Button_One();
             /* Button Two: Open active screens/tasks */
