@@ -5,13 +5,15 @@ namespace Display
 {
     Controller::Controller(uint16_t displayWidth, uint16_t displayHeight, Sys::SPIController ctrl, Sys::State *sysState)
     {
+        state = sysState;
+
         Controller::Instance(this);
 
         manager = { 0 };
         manager.width = displayWidth;
         manager.height = displayHeight;
 
-        display = Display::EInk(manager, ctrl);
+        display = Display::EInk(manager, ctrl, sysState);
         manager.displayCallback = &display;
 
         lvgl = Display::LVGL(manager, sysState);
@@ -37,8 +39,11 @@ namespace Display
     {
         display.Init();
         display.Clear();
-        /* lvgl.Init(); */
-        /* lvgl.Create(); */
+        lvgl.Init();
+        lvgl.Create();
+
+        state->Screen_Activate(Screen::FACE);
+        /* Alerts list shouldn't be default, just as there is no reason to with no unreads */
     }
 
     void Controller::Process()

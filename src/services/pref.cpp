@@ -63,7 +63,7 @@ SVCCTL_EvtAckStatus_t BLE::PrefService::Event_Handler(void *Event)
                         uint8_t *data;
                         data = attribute_modified->Attr_Data;
                         if (attribute_modified->Attr_Handle == (colorScheme.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Get_Pref()->Color_Scheme((Sys::Scheme)data[0]);
+                            sysState->Get_Pref()->scheme = ((Sys::Scheme)data[0]);
                         }
                         break;
 

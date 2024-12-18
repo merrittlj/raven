@@ -69,12 +69,25 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCE_DIR}/display/lvgl.cpp
     ${PROJECT_SOURCE_DIR}/display/eink.cpp
 
-    ${PROJECT_SOURCE_DIR}/display/gloock_18_date.c
-    ${PROJECT_SOURCE_DIR}/display/gloock_70_time.c
-    ${PROJECT_SOURCE_DIR}/display/axel_22_ui.c
-    ${PROJECT_SOURCE_DIR}/display/axel_20_text.c
-    # ${PROJECT_SOURCE_DIR}/display/lato_18.c
-    # ${PROJECT_SOURCE_DIR}/display/sunflower_80.c
+    ${PROJECT_SOURCE_DIR}/display/fonts/gloock_18_date.c
+    ${PROJECT_SOURCE_DIR}/display/fonts/gloock_70_time.c
+    ${PROJECT_SOURCE_DIR}/display/fonts/axel_22_ui.c
+    ${PROJECT_SOURCE_DIR}/display/fonts/axel_20_text.c
+
+    ${PROJECT_SOURCE_DIR}/display/icons/ravenicons/close.c
+    ${PROJECT_SOURCE_DIR}/display/icons/ravenicons/continue.c
+    ${PROJECT_SOURCE_DIR}/display/icons/ravenicons/continue_left.c
+    ${PROJECT_SOURCE_DIR}/display/icons/ravenicons/continue_right.c
+    ${PROJECT_SOURCE_DIR}/display/icons/ravenicons/flag.c
+    ${PROJECT_SOURCE_DIR}/display/icons/ravenicons/roundabout_left.c
+    ${PROJECT_SOURCE_DIR}/display/icons/ravenicons/roundabout_right.c
+    ${PROJECT_SOURCE_DIR}/display/icons/ravenicons/turn_left.c
+    ${PROJECT_SOURCE_DIR}/display/icons/ravenicons/turn_right.c
+    ${PROJECT_SOURCE_DIR}/display/icons/ravenicons/turn_sharp_left.c
+    ${PROJECT_SOURCE_DIR}/display/icons/ravenicons/turn_sharp_right.c
+    ${PROJECT_SOURCE_DIR}/display/icons/ravenicons/turn_slight_left.c
+    ${PROJECT_SOURCE_DIR}/display/icons/ravenicons/turn_slight_right.c
+    ${PROJECT_SOURCE_DIR}/display/icons/ravenicons/uturn.c
 )
 
 target_link_directories(${PROJECT_NAME}

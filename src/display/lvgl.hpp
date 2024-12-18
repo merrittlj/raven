@@ -33,15 +33,28 @@ namespace Display
             lv_obj_t *body;
 
             lv_obj_t *activeScreen;
+            lv_obj_t *activeList;
 
+            lv_obj_t *alertsListScreen;
             lv_obj_t *alertsList;
-            lv_obj_t *alerts;
 
             lv_obj_t *navScreen;
+            lv_obj_t *navInstruction;
+            lv_obj_t *navDistance;
+            lv_obj_t *navETA;
+            lv_obj_t *navAction;
 
             lv_obj_t *musicScreen;
+            lv_obj_t *musicTrack;
+            lv_obj_t *musicArtist;
+            lv_obj_t *musicAlbum;
 
-            void Create_Alerts_List();
+            lv_obj_t *Create_List(lv_obj_t *screen, std::string title);
+            void Active_Screen();
+            void Alerts_List_Screen();
+
+            /* Handles lists with groups(first button press) and items(second button press) */
+            uint16_t List_Handler(uint8_t group, uint8_t item);
 
         public:
             LVGL();
@@ -51,16 +64,15 @@ namespace Display
             void Create();
             static void Flush(lv_display_t *display, const lv_area_t *area, uint8_t *px_map);
 
-            void Time(Sys::Time value);
-            void Alert(Sys::Alert alert);
-            void Alerts_List_Screen();
+            void Time(Sys::TimeInfo value);
+            void Alert(Sys::AlertInfo info);
+            void Navigation(Sys::NavInfo info);
+            void Music(Sys::MusicInfo info);
 
             /* [1 - - - 3]
              * |  - - -  |
              * |  - - -  |
              * [2 - - - 4] */
-            /* Handles lists with groups(first button press) and items(second button press) */
-            uint16_t List_Handler(uint8_t group, uint8_t item);
             /* Button One: Universal return to face button */
             void Button_One();
             /* Button Two: Open active screens/tasks */

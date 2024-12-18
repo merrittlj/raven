@@ -2,6 +2,8 @@
 #define CONTROLLER_HPP
 
 
+#include "sys/state.hpp"
+
 #include "display/display.hpp"
 #include "display/eink.hpp"
 #include "display/lvgl.hpp"
@@ -15,6 +17,8 @@ namespace Display
     {
         private:
             inline static Controller *theInstance;
+
+            Sys::State *state;
 
             Display::Manager manager;
 

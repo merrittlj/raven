@@ -1,6 +1,7 @@
 #include "display/eink.hpp"
 
 #include "sys/spi.hpp"
+#include "sys/state.hpp"
 
 #include "stm32wbxx_hal.h"
 
@@ -56,10 +57,11 @@ namespace Display
     EInk::EInk()
     {}
 
-    EInk::EInk(Display::Manager man, Sys::SPIController ctrl)
+    EInk::EInk(Display::Manager man, Sys::SPIController ctrl, Sys::State *sysState)
     {
         manager = man;
         spi = ctrl;
+        state = sysState;
     }
 
     std::vector<uint8_t> *EInk::GetBuf()
@@ -228,7 +230,10 @@ namespace Display
         spi.SendCommand(0x24);  /* Write RAM(BW) */
         for (uint16_t j = 0; j < manager.height; j++) {
             for (uint16_t i = 0; i < widthBytes; i++) {
-                spi.SendData(buf.at(i + (j * widthBytes)));
+                if (state->scheme == Scheme::LIGHT)
+                    spi.SendData(buf.at(i + (j * widthBytes)));
+                if (state->scheme == Scheme::DARK)
+                    spi.SendData(buf.at(i + (j * widthBytes)) ^ 1);  /* Simple inversion */
             }
         }
         TurnOnDisplay();

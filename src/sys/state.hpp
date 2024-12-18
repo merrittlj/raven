@@ -16,7 +16,17 @@
 
 namespace Sys
 {
-    struct Time {
+    enum class Screen : uint8_t {
+        FACE,  /* Default active */
+        ALERT,  /* Default active */
+        ACTIVE,  /* Default active */
+        ALERTS_LIST,  /* Default inactive */
+        NAV,  /* Default inactive */
+        MUSIC,  /* Default inactive */
+        Enum_Length
+    };
+
+    struct TimeInfo {
         uint8_t month;
         uint8_t day;
 
@@ -25,10 +35,23 @@ namespace Sys
         uint8_t second;
     };
 
-    struct Alert {
+    struct AlertInfo {
         std::string source;
         std::string title;
         std::string body;
+    };
+
+    struct NavInfo {
+        std::string instruction;
+        std::string distance;
+        std::string eta;
+        std::string action;
+    };
+
+    struct MusicInfo {
+        std::string track;
+        std::string artist;
+        std::string album;
     };
 
     enum class Scheme {
@@ -37,10 +60,7 @@ namespace Sys
     };
     struct Preferences {
         /* Flipped/inverted when using dark mode */
-        lv_color_t userWhite;
-        lv_color_t userBlack;
-
-        void Color_Scheme(Scheme scheme);
+        Scheme scheme;
     };
 
     class State
@@ -48,9 +68,13 @@ namespace Sys
         private:
             volatile uint32_t App_State = 0x00000000;
 
+            /* Stores 0 or 1 values for if a screen is active */
+            /* Not used to track current state, but rather track what stays open */
+            std::array<uint8_t, Screen::Enum_Length> screens;
+
             Preferences pref;
 
-            Time Current_Time;
+            TimeInfo Current_Time;
 
             std::vector<Alert> alerts;
             Alert Alert_Builder;
@@ -83,7 +107,7 @@ namespace Sys
             };
 
             enum class Flag_Val : uint8_t {
-                NOT_SET,
+                NOT_SET = 0,
                 SET
             };
 
@@ -97,8 +121,14 @@ namespace Sys
             Preferences *Get_Pref();
 
             /* Setting time, vs updating(setting & displaying) */
-            void Set_Time(Time value);
-            void Update_Time(Time value);
+            void Set_Time(TimeInfo value);
+            void Update_Time(TimeInfo value);
+
+            void Screen_Activate(Screen s);
+            void Screen_Deactivate(Screen s);
+            /* 0 or 1 depending on if a screen is active(ran) */
+            uint8_t Is_Screen_Active(Screen s);
+            std::array<uint8_t, Screen::Enum_Length> Get_Active_Screens();
 
             void Alert_Build_Source(std::string str);
             void Alert_Build_Title(std::string str);
