@@ -7,9 +7,10 @@
 #include "tl.h"
 #include "lvgl.h"
 
-#include <cstdint>
+#include <cstddef>
 #include <string>
 #include <vector>
+#include <array>
 
 
 #define EVENT_POOL_SIZE                    (CFG_TLBLE_EVT_QUEUE_LENGTH*4U*DIVC(( sizeof(TL_PacketHeader_t) + TL_BLE_EVENT_FRAME_SIZE ), 4U))
@@ -21,7 +22,7 @@ namespace Sys
         ALERT,  /* Default active */
         ACTIVE,  /* Default active */
         ALERTS_LIST,  /* Default inactive */
-        NAV,  /* Default inactive */
+        NAVIGATION,  /* Default inactive */
         MUSIC,  /* Default inactive */
         Enum_Length
     };
@@ -70,14 +71,14 @@ namespace Sys
 
             /* Stores 0 or 1 values for if a screen is active */
             /* Not used to track current state, but rather track what stays open */
-            std::array<uint8_t, Screen::Enum_Length> screens;
+            std::array<uint8_t, (size_t)Screen::Enum_Length> screens;
 
             Preferences pref;
 
             TimeInfo Current_Time;
 
-            std::vector<Alert> alerts;
-            Alert Alert_Builder;
+            std::vector<AlertInfo> alerts;
+            AlertInfo Alert_Builder;
 
             /* Component index of the Red LED */
             uint32_t LED_Red_Index;
@@ -128,14 +129,14 @@ namespace Sys
             void Screen_Deactivate(Screen s);
             /* 0 or 1 depending on if a screen is active(ran) */
             uint8_t Is_Screen_Active(Screen s);
-            std::array<uint8_t, Screen::Enum_Length> Get_Active_Screens();
+            std::array<uint8_t, (size_t)Screen::Enum_Length> Get_Active_Screens();
 
             void Alert_Build_Source(std::string str);
             void Alert_Build_Title(std::string str);
             void Alert_Build_Body(std::string str);
             void Alert_Send();
             void Alert_Dismiss();
-            std::vector<Alert> *Get_Alerts();
+            std::vector<AlertInfo> *Get_Alerts();
 
             void Register_LED_Red(uint32_t pIndex);
             uint32_t Fetch_LED_Red();

@@ -74,20 +74,20 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCE_DIR}/display/fonts/axel_22_ui.c
     ${PROJECT_SOURCE_DIR}/display/fonts/axel_20_text.c
 
-    ${PROJECT_SOURCE_DIR}/display/icons/ravenicons/close.c
-    ${PROJECT_SOURCE_DIR}/display/icons/ravenicons/continue.c
-    ${PROJECT_SOURCE_DIR}/display/icons/ravenicons/continue_left.c
-    ${PROJECT_SOURCE_DIR}/display/icons/ravenicons/continue_right.c
-    ${PROJECT_SOURCE_DIR}/display/icons/ravenicons/flag.c
-    ${PROJECT_SOURCE_DIR}/display/icons/ravenicons/roundabout_left.c
-    ${PROJECT_SOURCE_DIR}/display/icons/ravenicons/roundabout_right.c
-    ${PROJECT_SOURCE_DIR}/display/icons/ravenicons/turn_left.c
-    ${PROJECT_SOURCE_DIR}/display/icons/ravenicons/turn_right.c
-    ${PROJECT_SOURCE_DIR}/display/icons/ravenicons/turn_sharp_left.c
-    ${PROJECT_SOURCE_DIR}/display/icons/ravenicons/turn_sharp_right.c
-    ${PROJECT_SOURCE_DIR}/display/icons/ravenicons/turn_slight_left.c
-    ${PROJECT_SOURCE_DIR}/display/icons/ravenicons/turn_slight_right.c
-    ${PROJECT_SOURCE_DIR}/display/icons/ravenicons/uturn.c
+    ${PROJECT_SOURCE_DIR}/display/icons/close.c
+    ${PROJECT_SOURCE_DIR}/display/icons/continue.c
+    ${PROJECT_SOURCE_DIR}/display/icons/continue_left.c
+    ${PROJECT_SOURCE_DIR}/display/icons/continue_right.c
+    ${PROJECT_SOURCE_DIR}/display/icons/flag.c
+    ${PROJECT_SOURCE_DIR}/display/icons/roundabout_left.c
+    ${PROJECT_SOURCE_DIR}/display/icons/roundabout_right.c
+    ${PROJECT_SOURCE_DIR}/display/icons/turn_left.c
+    ${PROJECT_SOURCE_DIR}/display/icons/turn_right.c
+    ${PROJECT_SOURCE_DIR}/display/icons/turn_sharp_left.c
+    ${PROJECT_SOURCE_DIR}/display/icons/turn_sharp_right.c
+    ${PROJECT_SOURCE_DIR}/display/icons/turn_slight_left.c
+    ${PROJECT_SOURCE_DIR}/display/icons/turn_slight_right.c
+    ${PROJECT_SOURCE_DIR}/display/icons/uturn.c
 )
 
 target_link_directories(${PROJECT_NAME}

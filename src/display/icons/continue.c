@@ -41,7 +41,7 @@ uint8_t continue_map[] = {
 
 };
 
-const lv_image_dsc_t continue = {
+const lv_image_dsc_t cont = {
   .header.magic = LV_IMAGE_HEADER_MAGIC,
   .header.cf = LV_COLOR_FORMAT_I1,
   .header.flags = 0 | LV_IMAGE_FLAGS_COMPRESSED,

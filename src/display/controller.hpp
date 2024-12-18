@@ -35,8 +35,8 @@ namespace Display
             void Init();
             void Process();
 
-            void Update_Time(Sys::Time value);
-            void Alert_Send(Sys::Alert alert);
+            void Update_Time(Sys::TimeInfo value);
+            void Alert_Send(Sys::AlertInfo alert);
 
             void Button_One();
             void Button_Two();

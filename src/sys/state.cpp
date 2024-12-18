@@ -5,14 +5,14 @@
 
 #include "lvgl.h"
 
-#include <cstdint>
+#include <cstddef>
 
 
 namespace Sys
 {
     State::State()
     {
-        pref.Color_Scheme(Scheme::LIGHT);
+        pref.scheme = Scheme::LIGHT;
     }
 
     State::~State()
@@ -51,20 +51,20 @@ namespace Sys
 
     void State::Screen_Activate(Screen s)
     {
-        screens.at(s) = 1;
+        screens.at((size_t)s) = 1;
     }
 
     void State::Screen_Deactivate(Screen s)
     {
-        screens.at(s) = 0;
+        screens.at((size_t)s) = 0;
     }
 
     uint8_t State::Is_Screen_Active(Screen s)
     {
-        return screens.at(s);
+        return screens.at((size_t)s);
     }
 
-    std::array<uint8_t, Screen::Enum_Length> State::Get_Active_Screens()
+    std::array<uint8_t, (size_t)Screen::Enum_Length> State::Get_Active_Screens()
     {
         return screens;
     }
@@ -96,7 +96,7 @@ namespace Sys
         alerts.pop_back();
     }
 
-    std::vector<Alert> *State::Get_Alerts()
+    std::vector<AlertInfo> *State::Get_Alerts()
     {
         return &alerts;
     }

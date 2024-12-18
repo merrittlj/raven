@@ -230,9 +230,9 @@ namespace Display
         spi.SendCommand(0x24);  /* Write RAM(BW) */
         for (uint16_t j = 0; j < manager.height; j++) {
             for (uint16_t i = 0; i < widthBytes; i++) {
-                if (state->scheme == Scheme::LIGHT)
+                if (state->Get_Pref()->scheme == Sys::Scheme::LIGHT)
                     spi.SendData(buf.at(i + (j * widthBytes)));
-                if (state->scheme == Scheme::DARK)
+                if (state->Get_Pref()->scheme == Sys::Scheme::DARK)
                     spi.SendData(buf.at(i + (j * widthBytes)) ^ 1);  /* Simple inversion */
             }
         }

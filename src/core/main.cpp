@@ -58,8 +58,8 @@ int main()
     BLE::TimeService timeService = BLE::TimeService(&gpioCtrl, &sysState);
     BLE::NotifyService notifyService = BLE::NotifyService(&gpioCtrl, &sysState);
     BLE::PrefService prefService = BLE::PrefService(&gpioCtrl, &sysState);
-    BLE::NavService navService = BLE::PrefService(&gpioCtrl, &sysState);
-    BLE::MusicService musicService = BLE::PrefService(&gpioCtrl, &sysState);
+    BLE::NavService navService = BLE::NavService(&gpioCtrl, &sysState);
+    BLE::MusicService musicService = BLE::MusicService(&gpioCtrl, &sysState);
 
     /* Configure the debug support if needed */
     debugCtrl.Init();

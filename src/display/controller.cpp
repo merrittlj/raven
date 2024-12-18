@@ -42,7 +42,7 @@ namespace Display
         lvgl.Init();
         lvgl.Create();
 
-        state->Screen_Activate(Screen::FACE);
+        state->Screen_Activate(Sys::Screen::FACE);
         /* Alerts list shouldn't be default, just as there is no reason to with no unreads */
     }
 
@@ -51,12 +51,12 @@ namespace Display
         lv_timer_periodic_handler();
     }
 
-    void Controller::Update_Time(Sys::Time value)
+    void Controller::Update_Time(Sys::TimeInfo value)
     {
         lvgl.Time(value);
     }
 
-    void Controller::Alert_Send(Sys::Alert alert)
+    void Controller::Alert_Send(Sys::AlertInfo alert)
     {
         lvgl.Alert(alert);
     }

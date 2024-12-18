@@ -7,6 +7,7 @@
 #include "stm32wbxx_hal.h"
 #include "lvgl.h"
 
+#include <array>
 #include <vector>
 #include <string>
 
@@ -16,20 +17,20 @@ LV_FONT_DECLARE(gloock_70_time)
 LV_FONT_DECLARE(axel_22_ui)
 LV_FONT_DECLARE(axel_20_text)
 
-LV_IMAGE_DECLARE(continue)
-LV_IMAGE_DECLARE(continue-left)
-LV_IMAGE_DECLARE(continue-right)
-LV_IMAGE_DECLARE(turn-left)
-LV_IMAGE_DECLARE(turn-slight-left)
-LV_IMAGE_DECLARE(turn-sharp-left)
-LV_IMAGE_DECLARE(turn-right)
-LV_IMAGE_DECLARE(turn-slight-right)
-LV_IMAGE_DECLARE(turn-sharp-right)
-LV_IMAGE_DECLARE(roundabout-left)
-LV_IMAGE_DECLARE(roundabout-right)
-LV_IMAGE_DECLARE(uturn)
-LV_IMAGE_DECLARE(close)
-LV_IMAGE_DECLARE(flag)
+LV_IMAGE_DECLARE(cont);
+LV_IMAGE_DECLARE(cont_left);
+LV_IMAGE_DECLARE(cont_right);
+LV_IMAGE_DECLARE(turn_left);
+LV_IMAGE_DECLARE(turn_slight_left);
+LV_IMAGE_DECLARE(turn_sharp_left);
+LV_IMAGE_DECLARE(turn_right);
+LV_IMAGE_DECLARE(turn_slight_right);
+LV_IMAGE_DECLARE(turn_sharp_right);
+LV_IMAGE_DECLARE(roundabout_left);
+LV_IMAGE_DECLARE(roundabout_right);
+LV_IMAGE_DECLARE(uturn);
+LV_IMAGE_DECLARE(close);
+LV_IMAGE_DECLARE(flag);
 
 namespace Display
 {
@@ -55,12 +56,12 @@ namespace Display
         lv_display_set_flush_cb(eInk, Flush);
     }
 
-    lv_obj_t *LVGL::Create_List(lv_obj_t *screen, std::string title)
+    lv_obj_t *LVGL::Create_List(lv_obj_t *screen, std::string text)
     {
         lv_obj_t *list = lv_list_create(screen);
         lv_obj_set_size(list, 200, 200);
         lv_obj_align(list, LV_ALIGN_TOP_LEFT, 0, 0);
-        lv_list_add_text(list, title.c_str());
+        lv_list_add_text(list, text.c_str());
         return list;
     }
 
@@ -198,7 +199,7 @@ namespace Display
         lv_obj_add_style(musicAlbum, &texts, 0);
         lv_label_set_text(musicAlbum, "Album");
         lv_obj_set_style_text_font(musicAlbum, &axel_20_text, 0);
-        lv_obj_align(musicAlbum, LV_ALIGN_BOTTOM, 0, -20);
+        lv_obj_align(musicAlbum, LV_ALIGN_BOTTOM_MID, 0, -20);
     }
 
     void LVGL::Flush(lv_display_t *display, const lv_area_t *area, uint8_t *px_map)
@@ -235,7 +236,7 @@ namespace Display
 
         lv_scr_load(alertScreen);
         /* ALERT default active */
-        state->Screen_Activate(Screen::ALERTS_LIST);  /* Until dismissal, activate unread alerts */
+        state->Screen_Activate(Sys::Screen::ALERTS_LIST);  /* Until dismissal, activate unread alerts */
     }
 
     void LVGL::Navigation(Sys::NavInfo info)
@@ -244,24 +245,24 @@ namespace Display
         lv_label_set_text(navDistance, info.distance.c_str());
         lv_label_set_text(navETA, info.eta.c_str());
 
-        if (info.action == "continue") lv_img_set_src(navAction, &continue);
-        if (info.action == "continue-left") lv_img_set_src(navAction, &continue-left);
-        if (info.action == "continue-right") lv_img_set_src(navAction, &continue-right);
-        if (info.action == "turn-left") lv_img_set_src(navAction, &turn-left);
-        if (info.action == "turn-slight-left") lv_img_set_src(navAction, &turn-slight-left);
-        if (info.action == "turn-sharp-left") lv_img_set_src(navAction, &turn-sharp-left);
-        if (info.action == "turn-right") lv_img_set_src(navAction, &turn-right);
-        if (info.action == "turn-slight-right") lv_img_set_src(navAction, &turn-slight-right);
-        if (info.action == "turn-sharp-right") lv_img_set_src(navAction, &turn-sharp-right);
-        if (info.action == "roundabout-left") lv_img_set_src(navAction, &roundabout-left);
-        if (info.action == "roundabout-right") lv_img_set_src(navAction, &roundabout-right);
+        if (info.action == "continue") lv_img_set_src(navAction, &cont);
+        if (info.action == "continue-left") lv_img_set_src(navAction, &cont_left);
+        if (info.action == "continue-right") lv_img_set_src(navAction, &cont_right);
+        if (info.action == "turn-left") lv_img_set_src(navAction, &turn_left);
+        if (info.action == "turn-slight-left") lv_img_set_src(navAction, &turn_slight_left);
+        if (info.action == "turn-sharp-left") lv_img_set_src(navAction, &turn_sharp_left);
+        if (info.action == "turn-right") lv_img_set_src(navAction, &turn_right);
+        if (info.action == "turn-slight-right") lv_img_set_src(navAction, &turn_slight_right);
+        if (info.action == "turn-sharp-right") lv_img_set_src(navAction, &turn_sharp_right);
+        if (info.action == "roundabout-left") lv_img_set_src(navAction, &roundabout_left);
+        if (info.action == "roundabout-right") lv_img_set_src(navAction, &roundabout_right);
         if (info.action == "uturn") lv_img_set_src(navAction, &uturn);
         if (info.action == "close") lv_img_set_src(navAction, &close);
         if (info.action == "flag") lv_img_set_src(navAction, &flag);
 
-        if (!state->Is_Screen_Active(Screen::NAVIGATION)) {
+        if (!state->Is_Screen_Active(Sys::Screen::NAVIGATION)) {
             lv_scr_load(navScreen);
-            state->Screen_Activate(Screen::NAVIGATION);
+            state->Screen_Activate(Sys::Screen::NAVIGATION);
         }
     }
 
@@ -271,24 +272,24 @@ namespace Display
         lv_label_set_text(musicArtist, info.artist.c_str());
         lv_label_set_text(musicAlbum, info.album.c_str());
 
-        if (!state->Is_Screen_Active(Screen::MUSIC)) {
+        if (!state->Is_Screen_Active(Sys::Screen::MUSIC)) {
             lv_scr_load(musicScreen);
-            state->Screen_Activate(Screen::MUSIC);
+            state->Screen_Activate(Sys::Screen::MUSIC);
         }
     }
 
     void LVGL::Active_Screen()
     {
-        std::vector<Sys::Screen> *screens = state->Get_Active_Screens();
-        for (int i = 0; i < screens.size(); ++i) {
+        std::array<uint8_t, (size_t)Sys::Screen::Enum_Length> screens = state->Get_Active_Screens();
+        for (size_t i = 0; i < screens.size(); ++i) {
             uint8_t s = screens.at(i);
             if (!s) continue;
-            if ((Screen)i == Screen::FACE) lv_list_add_button(activeList, NULL, "Watch Face");
-            if ((Screen)i == Screen::ALERT) continue;  /* Alert is inaccessible directly, but it shouldn't be active anyways */
-            if ((Screen)i == Screen::ACTIVE) continue;  /* Shouldn't be set active, text is redundant */
-            if ((Screen)i == Screen::ALERTS_LIST) lv_list_add_button(activeList, NULL, "Unread Alerts");
-            if ((Screen)i == Screen::NAV) lv_list_add_button(activeList, NULL, "Navigation");
-            if ((Screen)i == Screen::MUSIC) lv_list_add_button(activeList, NULL, "Music");
+            if ((Sys::Screen)i == Sys::Screen::FACE) lv_list_add_button(activeList, NULL, "Watch Face");
+            if ((Sys::Screen)i == Sys::Screen::ALERT) continue;  /* Alert is inaccessible directly, but it shouldn't be active anyways */
+            if ((Sys::Screen)i == Sys::Screen::ACTIVE) continue;  /* Shouldn't be set active, text is redundant */
+            if ((Sys::Screen)i == Sys::Screen::ALERTS_LIST) lv_list_add_button(activeList, NULL, "Unread Alerts");
+            if ((Sys::Screen)i == Sys::Screen::NAVIGATION) lv_list_add_button(activeList, NULL, "Navigation");
+            if ((Sys::Screen)i == Sys::Screen::MUSIC) lv_list_add_button(activeList, NULL, "Music");
         }
         lv_scr_load(activeScreen);
     }
@@ -328,7 +329,7 @@ namespace Display
             state->Alert_Dismiss();
             /* Deactivate on empty, safe doing here as all dismissals are routed here */
             if (state->Get_Alerts()->size() == 0)
-                state->Screen_Deactivate(Screen::ALERTS_LIST);
+                state->Screen_Deactivate(Sys::Screen::ALERTS_LIST);
             lv_scr_load(faceScreen);
         }
         /* Active screen: scroll up */

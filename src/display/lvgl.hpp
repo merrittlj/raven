@@ -49,7 +49,7 @@ namespace Display
             lv_obj_t *musicArtist;
             lv_obj_t *musicAlbum;
 
-            lv_obj_t *Create_List(lv_obj_t *screen, std::string title);
+            lv_obj_t *Create_List(lv_obj_t *screen, std::string text);
             void Active_Screen();
             void Alerts_List_Screen();
 
