@@ -61,6 +61,11 @@ namespace Display
         lvgl.Alert(alert);
     }
 
+    void Controller::Event_Send(Sys::EventInfo event)
+    {
+        lvgl.Event(event);
+    }
+
     void Controller::Button_One()
     {
         lvgl.Button_One();

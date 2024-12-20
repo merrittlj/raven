@@ -17,6 +17,7 @@
 #include "services/pref.hpp"
 #include "services/nav.hpp"
 #include "services/music.hpp"
+#include "services/event.hpp"
 #include "display/controller.hpp"
 
 #include "FreeRTOS.h" /* Must come first. */
@@ -60,6 +61,7 @@ int main()
     BLE::PrefService prefService = BLE::PrefService(&gpioCtrl, &sysState);
     BLE::NavService navService = BLE::NavService(&gpioCtrl, &sysState);
     BLE::MusicService musicService = BLE::MusicService(&gpioCtrl, &sysState);
+    BLE::EventService eventService = BLE::EventService(&gpioCtrl, &sysState);
 
     /* Configure the debug support if needed */
     debugCtrl.Init();
@@ -113,6 +115,7 @@ int main()
     prefService.Init();
     navService.Init();
     musicService.Init();
+    eventService.Init();
     bleApp.Advertising(SET);
 
     Display::Controller displayCtrl = Display::Controller(200, 200, spiCtrl, &sysState);

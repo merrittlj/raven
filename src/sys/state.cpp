@@ -84,21 +84,68 @@ namespace Sys
         Alert_Builder.body = str;
     }
 
-    void State::Alert_Send()
+    void State::Alert_Trigger()
     {
         alerts.push_back(Alert_Builder);
         Display::Controller::Instance()->Alert_Send(alerts.back());
         Alert_Builder = {"", "", ""};
     }
 
-    void State::Alert_Dismiss()
+    void State::Alert_Dismiss(size_t index)
     {
-        alerts.pop_back();
+        alerts.remove(index);
     }
 
     std::vector<AlertInfo> *State::Get_Alerts()
     {
         return &alerts;
+    }
+
+    void State::Event_Build_Type(uint8_t value)
+    {
+        EventBuilder.type = value;
+    }
+
+    void State::Event_Build_Id(uint8_t value)
+    {
+        EventBuilder.id = value;
+    }
+
+    void State::Event_Build_Title(std::string str)
+    {
+        EventBuilder.title = str;
+    }
+
+    void State::Event_Build_Desc(std::string str)
+    {
+        EventBuilder.desc = str;
+    }
+
+    void State::Event_Build_Timestamp(uint16_t value)
+    {
+        EventBuilder.timestamp = value;
+    }
+
+    void State::Event_Build_RepDur(uint8_t value)
+    {
+        EventBuilder.repDur = value;
+    }
+
+    void State::Event_Trigger()
+    {
+        events.push_back(Event_Builder);
+        Display::Controller::Instance()->Event_Send(events.back());
+        Event_Builder = {0, 0, "", "", 0, 0};
+    }
+
+    void State::Event_Dismiss(size_t index)
+    {
+        events.remove(index);
+    }
+
+    std::vector<EventInfo> Get_Events()
+    {
+        return events;
     }
 
     void State::Register_LED_Red(uint32_t pIndex)

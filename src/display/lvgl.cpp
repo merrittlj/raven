@@ -135,12 +135,26 @@ namespace Display
         lv_obj_set_style_max_width(body, 185, 0);
         lv_obj_align(body, LV_ALIGN_TOP_LEFT, 15, 85);
 
-        lv_obj_t *border = lv_obj_create(alertScreen);
-        lv_obj_add_style(border, &box, 0);
-        lv_obj_align(border, LV_ALIGN_CENTER, 0, 0);
-        lv_obj_move_background(border);
-        lv_obj_set_size(border, 200, 200);
+        lv_obj_t *alertBorder = lv_obj_create(alertScreen);
+        lv_obj_add_style(alertBorder, &box, 0);
+        lv_obj_align(alertBorder, LV_ALIGN_CENTER, 0, 0);
+        lv_obj_move_background(alertBorder);
+        lv_obj_set_size(alertBorder, 200, 200);
 
+
+        eventScreen = lv_obj_create(NULL);
+
+        static lv_style_t box;
+        lv_style_set_border_width(&box, 3);
+        lv_style_set_border_color(&box, lv_color_hex(0x000000));
+        lv_style_set_bg_color(&box, lv_color_hex(0xffffff));
+        lv_style_set_radius(&box, 5);
+
+        lv_obj_t *eventBorder = lv_obj_create(eventScreen);
+        lv_obj_add_style(eventBorder, &box, 0);
+        lv_obj_align(eventBorder, LV_ALIGN_CENTER, 0, 0);
+        lv_obj_move_background(eventBorder);
+        lv_obj_set_size(eventBorder, 200, 200);
 
 
         activeScreen = lv_obj_create(NULL);
@@ -155,6 +169,10 @@ namespace Display
 
         alertsListScreen = lv_obj_create(NULL);
         alertsList = Create_List(alertsListScreen, "Alerts");
+
+
+        eventsListScreen = lv_obj_create(NULL);
+        eventsList = Create_List(eventsListScreen, "Events");
 
 
         navScreen = lv_obj_create(NULL);
@@ -239,6 +257,15 @@ namespace Display
         state->Screen_Activate(Sys::Screen::ALERTS_LIST);  /* Until dismissal, activate unread alerts */
     }
 
+    void LVGL::Event(Sys::EventInfo info)
+    {
+        /* set event texts */
+
+        lv_scr_load(eventScreen);
+        /* EVENT default active */
+        state->Screen_Activate(Sys::Screen::EVENTS_LIST);
+    }
+
     void LVGL::Navigation(Sys::NavInfo info)
     {
         lv_label_set_text(navInstruction, info.instruction.c_str());
@@ -288,6 +315,7 @@ namespace Display
             if ((Sys::Screen)i == Sys::Screen::ALERT) continue;  /* Alert is inaccessible directly, but it shouldn't be active anyways */
             if ((Sys::Screen)i == Sys::Screen::ACTIVE) continue;  /* Shouldn't be set active, text is redundant */
             if ((Sys::Screen)i == Sys::Screen::ALERTS_LIST) lv_list_add_button(activeList, NULL, "Unread Alerts");
+            if ((Sys::Screen)i == Sys::Screen::EVENTS_LIST) lv_list_add_button(activeList, NULL, "Upcoming Events");
             if ((Sys::Screen)i == Sys::Screen::NAVIGATION) lv_list_add_button(activeList, NULL, "Navigation");
             if ((Sys::Screen)i == Sys::Screen::MUSIC) lv_list_add_button(activeList, NULL, "Music");
         }
@@ -302,6 +330,16 @@ namespace Display
             lv_list_add_button(alertsList, NULL, (alert.source).c_str());
         }
         lv_scr_load(alertsListScreen);
+    }
+
+    void LVGL::Events_List_Screen()
+    {
+        std::vector<Sys::EventInfo> stateEvents = state->Get_Events();
+        eventsList = Create_List(eventsListScreen, "Events");
+        for (Sys::EventInfo event : stateEvents) {
+            lv_list_add_button(eventsList, NULL, (event.title).c_str());
+        }
+        lv_scr_load(eventsListScreen);
     }
 
     uint16_t LVGL::List_Handler(uint8_t group, uint8_t item)
@@ -326,25 +364,48 @@ namespace Display
     {
         /* Alert screen: dismiss alert */
         if (lv_screen_active() == alertScreen) {
-            state->Alert_Dismiss();
+            state->Alert_Dismiss(alertIndex);
             /* Deactivate on empty, safe doing here as all dismissals are routed here */
             if (state->Get_Alerts()->size() == 0)
                 state->Screen_Deactivate(Sys::Screen::ALERTS_LIST);
             lv_scr_load(faceScreen);
         }
-        /* Active screen: scroll up */
-        else if (lv_screen_active() == activeScreen) {
-            /* Scroll up */
+        else if (lv_screen_active() == eventScreen) {
+            state->Event_Dismiss(eventIndex);
+            /* Deactivate on empty, safe doing here as all dismissals are routed here */
+            if (state->Get_Events.size() == 0)
+                state->Screen_Deactivate(Sys::Screen::EVENTS_LIST);
+            lv_scr_load(faceScreen);
         }
-        /* Alerts list: Group/item selector */
+        /* Active screen: selector */
+        else if (lv_screen_active() == activeScreen) {
+            /* Implement alerts/events list selectors */
+        }
+        /* Alerts list: selector */
         else if (lv_screen_active() == alertsListScreen) {
             /* If the group has been selected */
             if (prevButton > 0) {
                 uint16_t index = List_Handler(prevButton, 1);
                 prevButton = 0;
                 std::vector<Sys::AlertInfo> *stateAlerts = state->Get_Alerts();
-                if (index < stateAlerts->size())
-                    Alert(stateAlerts->at(index));
+                if (index < stateAlerts->size()) {
+                    alertIndex = index;
+                    Alert(stateAlerts->at(alertIndex));
+                }
+            }
+            else prevButton = 1;
+        }
+        /* Events list: selector */
+        else if (lv_screen_active() == eventsListScreen) {
+            /* If the group has been selected */
+            if (prevButton > 0) {
+                uint16_t index = List_Handler(prevButton, 1);
+                prevButton = 0;
+                std::vector<Sys::EventInfo> stateEvents = state->Get_Events();
+                if (index < stateEvents.size()) {
+                    eventIndex = index;
+                    Event(stateEvents->at(eventIndex));
+                }
             }
             else prevButton = 1;
         }
@@ -356,10 +417,14 @@ namespace Display
         if (lv_screen_active() == alertScreen) {
             Alerts_List_Screen();
         }
-        /* Active screen: scroll down */
-        else if (lv_screen_active() == activeScreen) {
-            /* Scroll down */
+        /* Event screen: shortcut to event list */
+        else if (lv_screen_active() == eventScreen) {
+            Events_List_Screen();
         }
+        /* Active screen: selector */
+        else if (lv_screen_active() == activeScreen) {
+        }
+        /* Alerts list screen: selector */
         else if (lv_screen_active() == alertsListScreen) {
             /* If the group has been selected */
             if (prevButton > 0) {
@@ -368,6 +433,18 @@ namespace Display
                 std::vector<Sys::AlertInfo> *stateAlerts = state->Get_Alerts();
                 if (index < stateAlerts->size())
                     Alert(stateAlerts->at(index));
+            }
+            else prevButton = 2;
+        }
+        /* Events list: selector */
+        else if (lv_screen_active() == eventsListScreen) {
+            /* If the group has been selected */
+            if (prevButton > 0) {
+                uint16_t index = List_Handler(prevButton, 2);
+                prevButton = 0;
+                std::vector<Sys::EventInfo> stateEvents = state->Get_Events();
+                if (index < stateEvents.size())
+                    Event(stateEvents->at(index));
             }
             else prevButton = 2;
         }

@@ -1,5 +1,5 @@
-#ifndef NOTIFY_HPP
-#define NOTIFY_HPP
+#ifndef EVENT_HPP
+#define EVENT_HPP
 
 
 #include "ble/service.hpp"
@@ -14,7 +14,7 @@
 
 namespace BLE
 {
-    class NotifyService : BLE::Service<NotifyService>
+    class EventService : BLE::Service<EventService>
     {
         protected:
             uintptr_t handle;
@@ -24,7 +24,7 @@ namespace BLE
              * service_max_attribute_record = 1 for service +
              *                                2 for each Write/Notify characteristic +
              *                                1 for client char configuration descriptor + */
-            const uint8_t SERVICE_MAX_ATT_RECORDS = 10;
+            const uint8_t SERVICE_MAX_ATT_RECORDS = 16;
 
             GPIO::Controller *gpioCtrl;
             Sys::State *sysState;
@@ -35,13 +35,16 @@ namespace BLE
             SVCCTL_EvtAckStatus_t Event_Handler(void *pckt);
 
         public:
-            BLE::Char source;
+            BLE::Char type;
+            BLE::Char id;
             BLE::Char title;
-            BLE::Char body;
+            BLE::Char desc;
+            BLE::Char timestamp;
+            BLE::Char repDur;
             BLE::Char trigger;
 
-            NotifyService(GPIO::Controller *pGpioCtrl, Sys::State *pSysState);
-            ~NotifyService();
+            EventService(GPIO::Controller *pGpioCtrl, Sys::State *pSysState);
+            ~EventService();
 
             uintptr_t Get_Handle() const;
             void Set_Handle(uintptr_t pHandle);
@@ -53,4 +56,4 @@ namespace BLE
 }
 
 
-#endif /* NOTIFY_HPP */
+#endif /* EVENT_HPP */

@@ -23,6 +23,9 @@ namespace Display
 
             uint8_t prevButton;
 
+            uint8_t alertIndex;
+            uint8_t eventIndex;
+
             lv_obj_t *faceScreen;
             lv_obj_t *time;
             lv_obj_t *date;
@@ -32,11 +35,16 @@ namespace Display
             lv_obj_t *title;
             lv_obj_t *body;
 
+            lv_obj_t *eventScreen;
+
             lv_obj_t *activeScreen;
             lv_obj_t *activeList;
 
             lv_obj_t *alertsListScreen;
             lv_obj_t *alertsList;
+
+            lv_obj_t *eventsListScreen;
+            lv_obj_t *eventsList;
 
             lv_obj_t *navScreen;
             lv_obj_t *navInstruction;
@@ -52,6 +60,7 @@ namespace Display
             lv_obj_t *Create_List(lv_obj_t *screen, std::string text);
             void Active_Screen();
             void Alerts_List_Screen();
+            void Events_List_Screen();
 
             /* Handles lists with groups(first button press) and items(second button press) */
             uint16_t List_Handler(uint8_t group, uint8_t item);
@@ -66,6 +75,7 @@ namespace Display
 
             void Time(Sys::TimeInfo value);
             void Alert(Sys::AlertInfo info);
+            void Event(Sys::EventInfo info);
             void Navigation(Sys::NavInfo info);
             void Music(Sys::MusicInfo info);
 

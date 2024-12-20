@@ -73,8 +73,8 @@ SVCCTL_EvtAckStatus_t BLE::NotifyService::Event_Handler(void *Event)
                         if (attribute_modified->Attr_Handle == (body.Get_Handle() + CHAR_VALUE_OFFSET)) {
                             sysState->Alert_Build_Body(std::string((const char *)data, (size_t)length));
                         }
-                        if (attribute_modified->Attr_Handle == (send.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Alert_Send();
+                        if (attribute_modified->Attr_Handle == (trigger.Get_Handle() + CHAR_VALUE_OFFSET)) {
+                            sysState->Alert_Trigger();
                             gpioCtrl->Write_Component(this->sysState->Fetch_LED_Red(), SET);
                             HAL_Delay(50);
                             gpioCtrl->Write_Component(this->sysState->Fetch_LED_Red(), RESET);
@@ -151,15 +151,15 @@ void BLE::NotifyService::Init()
     if (body.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
         Sys::Error_Handler(); /* UNEXPECTED */
 
-    Char_UUID_t sendUUID = BLE::UUID::CreateCharUUID({0x68,0x4A,0x49,0x64,0xB6,0xA6,0x11,0xEF,0xBE,0x87,0x08,0x00,0x20,0x0C,0x9A,0x66});
-    send = BLE::Char(UUID_TYPE_128, &sendUUID,
+    Char_UUID_t triggerUUID = BLE::UUID::CreateCharUUID({0x68,0x4A,0x49,0x64,0xB6,0xA6,0x11,0xEF,0xBE,0x87,0x08,0x00,0x20,0x0C,0x9A,0x66});
+    trigger = BLE::Char(UUID_TYPE_128, &triggerUUID,
             1 + 1,
             CHAR_PROP_READ | CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
             10,
             (uint8_t)VALUE_VARIABLE_LENGTH);
-    tBleStatus ret = send.Add(this->Get_Handle());
+    tBleStatus ret = trigger.Add(this->Get_Handle());
     if (ret != BLE_STATUS_SUCCESS)
         Sys::Error_Handler(); /* UNEXPECTED */
 }

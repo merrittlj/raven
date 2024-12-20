@@ -22,6 +22,7 @@ namespace Sys
         ALERT,  /* Default active */
         ACTIVE,  /* Default active */
         ALERTS_LIST,  /* Default inactive */
+        EVENTS_LIST, /* Default inactive */
         NAVIGATION,  /* Default inactive */
         MUSIC,  /* Default inactive */
         Enum_Length
@@ -40,6 +41,15 @@ namespace Sys
         std::string source;
         std::string title;
         std::string body;
+    };
+
+    struct EventInfo {
+        uint8_t type;
+        uint8_t id;
+        std::string title;
+        std::string desc;
+        uint16_t timestamp;
+        uint8_t repDur;
     };
 
     struct NavInfo {
@@ -79,6 +89,9 @@ namespace Sys
 
             std::vector<AlertInfo> alerts;
             AlertInfo Alert_Builder;
+
+            std::vector<EventInfo> events;
+            EventInfo Event_Builder;
 
             /* Component index of the Red LED */
             uint32_t LED_Red_Index;
@@ -134,9 +147,19 @@ namespace Sys
             void Alert_Build_Source(std::string str);
             void Alert_Build_Title(std::string str);
             void Alert_Build_Body(std::string str);
-            void Alert_Send();
-            void Alert_Dismiss();
+            void Alert_Trigger();
+            void Alert_Dismiss(size_t index);
             std::vector<AlertInfo> *Get_Alerts();
+
+            void Event_Build_Type(uint8_t value);
+            void Event_Build_Id(uint8_t value);
+            void Event_Build_Title(std::string str);
+            void Event_Build_Desc(std::string str);
+            void Event_Build_Timestamp(uint16_t value);
+            void Event_Build_RepDur(uint8_t value);
+            void Event_Trigger();
+            void Event_Dismiss(size_t index);
+            std::vector<EventInfo> Get_Events();
 
             void Register_LED_Red(uint32_t pIndex);
             uint32_t Fetch_LED_Red();
