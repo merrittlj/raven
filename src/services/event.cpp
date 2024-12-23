@@ -25,7 +25,8 @@ BLE::EventService::~EventService()
 tBleStatus BLE::EventService::Add()
 {
     uint16_t retHandle;
-    Char_UUID_t serviceUUID = BLE::UUID::CreateCharUUID({TODO});
+    
+    Char_UUID_t serviceUUID = BLE::UUID::CreateCharUUID({0x00,0xa9,0x70,0xd0,0xc0,0xdb,0x11,0xef,0xa8,0xfa,0x08,0x00,0x20,0x0c,0x9a,0x66});
     tBleStatus ret = aci_gatt_add_service(UUID_TYPE_128, (Service_UUID_t *)&serviceUUID,
             PRIMARY_SERVICE,
             SERVICE_MAX_ATT_RECORDS,
@@ -122,7 +123,7 @@ void BLE::EventService::Init()
     if (this->Add() != BLE_STATUS_SUCCESS)
         Sys::Error_Handler(); /* UNEXPECTED */
 
-    Char_UUID_t typeUUID = BLE::UUID::CreateCharUUID({TODO});
+    Char_UUID_t typeUUID = BLE::UUID::CreateCharUUID({0x00,0xa9,0x70,0xd1,0xc0,0xdb,0x11,0xef,0xa8,0xfa,0x08,0x00,0x20,0x0c,0x9a,0x66});
     type = BLE::Char(UUID_TYPE_128, &typeUUID,
             1 + 1,
             CHAR_PROP_WRITE,
@@ -133,7 +134,7 @@ void BLE::EventService::Init()
     if (type.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
         Sys::Error_Handler(); /* UNEXPECTED */
 
-    Char_UUID_t idUUID = BLE::UUID::CreateCharUUID({TODO});
+    Char_UUID_t idUUID = BLE::UUID::CreateCharUUID({0x00,0xa9,0x70,0xd2,0xc0,0xdb,0x11,0xef,0xa8,0xfa,0x08,0x00,0x20,0x0c,0x9a,0x66});
     id = BLE::Char(UUID_TYPE_128, &idUUID,
             1 + 1,
             CHAR_PROP_WRITE,
@@ -144,7 +145,7 @@ void BLE::EventService::Init()
     if (id.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
         Sys::Error_Handler(); /* UNEXPECTED */
 
-    Char_UUID_t titleUUID = BLE::UUID::CreateCharUUID({TODO});
+    Char_UUID_t titleUUID = BLE::UUID::CreateCharUUID({0x00,0xa9,0x70,0xd3,0xc0,0xdb,0x11,0xef,0xa8,0xfa,0x08,0x00,0x20,0x0c,0x9a,0x66});
     title = BLE::Char(UUID_TYPE_128, &titleUUID,
             1 + 1,
             CHAR_PROP_WRITE,
@@ -155,7 +156,7 @@ void BLE::EventService::Init()
     if (title.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
         Sys::Error_Handler(); /* UNEXPECTED */
 
-    Char_UUID_t descUUID = BLE::UUID::CreateCharUUID({TODO});
+    Char_UUID_t descUUID = BLE::UUID::CreateCharUUID({0x00,0xa9,0x70,0xd4,0xc0,0xdb,0x11,0xef,0xa8,0xfa,0x08,0x00,0x20,0x0c,0x9a,0x66});
     desc = BLE::Char(UUID_TYPE_128, &descUUID,
             1 + 1,
             CHAR_PROP_WRITE,
@@ -166,7 +167,7 @@ void BLE::EventService::Init()
     if (desc.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
         Sys::Error_Handler(); /* UNEXPECTED */
 
-    Char_UUID_t timestampUUID = BLE::UUID::CreateCharUUID({TODO});
+    Char_UUID_t timestampUUID = BLE::UUID::CreateCharUUID({0x00,0xa9,0x70,0xd5,0xc0,0xdb,0x11,0xef,0xa8,0xfa,0x08,0x00,0x20,0x0c,0x9a,0x66});
     timestamp = BLE::Char(UUID_TYPE_128, &timestampUUID,
             1 + 1,
             CHAR_PROP_WRITE,
@@ -177,7 +178,7 @@ void BLE::EventService::Init()
     if (timestamp.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
         Sys::Error_Handler(); /* UNEXPECTED */
 
-    Char_UUID_t repDurUUID = BLE::UUID::CreateCharUUID({TODO});
+    Char_UUID_t repDurUUID = BLE::UUID::CreateCharUUID({0x00,0xa9,0x70,0xd6,0xc0,0xdb,0x11,0xef,0xa8,0xfa,0x08,0x00,0x20,0x0c,0x9a,0x66});
     repDur = BLE::Char(UUID_TYPE_128, &repDurUUID,
             1 + 1,
             CHAR_PROP_WRITE,
@@ -188,7 +189,7 @@ void BLE::EventService::Init()
     if (repDur.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
         Sys::Error_Handler(); /* UNEXPECTED */
 
-    Char_UUID_t triggerUUID = BLE::UUID::CreateCharUUID({TODO});
+    Char_UUID_t triggerUUID = BLE::UUID::CreateCharUUID({0x00,0xa9,0x70,0xd7,0xc0,0xdb,0x11,0xef,0xa8,0xfa,0x08,0x00,0x20,0x0c,0x9a,0x66});
     trigger = BLE::Char(UUID_TYPE_128, &triggerUUID,
             1 + 1,
             CHAR_PROP_WRITE,

@@ -93,7 +93,7 @@ namespace Sys
 
     void State::Alert_Dismiss(size_t index)
     {
-        alerts.remove(index);
+        alerts.erase(alerts.begin() + index);
     }
 
     std::vector<AlertInfo> *State::Get_Alerts()
@@ -103,32 +103,32 @@ namespace Sys
 
     void State::Event_Build_Type(uint8_t value)
     {
-        EventBuilder.type = value;
+        Event_Builder.type = value;
     }
 
     void State::Event_Build_Id(uint8_t value)
     {
-        EventBuilder.id = value;
+        Event_Builder.id = value;
     }
 
     void State::Event_Build_Title(std::string str)
     {
-        EventBuilder.title = str;
+        Event_Builder.title = str;
     }
 
     void State::Event_Build_Desc(std::string str)
     {
-        EventBuilder.desc = str;
+        Event_Builder.desc = str;
     }
 
     void State::Event_Build_Timestamp(uint16_t value)
     {
-        EventBuilder.timestamp = value;
+        Event_Builder.timestamp = value;
     }
 
     void State::Event_Build_RepDur(uint8_t value)
     {
-        EventBuilder.repDur = value;
+        Event_Builder.repDur = value;
     }
 
     void State::Event_Trigger()
@@ -140,10 +140,10 @@ namespace Sys
 
     void State::Event_Dismiss(size_t index)
     {
-        events.remove(index);
+        events.erase(events.begin() + index);
     }
 
-    std::vector<EventInfo> Get_Events()
+    std::vector<EventInfo> State::Get_Events()
     {
         return events;
     }

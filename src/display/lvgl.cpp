@@ -144,12 +144,6 @@ namespace Display
 
         eventScreen = lv_obj_create(NULL);
 
-        static lv_style_t box;
-        lv_style_set_border_width(&box, 3);
-        lv_style_set_border_color(&box, lv_color_hex(0x000000));
-        lv_style_set_bg_color(&box, lv_color_hex(0xffffff));
-        lv_style_set_radius(&box, 5);
-
         lv_obj_t *eventBorder = lv_obj_create(eventScreen);
         lv_obj_add_style(eventBorder, &box, 0);
         lv_obj_align(eventBorder, LV_ALIGN_CENTER, 0, 0);
@@ -373,7 +367,7 @@ namespace Display
         else if (lv_screen_active() == eventScreen) {
             state->Event_Dismiss(eventIndex);
             /* Deactivate on empty, safe doing here as all dismissals are routed here */
-            if (state->Get_Events.size() == 0)
+            if (state->Get_Events().size() == 0)
                 state->Screen_Deactivate(Sys::Screen::EVENTS_LIST);
             lv_scr_load(faceScreen);
         }
@@ -404,7 +398,7 @@ namespace Display
                 std::vector<Sys::EventInfo> stateEvents = state->Get_Events();
                 if (index < stateEvents.size()) {
                     eventIndex = index;
-                    Event(stateEvents->at(eventIndex));
+                    Event(stateEvents.at(eventIndex));
                 }
             }
             else prevButton = 1;
@@ -444,7 +438,7 @@ namespace Display
                 prevButton = 0;
                 std::vector<Sys::EventInfo> stateEvents = state->Get_Events();
                 if (index < stateEvents.size())
-                    Event(stateEvents->at(index));
+                    Event(stateEvents.at(index));
             }
             else prevButton = 2;
         }
