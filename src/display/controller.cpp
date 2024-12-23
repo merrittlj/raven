@@ -71,22 +71,11 @@ namespace Display
         lvgl.Event(event);
     }
 
-    void Controller::Button_One()
+    void Controller::Button(uint8_t b)
     {
-        lvgl.Button_One();
-    }
-
-    void Controller::Button_Two()
-    {
-        lvgl.Button_Two();
-    }
-
-    void Controller::Button_Three()
-    {
-        lvgl.Button_Three();
-    }
-    void Controller::Button_Four()
-    {
-        lvgl.Button_Four();
+        if (b == 1) lvgl.Button_One();
+        if (b == 2) lvgl.Button_Two();
+        if (b == 3) lvgl.Button_Three();
+        if (b == 4) lvgl.Button_Four();
     }
 }

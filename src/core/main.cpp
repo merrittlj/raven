@@ -80,10 +80,11 @@ int main()
     uint8_t cs = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 6), GPIO::Types::SPI));
     uint8_t pwr = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 8), GPIO::Types::SPI));
 
-    uint8_t btn1 = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 12), GPIO::Types::Button));
-    uint8_t btn2 = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 13), GPIO::Types::Button));
-    uint8_t btn3 = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 14), GPIO::Types::Button));
-    uint8_t btn4 = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 15), GPIO::Types::Button));
+    std::array<uint8_t, 4> btns;
+    btns.at(0) = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 12), GPIO::Types::Button));
+    btns.at(1) = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 13), GPIO::Types::Button));
+    btns.at(2) = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 14), GPIO::Types::Button));
+    btns.at(3) = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 15), GPIO::Types::Button));
 
     gpioCtrl.Config();
     gpioCtrl.Init();
@@ -128,9 +129,20 @@ int main()
     NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
 
     RTOS::Process_Params *processParams = new RTOS::Process_Params;
-    processParams->evtP = sysEvtP;
-    processParams->displayCtrl = displayCtrl;
+    processParams->evtP = &sysEvtP;
+    processParams->displayCtrl = &displayCtrl;
     xTaskCreate(RTOS::Process_Task, "Process", configMINIMAL_STACK_SIZE, (void *)processParams, tskIDLE_PRIORITY, (TaskHandle_t *)NULL);
+
+    RTOS::Button_Params *buttonParams = new RTOS::Button_Params;
+    buttonParams->btnPort = &btnPort;
+    buttonParams->gpioCtrl = &gpioCtrl;
+    buttonParams->displayCtrl = &displayCtrl;
+    buttonParams->sysState = &sysState;
+    for (uint8_t i = 0; i < 4; ++i) {
+        buttonParams->button = i;
+        buttonParams->buttonIndex = btns.at(i);
+        xTaskCreate(RTOS::Button_Task, "ButtonX", configMINIMAL_STACK_SIZE, (void *)buttonParams, tskIDLE_PRIORITY + 1, (TaskHandle_t *)NULL);
+    }
 
     vTaskStartScheduler();
 
@@ -140,28 +152,6 @@ int main()
      * to be created.  See the memory management section on the FreeRTOS web site
      * for more details. */
     for (;;) {}
-
-    for(;;)
-    {
-        if ((HAL_GetTick() - prevTick) >= 1) {
-            prevTick = HAL_GetTick();
-
-            btnPort.ButtonProcess(gpioCtrl.Read_Component(btn1) | (gpioCtrl.Read_Component(btn2) << 1) | (gpioCtrl.Read_Component(btn3) << 2) | (gpioCtrl.Read_Component(btn4) << 3));
-            if (btnPort.ButtonPressed(BUTTON_PIN_0)) {
-                gpioCtrl.Write_Component(sysState.Fetch_LED_Red(), SET);
-                displayCtrl.Button_One();
-            } else gpioCtrl.Write_Component(sysState.Fetch_LED_Red(), RESET);
-            if (btnPort.ButtonPressed(BUTTON_PIN_1)) {
-                displayCtrl.Button_Two();
-            }
-            if (btnPort.ButtonPressed(BUTTON_PIN_2)) {
-                displayCtrl.Button_Three();
-            }
-            if (btnPort.ButtonPressed(BUTTON_PIN_3)) {
-                displayCtrl.Button_Four();
-            }
-        }
-    }
 }
 
 

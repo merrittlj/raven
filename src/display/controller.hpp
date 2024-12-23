@@ -40,10 +40,7 @@ namespace Display
             void Alert_Send(Sys::AlertInfo alert);
             void Event_Send(Sys::EventInfo event);
 
-            void Button_One();
-            void Button_Two();
-            void Button_Three();
-            void Button_Four();
+            void Button(uint8_t b);
     };
 }
 

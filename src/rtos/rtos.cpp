@@ -9,14 +9,30 @@ namespace RTOS
     Process_Params::Process_Params()
     {}
 
+    Button_Params::Button_Params()
+    {}
+
     void Process_Task(void *params)
     {
         Process_Params *p = (Process_Params *)params;
         for (;;) {
-            p->evtP.BLE_ProcessEvent();
-            p->evtP.Sys_ProcessEvent();
+            p->evtP->BLE_ProcessEvent();
+            p->evtP->Sys_ProcessEvent();
 
-            p->displayCtrl.Process();
+            p->displayCtrl->Process();
+        }
+    }
+
+    void Button_Task(void *params)
+    {
+        Button_Params *p = (Button_Params *)params;
+        for (;;) {
+            p->btnPort->ButtonProcess(p->gpioCtrl->Read_Component(p->buttonIndex));
+            if (p->btnPort->ButtonPressed(1 << (p->button - 1))) {
+                p->displayCtrl->Button(p->button);
+            } 
+
+            vTaskDelay(1);
         }
     }
 }
