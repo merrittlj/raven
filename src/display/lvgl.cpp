@@ -341,115 +341,117 @@ namespace Display
         return (group - 1) * 2 + (item - 1);
     }
 
-    void LVGL::Button_One()
+    void LVGL::Button(uint8_t b)
     {
-        /* All screens: load face */
-        lv_scr_load(faceScreen);
-        /* Default active */
-    }
-
-    void LVGL::Button_Two()
-    {
-        lv_scr_load(activeScreen);
-        /* Default active */
-    }
-
-    void LVGL::Button_Three()
-    {
-        /* Alert screen: dismiss alert */
-        if (lv_screen_active() == alertScreen) {
-            state->Alert_Dismiss(alertIndex);
-            /* Deactivate on empty, safe doing here as all dismissals are routed here */
-            if (state->Get_Alerts()->size() == 0)
-                state->Screen_Deactivate(Sys::Screen::ALERTS_LIST);
+        if (b == 1) {
+            /* All screens: load face */
             lv_scr_load(faceScreen);
         }
-        else if (lv_screen_active() == eventScreen) {
-            state->Event_Dismiss(eventIndex);
-            /* Deactivate on empty, safe doing here as all dismissals are routed here */
-            if (state->Get_Events().size() == 0)
-                state->Screen_Deactivate(Sys::Screen::EVENTS_LIST);
-            lv_scr_load(faceScreen);
+        
+        if (b == 2) {
+            /* All screens: load active screen */
+            lv_scr_load(activeScreen);
         }
-        /* Active screen: selector */
-        else if (lv_screen_active() == activeScreen) {
-            /* Implement alerts/events list selectors */
-        }
-        /* Alerts list: selector */
-        else if (lv_screen_active() == alertsListScreen) {
-            /* If the group has been selected */
-            if (prevButton > 0) {
-                uint16_t index = List_Handler(prevButton, 1);
-                prevButton = 0;
-                std::vector<Sys::AlertInfo> *stateAlerts = state->Get_Alerts();
-                if (index < stateAlerts->size()) {
-                    alertIndex = index;
-                    Alert(stateAlerts->at(alertIndex));
-                }
+
+        if (b == 3) {
+            /* Alert screen: dismiss alert */
+            if (lv_screen_active() == alertScreen) {
+                state->Alert_Dismiss(alertIndex);
+                /* Deactivate on empty, safe doing here as all dismissals are routed here */
+                if (state->Get_Alerts()->size() == 0)
+                    state->Screen_Deactivate(Sys::Screen::ALERTS_LIST);
+                lv_scr_load(faceScreen);
             }
-            else prevButton = 1;
-        }
-        /* Events list: selector */
-        else if (lv_screen_active() == eventsListScreen) {
-            /* If the group has been selected */
-            if (prevButton > 0) {
-                uint16_t index = List_Handler(prevButton, 1);
-                prevButton = 0;
-                std::vector<Sys::EventInfo> stateEvents = state->Get_Events();
-                if (index < stateEvents.size()) {
-                    eventIndex = index;
-                    Event(stateEvents.at(eventIndex));
-                }
+            else if (lv_screen_active() == eventScreen) {
+                state->Event_Dismiss(eventIndex);
+                /* Deactivate on empty, safe doing here as all dismissals are routed here */
+                if (state->Get_Events().size() == 0)
+                    state->Screen_Deactivate(Sys::Screen::EVENTS_LIST);
+                lv_scr_load(faceScreen);
             }
-            else prevButton = 1;
+            /* Active screen: selector */
+            else if (lv_screen_active() == activeScreen) {
+                /* Implement alerts/events list selectors */
+            }
+            /* Alerts list: selector */
+            else if (lv_screen_active() == alertsListScreen) {
+                /* If the group has been selected */
+                if (prevButton > 0) {
+                    uint16_t index = List_Handler(prevButton, 1);
+                    prevButton = 0;
+                    std::vector<Sys::AlertInfo> *stateAlerts = state->Get_Alerts();
+                    if (index < stateAlerts->size()) {
+                        alertIndex = index;
+                        Alert(stateAlerts->at(alertIndex));
+                    }
+                }
+                else prevButton = 1;
+            }
+            /* Events list: selector */
+            else if (lv_screen_active() == eventsListScreen) {
+                /* If the group has been selected */
+                if (prevButton > 0) {
+                    uint16_t index = List_Handler(prevButton, 1);
+                    prevButton = 0;
+                    std::vector<Sys::EventInfo> stateEvents = state->Get_Events();
+                    if (index < stateEvents.size()) {
+                        eventIndex = index;
+                        Event(stateEvents.at(eventIndex));
+                    }
+                }
+                else prevButton = 1;
+            }
+        }
+
+        if (b == 4) {
+            /* Alert screen: shortcut to alert list */
+            if (lv_screen_active() == alertScreen) {
+                Alerts_List_Screen();
+            }
+            /* Event screen: shortcut to event list */
+            else if (lv_screen_active() == eventScreen) {
+                Events_List_Screen();
+            }
+            /* Active screen: selector */
+            else if (lv_screen_active() == activeScreen) {
+            }
+            /* Alerts list screen: selector */
+            else if (lv_screen_active() == alertsListScreen) {
+                /* If the group has been selected */
+                if (prevButton > 0) {
+                    uint16_t index = List_Handler(prevButton, 2);
+                    prevButton = 0;
+                    std::vector<Sys::AlertInfo> *stateAlerts = state->Get_Alerts();
+                    if (index < stateAlerts->size())
+                        Alert(stateAlerts->at(index));
+                }
+                else prevButton = 2;
+            }
+            /* Events list: selector */
+            else if (lv_screen_active() == eventsListScreen) {
+                /* If the group has been selected */
+                if (prevButton > 0) {
+                    uint16_t index = List_Handler(prevButton, 2);
+                    prevButton = 0;
+                    std::vector<Sys::EventInfo> stateEvents = state->Get_Events();
+                    if (index < stateEvents.size())
+                        Event(stateEvents.at(index));
+                }
+                else prevButton = 2;
+            }
         }
     }
 
-    void LVGL::Button_Four()
+    void LVGL::Button_Double(uint8_t b1, uint8_t b2)
     {
-        /* Alert screen: shortcut to alert list */
-        if (lv_screen_active() == alertScreen) {
-            Alerts_List_Screen();
-        }
-        /* Event screen: shortcut to event list */
-        else if (lv_screen_active() == eventScreen) {
-            Events_List_Screen();
-        }
-        /* Active screen: selector */
-        else if (lv_screen_active() == activeScreen) {
-        }
-        /* Alerts list screen: selector */
-        else if (lv_screen_active() == alertsListScreen) {
-            /* If the group has been selected */
-            if (prevButton > 0) {
-                uint16_t index = List_Handler(prevButton, 2);
-                prevButton = 0;
-                std::vector<Sys::AlertInfo> *stateAlerts = state->Get_Alerts();
-                if (index < stateAlerts->size())
-                    Alert(stateAlerts->at(index));
+        /* Button 3 & 4 double press */
+        if ((b1 == 3 && b2 == 4) || (b1 == 4 && b2 == 3)) {
+            /* Alerts list screen: selector */
+            if (lv_screen_active() == alertsListScreen) {
+                /* We only have two items so double selector only applies for groups */
+                if (prevButton == 0)
+                    prevButton = 3;  /* TODO: prev button defines */
             }
-            else prevButton = 2;
-        }
-        /* Events list: selector */
-        else if (lv_screen_active() == eventsListScreen) {
-            /* If the group has been selected */
-            if (prevButton > 0) {
-                uint16_t index = List_Handler(prevButton, 2);
-                prevButton = 0;
-                std::vector<Sys::EventInfo> stateEvents = state->Get_Events();
-                if (index < stateEvents.size())
-                    Event(stateEvents.at(index));
-            }
-            else prevButton = 2;
-        }
-    }
-
-    void LVGL::Button_Double()
-    {
-        if (lv_screen_active() == alertsListScreen) {
-            /* We only have two items so double selector only applies for groups */
-            if (prevButton == 0)
-                prevButton = 3;
         }
     }
 }

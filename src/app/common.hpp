@@ -5,6 +5,7 @@
 #include "app/app_conf.h"
 #include "hw/common.hpp"
 
+#include <cstddef>
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
@@ -61,6 +62,8 @@
 #define DIVR(x, y)         (((x)+((y)/2))/(y))
 
 #define SHRR(x, n)         ((((x)>>((n)-1))+1)>>1)
+
+#define U32 uint32_t
 
 #define BITN(w, n)         (((w)[(n)/32] >> ((n)%32)) & 1)
 

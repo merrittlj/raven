@@ -29,8 +29,24 @@ namespace RTOS
         for (;;) {
             p->btnPort->ButtonProcess(p->gpioCtrl->Read_Component(p->buttonIndex));
             if (p->btnPort->ButtonPressed(1 << (p->button - 1))) {
-                p->displayCtrl->Button(p->button);
-            } 
+                BITNSET(p->buttonState, p->button - 1, 1);
+                /* Button 1 & 2 do not have double press functionality */
+                if (p->button == 1 || p->button == 2) {
+                    p->displayCtrl->Button(p->button);
+                    continue;
+                }
+
+                uint8_t db = 0;
+                for(uint8_t i = 0; i < DOUBLE_PRESS_TIMEOUT; ++i) {
+                    if ((p->button == 3 && BITN(p->buttonState, (4 - 1))) || (p->button == 4 && BITN(p->buttonState, (3 - 1)))) {
+                        p->displayCtrl->Button_Double(3, 4);
+                        db = 1;
+                        break;
+                    }
+                    vTaskDelay(1);
+                }
+                if (!db) p->displayCtrl->Button(p->button);
+            } else BITNSET(p->buttonState, p->button - 1, 0);
 
             vTaskDelay(1);
         }

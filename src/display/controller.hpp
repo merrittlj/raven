@@ -41,6 +41,7 @@ namespace Display
             void Event_Send(Sys::EventInfo event);
 
             void Button(uint8_t b);
+            void Button_Double(uint8_t b1, uint8_t b2);
     };
 }
 

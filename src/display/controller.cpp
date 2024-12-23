@@ -73,9 +73,12 @@ namespace Display
 
     void Controller::Button(uint8_t b)
     {
-        if (b == 1) lvgl.Button_One();
-        if (b == 2) lvgl.Button_Two();
-        if (b == 3) lvgl.Button_Three();
-        if (b == 4) lvgl.Button_Four();
+        lvgl.Button(b);
+    }
+
+
+    void Controller::Button_Double(uint8_t b1, uint8_t b2)
+    {
+        lvgl.Button_Double(b1, b2);
     }
 }

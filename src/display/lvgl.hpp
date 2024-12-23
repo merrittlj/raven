@@ -84,15 +84,12 @@ namespace Display
              * |  - - -  |
              * [2 - - - 4] */
             /* Button One: Universal return to face button */
-            void Button_One();
             /* Button Two: Open active screens/tasks */
-            void Button_Two();
             /* Button Three: Multi-purpose #1, confirm, scroll up, dismiss, etc. */
-            void Button_Three();
             /* Button Four: Multi-purpose #2, cancel, scroll down, etc. */
-            void Button_Four();
-            /* Button Double: Multiple-purpose #1 and #2 pressed simultaneously, group 3 selector */
-            void Button_Double();
+            /* Button 3 & 4 double press: Multiple-purpose #1 and #2 pressed simultaneously, group 3 selector */
+            void Button(uint8_t b);
+            void Button_Double(uint8_t b1, uint8_t b2);
     };
 }
 

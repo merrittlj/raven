@@ -133,11 +133,13 @@ int main()
     processParams->displayCtrl = &displayCtrl;
     xTaskCreate(RTOS::Process_Task, "Process", configMINIMAL_STACK_SIZE, (void *)processParams, tskIDLE_PRIORITY, (TaskHandle_t *)NULL);
 
+    uint32_t buttonState = 0;
     RTOS::Button_Params *buttonParams = new RTOS::Button_Params;
     buttonParams->btnPort = &btnPort;
     buttonParams->gpioCtrl = &gpioCtrl;
     buttonParams->displayCtrl = &displayCtrl;
     buttonParams->sysState = &sysState;
+    buttonParams->buttonState = &buttonState;
     for (uint8_t i = 0; i < 4; ++i) {
         buttonParams->button = i;
         buttonParams->buttonIndex = btns.at(i);
