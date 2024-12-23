@@ -42,26 +42,26 @@ extern "C" {
         for (;;);
     }
 
-    /* System service call via SWI instruction */
-    void SVC_Handler(void)
-    {
-    }
+    /* /1* System service call via SWI instruction *1/ */
+    /* void SVC_Handler(void) */
+    /* { */
+    /* } */
 
     /* Debug monitor */
     void DebugMon_Handler(void)
     {
     }
 
-    /* Pendable request for system service */
-    void PendSV_Handler(void)
-    {
-    }
+    /* /1* Pendable request for system service *1/ */
+    /* void PendSV_Handler(void) */
+    /* { */
+    /* } */
 
-    /* SysTick timer */
-    void SysTick_Handler(void)
-    {
-        HAL_IncTick();
-    }
+    /* /1* SysTick timer *1/ */
+    /* void SysTick_Handler(void) */
+    /* { */
+    /*     HAL_IncTick(); */
+    /* } */
 
 
     void IPCC_C1_TX_IRQHandler(void)

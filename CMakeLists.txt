@@ -52,6 +52,8 @@ add_executable(${PROJECT_NAME}
 
     ${PROJECT_SOURCE_DIR}/app/debug.cpp
 
+    ${PROJECT_SOURCE_DIR}/rtos/rtos.cpp
+
     ${PROJECT_SOURCE_DIR}/gpio/gpio.cpp
 
     ${PROJECT_SOURCE_DIR}/ble/ble.cpp
@@ -99,7 +101,7 @@ target_link_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
 		lib::stm_cube
-        lib::free_rtos
+        lib::rtos
         lib::debouncer
         lib::lvgl
 )

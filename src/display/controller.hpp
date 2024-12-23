@@ -26,6 +26,7 @@ namespace Display
             Display::LVGL lvgl;
 
         public:
+            Controller();
             Controller(uint16_t displayWidth, uint16_t displayHeight, Sys::SPIController ctrl, Sys::State *sysState);
             ~Controller();
 

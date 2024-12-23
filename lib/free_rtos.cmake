@@ -4,8 +4,10 @@ FetchContent_Declare(freertos_kernel
     GIT_TAG V11.1.0
 )
 
+set(RTOS_PORTABLE ARM_CM4F)
+
 add_library(freertos_config INTERFACE)
-add_library(lib::free_rtos ALIAS freertos_config)
+add_library(lib::free_rtos_config ALIAS freertos_config)
 
 target_include_directories(freertos_config SYSTEM
 INTERFACE
@@ -28,5 +30,27 @@ FetchContent_MakeAvailable(freertos_kernel)
 
 include_directories(
     ${freertos_kernel_SOURCE_DIR}/include
-    ${freertos_kernel_SOURCE_DIR}/portable/GCC/ARM_CM4F
+    ${freertos_kernel_SOURCE_DIR}/portable/GCC/${RTOS_PORTABLE}
+)
+
+add_library(rtos
+    ${freertos_kernel_SOURCE_DIR}/tasks.c
+    ${freertos_kernel_SOURCE_DIR}/list.c
+    ${freertos_kernel_SOURCE_DIR}/timers.c
+    ${freertos_kernel_SOURCE_DIR}/queue.c
+
+    ${freertos_kernel_SOURCE_DIR}/portable/GCC/${RTOS_PORTABLE}/port.c
+    ${freertos_kernel_SOURCE_DIR}/portable/MemMang/heap_4.c
+)
+add_library(lib::rtos ALIAS rtos)
+
+target_include_directories(rtos
+    PRIVATE
+    ${freertos_kernel_SOURCE_DIR}/include
+    ${freertos_kernel_SOURCE_DIR}/portable/GCC/${RTOS_PORTABLE}
+)
+
+target_link_libraries(rtos
+    PUBLIC
+    lib::free_rtos_config
 )

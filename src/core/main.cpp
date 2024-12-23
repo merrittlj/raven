@@ -19,6 +19,7 @@
 #include "services/music.hpp"
 #include "services/event.hpp"
 #include "display/controller.hpp"
+#include "rtos/rtos.hpp"
 
 #include "FreeRTOS.h" /* Must come first. */
 #include "task.h" /* RTOS task related API prototypes. */
@@ -123,13 +124,25 @@ int main()
 
     Debouncer btnPort(BUTTON_PIN_0 | BUTTON_PIN_1 | BUTTON_PIN_2 | BUTTON_PIN_3);
 
+    /* FreeRTOS */
+    NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
+
+    RTOS::Process_Params *processParams = new RTOS::Process_Params;
+    processParams->evtP = sysEvtP;
+    processParams->displayCtrl = displayCtrl;
+    xTaskCreate(RTOS::Process_Task, "Process", configMINIMAL_STACK_SIZE, (void *)processParams, tskIDLE_PRIORITY, (TaskHandle_t *)NULL);
+
+    vTaskStartScheduler();
+
+    /* If all is well, the scheduler will now be running, and the following line
+     * will never be reached.  If the following line does execute, then there was
+     * insufficient FreeRTOS heap memory available for the idle and/or timer tasks
+     * to be created.  See the memory management section on the FreeRTOS web site
+     * for more details. */
+    for (;;) {}
+
     for(;;)
     {
-        sysEvtP.BLE_ProcessEvent();
-        sysEvtP.Sys_ProcessEvent();
-
-        displayCtrl.Process();
-
         if ((HAL_GetTick() - prevTick) >= 1) {
             prevTick = HAL_GetTick();
 

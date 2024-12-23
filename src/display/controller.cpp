@@ -3,6 +3,11 @@
 
 namespace Display
 {
+    Controller::Controller()
+    {
+
+    }
+
     Controller::Controller(uint16_t displayWidth, uint16_t displayHeight, Sys::SPIController ctrl, Sys::State *sysState)
     {
         state = sysState;

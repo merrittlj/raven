@@ -37,6 +37,7 @@ namespace Sys
             Sys::State *sysState;
 
         public:
+            Event_Processor();
             Event_Processor(Sys::State *state);
             ~Event_Processor();
 

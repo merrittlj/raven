@@ -156,6 +156,9 @@ void Sys::Controller::Init_CPU2()
     TL_Enable();
 }
 
+Sys::Event_Processor::Event_Processor()
+{}
+
 Sys::Event_Processor::Event_Processor(Sys::State *state)
 {
     this->sysState = state;
