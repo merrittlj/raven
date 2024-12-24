@@ -120,7 +120,7 @@ void BLE::MusicService::Init()
 
     Char_UUID_t artistUUID = BLE::UUID::CreateCharUUID({0x98,0x2f,0xc7,0x71,0xbc,0x48,0x11,0xef,0x99,0x08,0x08,0x00,0x20,0x0c,0x9a,0x66});
     artist = BLE::Char(UUID_TYPE_128, &artistUUID,
-            1 + 1,
+            1,  /* TODO: need to truncate and determine UI parity */
             CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
@@ -131,7 +131,7 @@ void BLE::MusicService::Init()
 
     Char_UUID_t trackUUID = BLE::UUID::CreateCharUUID({0x98,0x2f,0xc7,0x72,0xbc,0x48,0x11,0xef,0x99,0x08,0x08,0x00,0x20,0x0c,0x9a,0x66});
     track = BLE::Char(UUID_TYPE_128, &trackUUID,
-            1 + 1,
+            1,  /* TODO: see prev */
             CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
@@ -142,7 +142,7 @@ void BLE::MusicService::Init()
 
     Char_UUID_t albumUUID = BLE::UUID::CreateCharUUID({0x98,0x2f,0xc7,0x73,0xbc,0x48,0x11,0xef,0x99,0x08,0x08,0x00,0x20,0x0c,0x9a,0x66});
     album = BLE::Char(UUID_TYPE_128, &albumUUID,
-            1 + 1,
+            1,  /* TODO: see prev */
             CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
@@ -153,7 +153,7 @@ void BLE::MusicService::Init()
 
     Char_UUID_t albumArtUUID = BLE::UUID::CreateCharUUID({0x98,0x2f,0xc7,0x74,0xbc,0x48,0x11,0xef,0x99,0x08,0x08,0x00,0x20,0x0c,0x9a,0x66});
     albumArt = BLE::Char(UUID_TYPE_128, &albumArtUUID,
-            5000 + 1,
+            5000,
             CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
@@ -164,7 +164,7 @@ void BLE::MusicService::Init()
 
     Char_UUID_t triggerUUID = BLE::UUID::CreateCharUUID({0x98,0x2f,0xc7,0x75,0xbc,0x48,0x11,0xef,0x99,0x08,0x08,0x00,0x20,0x0c,0x9a,0x66});
     trigger = BLE::Char(UUID_TYPE_128, &triggerUUID,
-            1 + 1,
+            1,
             CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,

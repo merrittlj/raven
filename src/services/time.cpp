@@ -144,16 +144,5 @@ void BLE::TimeService::Init()
 tBleStatus BLE::TimeService::Update_Char_Value(uint16_t UUID16, uint16_t newValueLength, uint8_t *pNewValue)
 {
     tBleStatus ret = BLE_STATUS_INVALID_PARAMS;
-
-    /* if (UUID16 == BLE::UUID::ExtractUUID16FromLE(syncRequestChar.Get_UUID())) { */
-    /*     if (newValueLength <= syncRequestChar.Get_Value_Length()) */
-    /*     { */
-    /*         ret = aci_gatt_update_char_value(this->Get_Handle(), */
-    /*                 syncRequestChar.Get_Handle(), */
-    /*                 0, /1* charValOffset *1/ */
-    /*                 newValueLength, /1* charValueLen *1/ */
-    /*                 (uint8_t *)pNewValue); */
-    /*     } */
-    /* } */
     return ret;
 }

@@ -120,7 +120,7 @@ void BLE::NotifyService::Init()
 
     Char_UUID_t sourceUUID = BLE::UUID::CreateCharUUID({0x68,0x4A,0x49,0x61,0xB6,0xA6,0x11,0xEF,0xBE,0x87,0x08,0x00,0x20,0x0C,0x9A,0x66});
     source = BLE::Char(UUID_TYPE_128, &sourceUUID,
-            1 + 15,
+            15,
             CHAR_PROP_READ | CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
@@ -131,7 +131,7 @@ void BLE::NotifyService::Init()
 
     Char_UUID_t titleUUID = BLE::UUID::CreateCharUUID({0x68,0x4A,0x49,0x62,0xB6,0xA6,0x11,0xEF,0xBE,0x87,0x08,0x00,0x20,0x0C,0x9A,0x66});
     title = BLE::Char(UUID_TYPE_128, &titleUUID,
-            1 + 15,
+            15,
             CHAR_PROP_READ | CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
@@ -142,7 +142,7 @@ void BLE::NotifyService::Init()
 
     Char_UUID_t bodyUUID = BLE::UUID::CreateCharUUID({0x68,0x4A,0x49,0x63,0xB6,0xA6,0x11,0xEF,0xBE,0x87,0x08,0x00,0x20,0x0C,0x9A,0x66});
     body = BLE::Char(UUID_TYPE_128, &bodyUUID,
-            1 + 90,
+            90,
             CHAR_PROP_READ | CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
@@ -153,7 +153,7 @@ void BLE::NotifyService::Init()
 
     Char_UUID_t triggerUUID = BLE::UUID::CreateCharUUID({0x68,0x4A,0x49,0x64,0xB6,0xA6,0x11,0xEF,0xBE,0x87,0x08,0x00,0x20,0x0C,0x9A,0x66});
     trigger = BLE::Char(UUID_TYPE_128, &triggerUUID,
-            1 + 1,
+            1,
             CHAR_PROP_READ | CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
@@ -173,16 +173,5 @@ void BLE::NotifyService::Init()
 tBleStatus BLE::NotifyService::Update_Char_Value(uint16_t UUID16, uint16_t newValueLength, uint8_t *pNewValue)
 {
     tBleStatus ret = BLE_STATUS_INVALID_PARAMS;
-
-    /* if (UUID16 == BLE::UUID::ExtractUUID16FromLE(syncRequestChar.Get_UUID())) { */
-    /*     if (newValueLength <= syncRequestChar.Get_Value_Length()) */
-    /*     { */
-    /*         ret = aci_gatt_update_char_value(this->Get_Handle(), */
-    /*                 syncRequestChar.Get_Handle(), */
-    /*                 0, /1* charValOffset *1/ */
-    /*                 newValueLength, /1* charValueLen *1/ */
-    /*                 (uint8_t *)pNewValue); */
-    /*     } */
-    /* } */
     return ret;
 }

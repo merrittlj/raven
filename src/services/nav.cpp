@@ -115,7 +115,7 @@ void BLE::NavService::Init()
 
     Char_UUID_t instructionUUID = BLE::UUID::CreateCharUUID({0x84,0xd7,0x3b,0xe1,0xbc,0x48,0x11,0xef,0x99,0x08,0x08,0x00,0x20,0x0c,0x9a,0x66});
     instruction = BLE::Char(UUID_TYPE_128, &instructionUUID,
-            1 + 1,
+            1,  /* TODO: need to figure out truncation and UI parity */
             CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
@@ -126,7 +126,7 @@ void BLE::NavService::Init()
 
     Char_UUID_t distanceUUID = BLE::UUID::CreateCharUUID({0x84,0xd7,0x3b,0xe2,0xbc,0x48,0x11,0xef,0x99,0x08,0x08,0x00,0x20,0x0c,0x9a,0x66});
     distance = BLE::Char(UUID_TYPE_128, &distanceUUID,
-            1 + 1,
+            1,  /* TODO: see prev */
             CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
@@ -137,7 +137,7 @@ void BLE::NavService::Init()
 
     Char_UUID_t etaUUID = BLE::UUID::CreateCharUUID({0x84,0xd7,0x3b,0xe3,0xbc,0x48,0x11,0xef,0x99,0x08,0x08,0x00,0x20,0x0c,0x9a,0x66});
     eta = BLE::Char(UUID_TYPE_128, &etaUUID,
-            1 + 1,
+            1,  /* TODO: see prev */
             CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
@@ -148,7 +148,7 @@ void BLE::NavService::Init()
 
     Char_UUID_t actionUUID = BLE::UUID::CreateCharUUID({0x84,0xd7,0x3b,0xe4,0xbc,0x48,0x11,0xef,0x99,0x08,0x08,0x00,0x20,0x0c,0x9a,0x66});
     action = BLE::Char(UUID_TYPE_128, &actionUUID,
-            1 + 1,
+            1,  /* TODO: see prev */
             CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,

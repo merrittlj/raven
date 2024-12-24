@@ -125,7 +125,7 @@ void BLE::EventService::Init()
 
     Char_UUID_t typeUUID = BLE::UUID::CreateCharUUID({0x00,0xa9,0x70,0xd1,0xc0,0xdb,0x11,0xef,0xa8,0xfa,0x08,0x00,0x20,0x0c,0x9a,0x66});
     type = BLE::Char(UUID_TYPE_128, &typeUUID,
-            1 + 1,
+            1,
             CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
@@ -136,7 +136,7 @@ void BLE::EventService::Init()
 
     Char_UUID_t idUUID = BLE::UUID::CreateCharUUID({0x00,0xa9,0x70,0xd2,0xc0,0xdb,0x11,0xef,0xa8,0xfa,0x08,0x00,0x20,0x0c,0x9a,0x66});
     id = BLE::Char(UUID_TYPE_128, &idUUID,
-            1 + 1,
+            1,
             CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
@@ -147,7 +147,7 @@ void BLE::EventService::Init()
 
     Char_UUID_t titleUUID = BLE::UUID::CreateCharUUID({0x00,0xa9,0x70,0xd3,0xc0,0xdb,0x11,0xef,0xa8,0xfa,0x08,0x00,0x20,0x0c,0x9a,0x66});
     title = BLE::Char(UUID_TYPE_128, &titleUUID,
-            1 + 1,
+            1,  /* TODO: we need to truncate on GB & need UI parity */
             CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
@@ -158,7 +158,7 @@ void BLE::EventService::Init()
 
     Char_UUID_t descUUID = BLE::UUID::CreateCharUUID({0x00,0xa9,0x70,0xd4,0xc0,0xdb,0x11,0xef,0xa8,0xfa,0x08,0x00,0x20,0x0c,0x9a,0x66});
     desc = BLE::Char(UUID_TYPE_128, &descUUID,
-            1 + 1,
+            1,  /* TODO: see prev */
             CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
@@ -169,7 +169,7 @@ void BLE::EventService::Init()
 
     Char_UUID_t timestampUUID = BLE::UUID::CreateCharUUID({0x00,0xa9,0x70,0xd5,0xc0,0xdb,0x11,0xef,0xa8,0xfa,0x08,0x00,0x20,0x0c,0x9a,0x66});
     timestamp = BLE::Char(UUID_TYPE_128, &timestampUUID,
-            1 + 1,
+            1,
             CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
@@ -180,7 +180,7 @@ void BLE::EventService::Init()
 
     Char_UUID_t repDurUUID = BLE::UUID::CreateCharUUID({0x00,0xa9,0x70,0xd6,0xc0,0xdb,0x11,0xef,0xa8,0xfa,0x08,0x00,0x20,0x0c,0x9a,0x66});
     repDur = BLE::Char(UUID_TYPE_128, &repDurUUID,
-            1 + 1,
+            1,
             CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
@@ -191,7 +191,7 @@ void BLE::EventService::Init()
 
     Char_UUID_t triggerUUID = BLE::UUID::CreateCharUUID({0x00,0xa9,0x70,0xd7,0xc0,0xdb,0x11,0xef,0xa8,0xfa,0x08,0x00,0x20,0x0c,0x9a,0x66});
     trigger = BLE::Char(UUID_TYPE_128, &triggerUUID,
-            1 + 1,
+            1,
             CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
