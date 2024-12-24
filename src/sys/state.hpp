@@ -63,6 +63,7 @@ namespace Sys
         std::string track;
         std::string artist;
         std::string album;
+        uint8_t *albumArt;
     };
 
     enum class Scheme {
@@ -92,6 +93,8 @@ namespace Sys
 
             std::vector<EventInfo> events;
             EventInfo Event_Builder;
+
+            MusicInfo Music_Builder;
 
             /* Component index of the Red LED */
             uint32_t LED_Red_Index;
@@ -160,6 +163,12 @@ namespace Sys
             void Event_Trigger();
             void Event_Dismiss(size_t index);
             std::vector<EventInfo> Get_Events();
+
+            void Music_Build_Artist(std::string str);
+            void Music_Build_Track(std::string str);
+            void Music_Build_Album(std::string str);
+            void Music_Build_Album_Art(uint8_t *arr);
+            void Music_Trigger();
 
             void Register_LED_Red(uint32_t pIndex);
             uint32_t Fetch_LED_Red();

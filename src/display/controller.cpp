@@ -71,6 +71,11 @@ namespace Display
         lvgl.Event(event);
     }
 
+    void Controller::Music_Send(Sys::MusicInfo music)
+    {
+        lvgl.Music(music);
+    }
+
     void Controller::Button(uint8_t b)
     {
         lvgl.Button(b);

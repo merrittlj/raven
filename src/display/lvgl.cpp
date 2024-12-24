@@ -12,6 +12,10 @@
 #include <string>
 
 
+#ifndef LV_ATTRIBUTE_MEM_ALIGN
+#define LV_ATTRIBUTE_MEM_ALIGN
+#endif
+
 LV_FONT_DECLARE(gloock_18_date)
 LV_FONT_DECLARE(gloock_70_time)
 LV_FONT_DECLARE(axel_22_ui)
@@ -212,6 +216,9 @@ namespace Display
         lv_label_set_text(musicAlbum, "Album");
         lv_obj_set_style_text_font(musicAlbum, &axel_20_text, 0);
         lv_obj_align(musicAlbum, LV_ALIGN_BOTTOM_MID, 0, -20);
+
+        musicBG = lv_img_create(musicScreen);
+        lv_obj_align(musicBG, LV_ALIGN_CENTER, 0, 0);
     }
 
     void LVGL::Flush(lv_display_t *display, const lv_area_t *area, uint8_t *px_map)
@@ -293,6 +300,20 @@ namespace Display
         lv_label_set_text(musicArtist, info.artist.c_str());
         lv_label_set_text(musicAlbum, info.album.c_str());
 
+        const lv_image_dsc_t albumArt = {
+            {
+                LV_IMAGE_HEADER_MAGIC,  /* .magic */
+                LV_COLOR_FORMAT_I1,  /* .cf */
+                0,  /* .flags */
+                200,  /* .w */
+                200,  /* .h */
+                13  /* .stride */
+            },
+            sizeof(info.albumArt),  /* .data_size */
+            info.albumArt,  /* .data */
+        };
+        lv_img_set_src(musicBG, &albumArt);
+
         if (!state->Is_Screen_Active(Sys::Screen::MUSIC)) {
             lv_scr_load(musicScreen);
             state->Screen_Activate(Sys::Screen::MUSIC);
@@ -347,7 +368,7 @@ namespace Display
             /* All screens: load face */
             lv_scr_load(faceScreen);
         }
-        
+
         if (b == 2) {
             /* All screens: load active screen */
             lv_scr_load(activeScreen);

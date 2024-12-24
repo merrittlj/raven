@@ -148,6 +148,34 @@ namespace Sys
         return events;
     }
 
+    void State::Music_Build_Artist(std::string str)
+    {
+        Music_Builder.artist = str;
+    }
+
+    void State::Music_Build_Track(std::string str)
+    {
+        Music_Builder.track = str;
+    }
+
+    void State::Music_Build_Album(std::string str)
+    {
+        Music_Builder.album = str;
+    }
+
+    void State::Music_Build_Album_Art(uint8_t *arr)
+    {
+        /* While we should pass in the E-ink display, the BLE protocol is hardcoded anyways */
+        /* 5000 bytes */
+        Music_Builder.albumArt = arr;
+    }
+
+    void State::Music_Trigger()
+    {
+        Display::Controller::Instance()->Music_Send(Music_Builder);
+        Music_Builder = {"", "", "", NULL};
+    }
+
     void State::Register_LED_Red(uint32_t pIndex)
     {
         this->LED_Red_Index = pIndex;

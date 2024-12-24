@@ -56,6 +56,7 @@ namespace Display
             lv_obj_t *musicTrack;
             lv_obj_t *musicArtist;
             lv_obj_t *musicAlbum;
+            lv_obj_t *musicBG;
 
             lv_obj_t *Create_List(lv_obj_t *screen, std::string text);
             void Active_Screen();
