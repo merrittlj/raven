@@ -53,11 +53,11 @@ void Sys::SPIController::SendData(uint8_t data)
 void Sys::SPIController::Reset()
 {
     gpioCtrl->Write_Component(manager.rst, SET);
-    HAL_Delay(20);
+    HAL_Delay(10);
     gpioCtrl->Write_Component(manager.rst, RESET);
-    HAL_Delay(5);
+    HAL_Delay(10);
     gpioCtrl->Write_Component(manager.rst, SET);
-    HAL_Delay(20);
+    HAL_Delay(10);
 }
 
 void Sys::SPIController::BlockBusy()

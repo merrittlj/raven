@@ -25,6 +25,7 @@ namespace Sys
         EVENTS_LIST, /* Default inactive */
         NAVIGATION,  /* Default inactive */
         MUSIC,  /* Default inactive */
+        ABOUT,  /* Default active */
         Enum_Length
     };
 

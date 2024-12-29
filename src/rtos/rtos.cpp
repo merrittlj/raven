@@ -30,14 +30,20 @@ namespace RTOS
             p->btnPort->ButtonProcess(p->gpioCtrl->Read_Component(p->buttonIndex));
             if (p->btnPort->ButtonPressed(1 << (p->button - 1))) {
                 BITNSET(p->buttonState, p->button - 1, 1);
-                /* Button 1 & 2 do not have double press functionality */
-                if (p->button == 1 || p->button == 2) {
-                    p->displayCtrl->Button(p->button);
-                    continue;
-                }
+                /* Ignore, button 1 & 2 now have about screen functionality */
+                /* /1* Button 1 & 2 do not have double press functionality *1/ */
+                /* if (p->button == 1 || p->button == 2) { */
+                /*     p->displayCtrl->Button(p->button); */
+                /*     continue; */
+                /* } */
 
                 uint8_t db = 0;
                 for(uint8_t i = 0; i < DOUBLE_PRESS_TIMEOUT; ++i) {
+                    if ((p->button == 1 && BITN(p->buttonState, (2 - 1))) || (p->button == 2 && BITN(p->buttonState, (1 - 1)))) {
+                        p->displayCtrl->Button_Double(1, 2);
+                        db = 1;
+                        break;
+                    }
                     if ((p->button == 3 && BITN(p->buttonState, (4 - 1))) || (p->button == 4 && BITN(p->buttonState, (3 - 1)))) {
                         p->displayCtrl->Button_Double(3, 4);
                         db = 1;

@@ -219,6 +219,32 @@ namespace Display
 
         musicBG = lv_img_create(musicScreen);
         lv_obj_align(musicBG, LV_ALIGN_CENTER, 0, 0);
+
+
+        aboutScreen = lv_obj_create(NULL);
+
+        lv_obj_t *ravenIcon = lv_img_create(aboutScreen);
+        /* lv_img_set_src(ravenIcon, &raven); */
+        lv_img_set_src(ravenIcon, &flag);
+        lv_obj_align(ravenIcon, LV_ALIGN_CENTER, 0, 0);
+
+        lv_obj_t *version = lv_label_create(aboutScreen);
+        lv_obj_add_style(version, &texts, 0);
+        lv_label_set_text(version, "V0.6");
+        lv_obj_set_style_text_font(version, &axel_22_ui, 0);
+        lv_obj_align(version, LV_ALIGN_CENTER, 0, 30);
+
+        lv_obj_t *edition = lv_label_create(aboutScreen);
+        lv_obj_add_style(edition, &texts, 0);
+        lv_label_set_text(edition, "Edition #1");
+        lv_obj_set_style_text_font(edition, &axel_22_ui, 0);
+        lv_obj_align(edition, LV_ALIGN_CENTER, 0, 50);
+
+        lv_obj_t *credit = lv_label_create(aboutScreen);
+        lv_obj_add_style(credit, &texts, 0);
+        lv_label_set_text(credit, "Designer/Programmer: Lucas Merritt(merrittlj)");
+        lv_obj_set_style_text_font(credit, &axel_22_ui, 0);
+        lv_obj_align(credit, LV_ALIGN_CENTER, 0, 70);
     }
 
     void LVGL::Flush(lv_display_t *display, const lv_area_t *area, uint8_t *px_map)
@@ -254,7 +280,6 @@ namespace Display
         lv_label_set_text(body, info.body.c_str());
 
         lv_scr_load(alertScreen);
-        /* ALERT default active */
         state->Screen_Activate(Sys::Screen::ALERTS_LIST);  /* Until dismissal, activate unread alerts */
     }
 
@@ -263,7 +288,6 @@ namespace Display
         /* set event texts */
 
         lv_scr_load(eventScreen);
-        /* EVENT default active */
         state->Screen_Activate(Sys::Screen::EVENTS_LIST);
     }
 
@@ -333,6 +357,7 @@ namespace Display
             if ((Sys::Screen)i == Sys::Screen::EVENTS_LIST) lv_list_add_button(activeList, NULL, "Upcoming Events");
             if ((Sys::Screen)i == Sys::Screen::NAVIGATION) lv_list_add_button(activeList, NULL, "Navigation");
             if ((Sys::Screen)i == Sys::Screen::MUSIC) lv_list_add_button(activeList, NULL, "Music");
+            if ((Sys::Screen)i == Sys::Screen::ABOUT) continue;  /* Only accessed through shortcut */
         }
         lv_scr_load(activeScreen);
     }
@@ -465,7 +490,12 @@ namespace Display
 
     void LVGL::Button_Double(uint8_t b1, uint8_t b2)
     {
+        /* Button 1 & 2 double press */
         /* Button 3 & 4 double press */
+        if ((b1 == 1 && b2 == 2) || (b1 == 2 && b2 == 1)) {
+            /* Global about screen */
+            lv_scr_load(aboutScreen);
+        }
         if ((b1 == 3 && b2 == 4) || (b1 == 4 && b2 == 3)) {
             /* Alerts list screen: selector */
             if (lv_screen_active() == alertsListScreen) {
