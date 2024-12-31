@@ -52,7 +52,8 @@
 #define configCPU_CLOCK_HZ				( 32000000U )  /* Sucks to have to use this instead of include, but includes were not working */
 #define configTICK_RATE_HZ				( ( TickType_t ) 1000 )
 #define configMAX_PRIORITIES			( 5 )
-#define configMINIMAL_STACK_SIZE		( ( unsigned short ) 130 )
+/* #define configMINIMAL_STACK_SIZE		( ( unsigned short ) 130 ) */
+#define configMINIMAL_STACK_SIZE		( ( unsigned short ) 2000 )  /* How large is necessary? */
 #define configTOTAL_HEAP_SIZE			( ( size_t ) ( 75 * 1024 ) )
 #define configMAX_TASK_NAME_LEN			( 10 )
 #define configUSE_TRACE_FACILITY		1
@@ -60,7 +61,7 @@
 #define configIDLE_SHOULD_YIELD			1
 #define configUSE_MUTEXES				1
 #define configQUEUE_REGISTRY_SIZE		8
-#define configCHECK_FOR_STACK_OVERFLOW	2
+#define configCHECK_FOR_STACK_OVERFLOW	1
 #define configUSE_RECURSIVE_MUTEXES		1
 #define configUSE_MALLOC_FAILED_HOOK	1
 #define configUSE_APPLICATION_TASK_TAG	0
@@ -120,6 +121,6 @@ header file. */
 standard names. */
 #define vPortSVCHandler SVC_Handler
 #define xPortPendSVHandler PendSV_Handler
-#define xPortSysTickHandler SysTick_Handler
+/* #define xPortSysTickHandler SysTick_Handler */
 
 #endif /* FREERTOS_CONFIG_H */

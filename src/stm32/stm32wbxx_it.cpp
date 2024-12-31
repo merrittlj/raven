@@ -10,8 +10,13 @@
 
 #include "hw.h"
 
+#include "FreeRTOS.h"
+#include "semphr.h"
+
 
 extern "C" {
+    void xPortSysTickHandler(void);
+
     /* Non-Maskable Interrupt */
     void NMI_Handler(void)
     {
@@ -62,7 +67,12 @@ extern "C" {
     /* { */
     /*     HAL_IncTick(); */
     /* } */
-
+    void SysTick_Handler(void)
+    {
+        HAL_IncTick();
+        if(xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
+            xPortSysTickHandler();
+    }
 
     void IPCC_C1_TX_IRQHandler(void)
     {

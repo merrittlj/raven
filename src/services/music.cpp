@@ -153,7 +153,7 @@ void BLE::MusicService::Init()
 
     Char_UUID_t albumArtUUID = BLE::UUID::CreateCharUUID({0x98,0x2f,0xc7,0x74,0xbc,0x48,0x11,0xef,0x99,0x08,0x08,0x00,0x20,0x0c,0x9a,0x66});
     albumArt = BLE::Char(UUID_TYPE_128, &albumArtUUID,
-            5000,
+            512,  /* TODO: receive in chunks */
             CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,

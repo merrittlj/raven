@@ -20,7 +20,7 @@ LV_FONT_DECLARE(gloock_18_date)
 LV_FONT_DECLARE(gloock_70_time)
 LV_FONT_DECLARE(axel_22_ui)
 LV_FONT_DECLARE(axel_20_text)
-LV_FONT_DECLARE(tag_70)
+LV_FONT_DECLARE(tag)  /* 110 font size */
 
 LV_IMAGE_DECLARE(cont);
 LV_IMAGE_DECLARE(cont_left);
@@ -78,11 +78,11 @@ namespace Display
         lv_style_set_text_font(&texts, &gloock_70_time);
 
         tagScreen = lv_screen_active();
-        tag = lv_label_create(tagScreen);
-        lv_obj_add_style(tag, &texts, 0);
-        lv_label_set_text(tag, "Raven");
-        lv_obj_set_style_text_font(tag, &tag_70, 0);
-        lv_obj_align(tag, LV_ALIGN_CENTER, 0, 0);
+        lv_obj_t *tagText = lv_label_create(tagScreen);
+        lv_obj_add_style(tagText, &texts, 0);
+        lv_label_set_text(tagText, "Raven");
+        lv_obj_set_style_text_font(tagText, &tag, 0);
+        lv_obj_align(tagText, LV_ALIGN_CENTER, 0, 0);
 
 
         faceScreen = lv_obj_create(NULL);
@@ -279,6 +279,8 @@ namespace Display
         if (value.day % 10 == 3 && value.day != 13) day += "rd";
         else day += "th";
         lv_label_set_text(date, (months[value.month - 1] + " " + day).c_str());
+
+        lv_scr_load(faceScreen);
     }
 
     void LVGL::Alert(Sys::AlertInfo info)
