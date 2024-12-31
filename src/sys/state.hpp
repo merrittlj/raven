@@ -84,7 +84,7 @@ namespace Sys
 
             /* Stores 0 or 1 values for if a screen is active */
             /* Not used to track current state, but rather track what stays open */
-            std::array<uint8_t, (size_t)Screen::Enum_Length> screens;
+            std::array<uint8_t, (size_t)Screen::Enum_Length> screens = {};
 
             Preferences pref;
 
@@ -97,6 +97,8 @@ namespace Sys
             EventInfo Event_Builder;
 
             MusicInfo Music_Builder;
+
+            NavInfo Nav_Builder;
 
             /* Component index of the Red LED */
             uint32_t LED_Red_Index;
@@ -165,6 +167,12 @@ namespace Sys
             void Event_Trigger();
             void Event_Dismiss(size_t index);
             std::vector<EventInfo> Get_Events();
+
+            void Nav_Build_Instruction(std::string str);
+            void Nav_Build_Distance(std::string str);
+            void Nav_Build_ETA(std::string str);
+            void Nav_Build_Action(std::string str);
+            void Nav_Trigger();
 
             void Music_Build_Artist(std::string str);
             void Music_Build_Track(std::string str);

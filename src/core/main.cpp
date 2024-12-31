@@ -116,9 +116,8 @@ int main()
     notifyService.Init();
     prefService.Init();
     navService.Init();
-    /* Avoid having services(so far eventService) behind musicService */
-    eventService.Init();
     musicService.Init();
+    /* eventService.Init(); */
     bleApp.Advertising(SET);
 
     Display::Controller displayCtrl = Display::Controller(200, 200, spiCtrl, &sysState);

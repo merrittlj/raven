@@ -61,18 +61,23 @@ SVCCTL_EvtAckStatus_t BLE::NavService::Event_Handler(void *Event)
                     case ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE:
                         attribute_modified = (aci_gatt_attribute_modified_event_rp0*)blecore_evt->data;
                         uint8_t *data;
+                        uint16_t length;
                         data = attribute_modified->Attr_Data;
+                        length = attribute_modified->Attr_Data_Length;
                         if (attribute_modified->Attr_Handle == (instruction.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            /* Set instruction */
+                            sysState->Nav_Build_Instruction(std::string((const char *)data, (size_t)length));
                         }
                         if (attribute_modified->Attr_Handle == (distance.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            /* Set distance */
+                            sysState->Nav_Build_Distance(std::string((const char *)data, (size_t)length));
                         }
                         if (attribute_modified->Attr_Handle == (eta.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            /* Set eta */
+                            sysState->Nav_Build_ETA(std::string((const char *)data, (size_t)length));
                         }
                         if (attribute_modified->Attr_Handle == (action.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            /* Set action */
+                            sysState->Nav_Build_Action(std::string((const char *)data, (size_t)length));
+                        }
+                        if (attribute_modified->Attr_Handle == (trigger.Get_Handle() + CHAR_VALUE_OFFSET)) {
+                            sysState->Nav_Trigger();
                         }
                         break;
 
@@ -115,7 +120,7 @@ void BLE::NavService::Init()
 
     Char_UUID_t instructionUUID = BLE::UUID::CreateCharUUID({0x84,0xd7,0x3b,0xe1,0xbc,0x48,0x11,0xef,0x99,0x08,0x08,0x00,0x20,0x0c,0x9a,0x66});
     instruction = BLE::Char(UUID_TYPE_128, &instructionUUID,
-            1,  /* TODO: need to figure out truncation and UI parity */
+            30,  /* TODO: need to figure out truncation and UI parity */
             CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
@@ -126,7 +131,7 @@ void BLE::NavService::Init()
 
     Char_UUID_t distanceUUID = BLE::UUID::CreateCharUUID({0x84,0xd7,0x3b,0xe2,0xbc,0x48,0x11,0xef,0x99,0x08,0x08,0x00,0x20,0x0c,0x9a,0x66});
     distance = BLE::Char(UUID_TYPE_128, &distanceUUID,
-            1,  /* TODO: see prev */
+            10,  /* TODO: see prev */
             CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
@@ -137,7 +142,7 @@ void BLE::NavService::Init()
 
     Char_UUID_t etaUUID = BLE::UUID::CreateCharUUID({0x84,0xd7,0x3b,0xe3,0xbc,0x48,0x11,0xef,0x99,0x08,0x08,0x00,0x20,0x0c,0x9a,0x66});
     eta = BLE::Char(UUID_TYPE_128, &etaUUID,
-            1,  /* TODO: see prev */
+            5,  /* TODO: see prev */
             CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
@@ -148,7 +153,7 @@ void BLE::NavService::Init()
 
     Char_UUID_t actionUUID = BLE::UUID::CreateCharUUID({0x84,0xd7,0x3b,0xe4,0xbc,0x48,0x11,0xef,0x99,0x08,0x08,0x00,0x20,0x0c,0x9a,0x66});
     action = BLE::Char(UUID_TYPE_128, &actionUUID,
-            1,  /* TODO: see prev */
+            25,  /* TODO: see prev */
             CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
@@ -157,6 +162,16 @@ void BLE::NavService::Init()
     if (action.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
         Sys::Error_Handler(); /* UNEXPECTED */
 
+    Char_UUID_t triggerUUID = BLE::UUID::CreateCharUUID({0x84,0xd7,0x3b,0xe5,0xbc,0x48,0x11,0xef,0x99,0x08,0x08,0x00,0x20,0x0c,0x9a,0x66});
+    trigger = BLE::Char(UUID_TYPE_128, &triggerUUID,
+            1,
+            CHAR_PROP_WRITE,
+            ATTR_PERMISSION_NONE,
+            GATT_NOTIFY_ATTRIBUTE_WRITE,
+            10,
+            (uint8_t)VALUE_VARIABLE_LENGTH);
+    if (trigger.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
+        Sys::Error_Handler(); /* UNEXPECTED */
 }
 
 /**

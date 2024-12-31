@@ -39,6 +39,7 @@ namespace Display
             void Update_Time(Sys::TimeInfo value);
             void Alert_Send(Sys::AlertInfo alert);
             void Event_Send(Sys::EventInfo event);
+            void Nav_Send(Sys::NavInfo nav);
             void Music_Send(Sys::MusicInfo music);
 
             void Button(uint8_t b);

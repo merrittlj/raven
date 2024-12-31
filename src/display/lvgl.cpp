@@ -183,24 +183,26 @@ namespace Display
         navInstruction = lv_label_create(navScreen);
         lv_obj_add_style(navInstruction, &texts, 0);
         lv_label_set_text(navInstruction, "Instruction");
+        lv_obj_set_style_max_width(navInstruction, 185, 0);
         lv_obj_set_style_text_font(navInstruction, &axel_22_ui, 0);
-        lv_obj_align(navInstruction, LV_ALIGN_CENTER, 0, -50);
+        lv_obj_align(navInstruction, LV_ALIGN_BOTTOM_MID, 0, 0);
 
         navDistance = lv_label_create(navScreen);
         lv_obj_add_style(navDistance, &texts, 0);
         lv_label_set_text(navDistance, "Distance");
         lv_obj_set_style_text_font(navDistance, &axel_22_ui, 0);
-        lv_obj_align(navDistance, LV_ALIGN_CENTER, -70, 0);
+        lv_obj_align(navDistance, LV_ALIGN_LEFT_MID, 10, 0);
 
         navETA = lv_label_create(navScreen);
         lv_obj_add_style(navETA, &texts, 0);
         lv_label_set_text(navETA, "ETA");
         lv_obj_set_style_text_font(navETA, &axel_22_ui, 0);
-        lv_obj_align(navETA, LV_ALIGN_CENTER, 70, 0);
+        lv_obj_align(navETA, LV_ALIGN_RIGHT_MID, -10, 0);
 
-        navAction = lv_img_create(navScreen);
-        lv_img_set_src(navAction, &flag);
-        lv_obj_align(navAction, LV_ALIGN_CENTER, 0, 0);
+        navAction = lv_image_create(navScreen);
+        lv_image_set_src(navAction, &flag);
+        lv_obj_align(navAction, LV_ALIGN_CENTER, 0, -10);
+        lv_obj_move_background(navAction);
 
 
         musicScreen = lv_obj_create(NULL);
@@ -224,16 +226,17 @@ namespace Display
         lv_obj_align(musicAlbum, LV_ALIGN_BOTTOM_MID, 0, -20);
         lv_obj_add_flag(musicAlbum, LV_OBJ_FLAG_HIDDEN);  /* We will display album art anyways */
 
-        musicBG = lv_img_create(musicScreen);
+        musicBG = lv_image_create(musicScreen);
         lv_obj_align(musicBG, LV_ALIGN_CENTER, 0, 0);
-        lv_img_set_src(musicBG, &flag);
+        lv_image_set_src(musicBG, &flag);
+        lv_obj_move_background(musicBG);
 
 
         aboutScreen = lv_obj_create(NULL);
 
-        lv_obj_t *ravenIcon = lv_img_create(aboutScreen);
-        /* lv_img_set_src(ravenIcon, &raven); */
-        lv_img_set_src(ravenIcon, &flag);
+        lv_obj_t *ravenIcon = lv_image_create(aboutScreen);
+        /* lv_image_set_src(ravenIcon, &raven); */
+        lv_image_set_src(ravenIcon, &flag);
         lv_obj_align(ravenIcon, LV_ALIGN_CENTER, 0, 0);
 
         lv_obj_t *version = lv_label_create(aboutScreen);
@@ -275,8 +278,8 @@ namespace Display
         const std::string months[12] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
         std::string day = std::to_string(value.day);
         if (value.day % 10 == 1 && value.day != 11) day += "st";
-        if (value.day % 10 == 2 && value.day != 12) day += "nd";
-        if (value.day % 10 == 3 && value.day != 13) day += "rd";
+        else if (value.day % 10 == 2 && value.day != 12) day += "nd";
+        else if (value.day % 10 == 3 && value.day != 13) day += "rd";
         else day += "th";
         lv_label_set_text(date, (months[value.month - 1] + " " + day).c_str());
 
@@ -301,26 +304,26 @@ namespace Display
         state->Screen_Activate(Sys::Screen::EVENTS_LIST);
     }
 
-    void LVGL::Navigation(Sys::NavInfo info)
+    void LVGL::Nav(Sys::NavInfo info)
     {
         lv_label_set_text(navInstruction, info.instruction.c_str());
         lv_label_set_text(navDistance, info.distance.c_str());
         lv_label_set_text(navETA, info.eta.c_str());
 
-        if (info.action == "continue") lv_img_set_src(navAction, &cont);
-        if (info.action == "continue-left") lv_img_set_src(navAction, &cont_left);
-        if (info.action == "continue-right") lv_img_set_src(navAction, &cont_right);
-        if (info.action == "turn-left") lv_img_set_src(navAction, &turn_left);
-        if (info.action == "turn-slight-left") lv_img_set_src(navAction, &turn_slight_left);
-        if (info.action == "turn-sharp-left") lv_img_set_src(navAction, &turn_sharp_left);
-        if (info.action == "turn-right") lv_img_set_src(navAction, &turn_right);
-        if (info.action == "turn-slight-right") lv_img_set_src(navAction, &turn_slight_right);
-        if (info.action == "turn-sharp-right") lv_img_set_src(navAction, &turn_sharp_right);
-        if (info.action == "roundabout-left") lv_img_set_src(navAction, &roundabout_left);
-        if (info.action == "roundabout-right") lv_img_set_src(navAction, &roundabout_right);
-        if (info.action == "uturn") lv_img_set_src(navAction, &uturn);
-        if (info.action == "close") lv_img_set_src(navAction, &close);
-        if (info.action == "flag") lv_img_set_src(navAction, &flag);
+        if (info.action == "continue") lv_image_set_src(navAction, &cont);
+        if (info.action == "continue-left") lv_image_set_src(navAction, &cont_left);
+        if (info.action == "continue-right") lv_image_set_src(navAction, &cont_right);
+        if (info.action == "turn-left") lv_image_set_src(navAction, &turn_left);
+        if (info.action == "turn-slight-left") lv_image_set_src(navAction, &turn_slight_left);
+        if (info.action == "turn-sharp-left") lv_image_set_src(navAction, &turn_sharp_left);
+        if (info.action == "turn-right") lv_image_set_src(navAction, &turn_right);
+        if (info.action == "turn-slight-right") lv_image_set_src(navAction, &turn_slight_right);
+        if (info.action == "turn-sharp-right") lv_image_set_src(navAction, &turn_sharp_right);
+        if (info.action == "roundabout-left") lv_image_set_src(navAction, &roundabout_left);
+        if (info.action == "roundabout-right") lv_image_set_src(navAction, &roundabout_right);
+        if (info.action == "uturn") lv_image_set_src(navAction, &uturn);
+        if (info.action == "close") lv_image_set_src(navAction, &close);
+        if (info.action == "flag") lv_image_set_src(navAction, &flag);
 
         if (!state->Is_Screen_Active(Sys::Screen::NAVIGATION)) {
             lv_scr_load(navScreen);
@@ -334,19 +337,19 @@ namespace Display
         lv_label_set_text(musicArtist, info.artist.c_str());
         lv_label_set_text(musicAlbum, info.album.c_str());
 
-        const lv_image_dsc_t albumArt = {
-            {
-                LV_IMAGE_HEADER_MAGIC,  /* .magic */
-                LV_COLOR_FORMAT_I1,  /* .cf */
-                0,  /* .flags */
-                200,  /* .w */
-                200,  /* .h */
-                13  /* .stride */
-            },
-            sizeof(info.albumArt),  /* .data_size */
-            info.albumArt,  /* .data */
-        };
-        lv_img_set_src(musicBG, &albumArt);
+        /* const lv_image_dsc_t albumArt = { */
+        /*     { */
+        /*         LV_IMAGE_HEADER_MAGIC,  /1* .magic *1/ */
+        /*         LV_COLOR_FORMAT_I1,  /1* .cf *1/ */
+        /*         0,  /1* .flags *1/ */
+        /*         200,  /1* .w *1/ */
+        /*         200,  /1* .h *1/ */
+        /*         13  /1* .stride *1/ */
+        /*     }, */
+        /*     sizeof(info.albumArt),  /1* .data_size *1/ */
+        /*     info.albumArt,  /1* .data *1/ */
+        /* }; */
+        /* lv_image_set_src(musicBG, &albumArt); */
 
         if (!state->Is_Screen_Active(Sys::Screen::MUSIC)) {
             lv_scr_load(musicScreen);

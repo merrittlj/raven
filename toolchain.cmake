@@ -22,7 +22,7 @@ set(LDFLAGS "-T../src/linker.ld -nostartfiles --specs=nano.specs --specs=nosys.s
 set(CMAKE_C_FLAGS                   "-Wall -Wextra -Werror -Wundef -Wshadow -Wdouble-promotion -Wformat-truncation -Wno-padded -Wconversion -Wno-missing-field-initializers -Wno-unused-variable -Wno-unused-but-set-variable -ffunction-sections -fdata-sections -fno-common")
 set(CMAKE_C_FLAGS					"${CMAKE_C_FLAGS} ${DFLAGS} ${DEFINES} ${LDFLAGS}")
 
-set(CMAKE_C_FLAGS_DEBUG             "-O0 -g3 -ggdb3 -DDEBUG" CACHE INTERNAL "")
+set(CMAKE_C_FLAGS_DEBUG             "-Os -g3 -ggdb3 -DDEBUG" CACHE INTERNAL "")
 set(CMAKE_C_FLAGS_RELEASE           "-Os -DNDEBUG" CACHE INTERNAL "")
 
 set(CMAKE_CXX_FLAGS                 "${CMAKE_C_FLAGS}" CACHE INTERNAL "")

@@ -71,6 +71,11 @@ namespace Display
         lvgl.Event(event);
     }
 
+    void Controller::Nav_Send(Sys::NavInfo nav)
+    {
+        lvgl.Nav(nav);
+    }
+
     void Controller::Music_Send(Sys::MusicInfo music)
     {
         lvgl.Music(music);

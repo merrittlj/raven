@@ -88,7 +88,7 @@ namespace Sys
     {
         alerts.push_back(Alert_Builder);
         Display::Controller::Instance()->Alert_Send(alerts.back());
-        Alert_Builder = {"", "", ""};
+        /* Alert_Builder = {"", "", ""}; */
     }
 
     void State::Alert_Dismiss(size_t index)
@@ -135,7 +135,7 @@ namespace Sys
     {
         events.push_back(Event_Builder);
         Display::Controller::Instance()->Event_Send(events.back());
-        Event_Builder = {0, 0, "", "", 0, 0};
+        /* Event_Builder = {0, 0, "", "", 0, 0}; */
     }
 
     void State::Event_Dismiss(size_t index)
@@ -146,6 +146,32 @@ namespace Sys
     std::vector<EventInfo> State::Get_Events()
     {
         return events;
+    }
+
+    void State::Nav_Build_Instruction(std::string str)
+    {
+        Nav_Builder.instruction = str;
+    }
+
+    void State::Nav_Build_Distance(std::string str)
+    {
+        Nav_Builder.distance = str;
+    }
+
+    void State::Nav_Build_ETA(std::string str)
+    {
+        Nav_Builder.eta = str;
+    }
+
+    void State::Nav_Build_Action(std::string str)
+    {
+        Nav_Builder.action = str;
+    }
+
+    void State::Nav_Trigger()
+    {
+        Display::Controller::Instance()->Nav_Send(Nav_Builder);
+        /* Nav_Builder = {"", "", "", ""}; */
     }
 
     void State::Music_Build_Artist(std::string str)
@@ -173,7 +199,7 @@ namespace Sys
     void State::Music_Trigger()
     {
         Display::Controller::Instance()->Music_Send(Music_Builder);
-        Music_Builder = {"", "", "", NULL};
+        /* Music_Builder = {"", "", "", NULL}; */
     }
 
     void State::Register_LED_Red(uint32_t pIndex)

@@ -81,7 +81,7 @@ namespace Display
             void Time(Sys::TimeInfo value);
             void Alert(Sys::AlertInfo info);
             void Event(Sys::EventInfo info);
-            void Navigation(Sys::NavInfo info);
+            void Nav(Sys::NavInfo info);
             void Music(Sys::MusicInfo info);
 
             /* [1 - - - 3]

@@ -12,13 +12,13 @@
 #define LV_ATTRIBUTE_MEM_ALIGN
 #endif
 
-#ifndef LV_ATTRIBUTE_TURN_LEFT
-#define LV_ATTRIBUTE_TURN_LEFT
+#ifndef LV_ATTRIBUTE_CONTINUE_LEFT
+#define LV_ATTRIBUTE_CONTINUE_LEFT
 #endif
 
 static const
-LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_TURN_LEFT
-uint8_t turn_left_map[] = {
+LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_CONTINUE_LEFT
+uint8_t continue_left_map[] = {
 
     0x09,0x09,0x09,0xff,0xff,0xff,0xff,0xff,
 
@@ -125,14 +125,14 @@ uint8_t turn_left_map[] = {
 
 };
 
-const lv_image_dsc_t turn_left = {
+const lv_image_dsc_t continue_left = {
   .header.magic = LV_IMAGE_HEADER_MAGIC,
   .header.cf = LV_COLOR_FORMAT_I1,
   .header.flags = 0,
   .header.w = 100,
   .header.h = 100,
   .header.stride = 13,
-  .data_size = sizeof(turn_left_map),
-  .data = turn_left_map,
+  .data_size = sizeof(continue_left_map),
+  .data = continue_left_map,
 };
 
