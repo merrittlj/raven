@@ -20,6 +20,7 @@ LV_FONT_DECLARE(gloock_18_date)
 LV_FONT_DECLARE(gloock_70_time)
 LV_FONT_DECLARE(axel_22_ui)
 LV_FONT_DECLARE(axel_20_text)
+LV_FONT_DECLARE(tag_70)
 
 LV_IMAGE_DECLARE(cont);
 LV_IMAGE_DECLARE(cont_left);
@@ -71,22 +72,27 @@ namespace Display
 
     void LVGL::Create()
     {
-        /*Change the active screen's background color*/
-        lv_obj_set_style_bg_color(lv_screen_active(), lv_color_hex(0xffffff), LV_PART_MAIN);
-
-        faceScreen = lv_screen_active();
-
         static lv_style_t texts;
         lv_style_init(&texts);
         lv_style_set_text_color(&texts, lv_color_hex(0x000000));
         lv_style_set_text_font(&texts, &gloock_70_time);
 
-        time = lv_label_create(lv_screen_active());
+        tagScreen = lv_screen_active();
+        tag = lv_label_create(tagScreen);
+        lv_obj_add_style(tag, &texts, 0);
+        lv_label_set_text(tag, "Raven");
+        lv_obj_set_style_text_font(tag, &tag_70, 0);
+        lv_obj_align(tag, LV_ALIGN_CENTER, 0, 0);
+
+
+        faceScreen = lv_obj_create(NULL);
+
+        time = lv_label_create(faceScreen);
         lv_obj_add_style(time, &texts, 0);
         lv_label_set_text(time, "00:00");
         lv_obj_align(time, LV_ALIGN_CENTER, 0, -10);
 
-        date = lv_label_create(lv_screen_active());
+        date = lv_label_create(faceScreen);
         lv_obj_add_style(date, &texts, 0);
         lv_label_set_text(date, "Month Day Year");
         lv_obj_set_style_text_font(date, &gloock_18_date, 0);
@@ -184,13 +190,13 @@ namespace Display
         lv_obj_add_style(navDistance, &texts, 0);
         lv_label_set_text(navDistance, "Distance");
         lv_obj_set_style_text_font(navDistance, &axel_22_ui, 0);
-        lv_obj_align(navDistance, LV_ALIGN_CENTER, 0, -70);
+        lv_obj_align(navDistance, LV_ALIGN_CENTER, -70, 0);
 
         navETA = lv_label_create(navScreen);
         lv_obj_add_style(navETA, &texts, 0);
         lv_label_set_text(navETA, "ETA");
         lv_obj_set_style_text_font(navETA, &axel_22_ui, 0);
-        lv_obj_align(navETA, LV_ALIGN_CENTER, 0, -90);
+        lv_obj_align(navETA, LV_ALIGN_CENTER, 70, 0);
 
         navAction = lv_img_create(navScreen);
         lv_img_set_src(navAction, &flag);
@@ -203,22 +209,24 @@ namespace Display
         lv_obj_add_style(musicTrack, &texts, 0);
         lv_label_set_text(musicTrack, "Track");
         lv_obj_set_style_text_font(musicTrack, &axel_22_ui, 0);
-        lv_obj_align(musicTrack, LV_ALIGN_CENTER, 0, -30);
+        lv_obj_align(musicTrack, LV_ALIGN_TOP_LEFT, 10, 10);
 
         musicArtist = lv_label_create(musicScreen);
         lv_obj_add_style(musicArtist, &texts, 0);
         lv_label_set_text(musicArtist, "Artist");
         lv_obj_set_style_text_font(musicArtist, &axel_20_text, 0);
-        lv_obj_align(musicArtist, LV_ALIGN_CENTER, 0, 0);
+        lv_obj_align(musicArtist, LV_ALIGN_TOP_LEFT, 10, 50);
 
         musicAlbum = lv_label_create(musicScreen);
         lv_obj_add_style(musicAlbum, &texts, 0);
         lv_label_set_text(musicAlbum, "Album");
         lv_obj_set_style_text_font(musicAlbum, &axel_20_text, 0);
         lv_obj_align(musicAlbum, LV_ALIGN_BOTTOM_MID, 0, -20);
+        lv_obj_add_flag(musicAlbum, LV_OBJ_FLAG_HIDDEN);  /* We will display album art anyways */
 
         musicBG = lv_img_create(musicScreen);
         lv_obj_align(musicBG, LV_ALIGN_CENTER, 0, 0);
+        lv_img_set_src(musicBG, &flag);
 
 
         aboutScreen = lv_obj_create(NULL);
@@ -230,7 +238,7 @@ namespace Display
 
         lv_obj_t *version = lv_label_create(aboutScreen);
         lv_obj_add_style(version, &texts, 0);
-        lv_label_set_text(version, "V0.6");
+        lv_label_set_text(version, "V0.7");
         lv_obj_set_style_text_font(version, &axel_22_ui, 0);
         lv_obj_align(version, LV_ALIGN_CENTER, 0, 30);
 
@@ -242,7 +250,7 @@ namespace Display
 
         lv_obj_t *credit = lv_label_create(aboutScreen);
         lv_obj_add_style(credit, &texts, 0);
-        lv_label_set_text(credit, "Designer/Programmer: Lucas Merritt(merrittlj)");
+        lv_label_set_text(credit, "Designer/Programmer:\nLucas Merritt\n(merrittlj)");
         lv_obj_set_style_text_font(credit, &axel_22_ui, 0);
         lv_obj_align(credit, LV_ALIGN_CENTER, 0, 70);
     }
@@ -350,6 +358,7 @@ namespace Display
         for (size_t i = 0; i < screens.size(); ++i) {
             uint8_t s = screens.at(i);
             if (!s) continue;
+            if ((Sys::Screen)i == Sys::Screen::TAG) continue; /* Accessible through startup/shutdown */
             if ((Sys::Screen)i == Sys::Screen::FACE) lv_list_add_button(activeList, NULL, "Watch Face");
             if ((Sys::Screen)i == Sys::Screen::ALERT) continue;  /* Alert is inaccessible directly, but it shouldn't be active anyways */
             if ((Sys::Screen)i == Sys::Screen::ACTIVE) continue;  /* Shouldn't be set active, text is redundant */

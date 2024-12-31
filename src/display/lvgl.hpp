@@ -26,6 +26,8 @@ namespace Display
             uint8_t alertIndex;
             uint8_t eventIndex;
 
+            lv_obj_t *tagScreen;
+
             lv_obj_t *faceScreen;
             lv_obj_t *time;
             lv_obj_t *date;

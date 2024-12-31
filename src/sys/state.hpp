@@ -18,6 +18,7 @@
 namespace Sys
 {
     enum class Screen : uint8_t {
+        TAG,  /* Default active */
         FACE,  /* Default active */
         ALERT,  /* Default active */
         ACTIVE,  /* Default active */
