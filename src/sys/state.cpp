@@ -13,6 +13,7 @@ namespace Sys
     State::State()
     {
         pref.scheme = Scheme::LIGHT;
+        Music_Builder.albumArt = new uint8_t[5000]();
     }
 
     State::~State()
@@ -191,9 +192,21 @@ namespace Sys
 
     void State::Music_Build_Album_Art(uint8_t *arr)
     {
-        /* While we should pass in the E-ink display, the BLE protocol is hardcoded anyways */
-        /* 5000 bytes */
-        Music_Builder.albumArt = arr;
+        if (chunkSize > capacity || chunkSize <= 0 || !arr) return;  /* Invalid inputs */
+
+        /* Album Art is built in passed 512-byte chunks, not much logic needed, just append given chunks */
+        size_t available = capacity - chunkOffset;
+
+        /* Full chunk can fit */
+        if (available >= chunkSize) {
+            memcpy(&(Music_Builder.albumArt[chunkOffset]), arr, chunkSize);
+            chunkOffset += chunkSize;
+        /* Partial chunk can fit */
+        } else if (available > 0) {
+            memcpy(&(Music_Builder.albumArt[chunkOffset]), arr, available);
+            chunkOffset += available;
+        /* No space left */
+        } else return;
     }
 
     void State::Music_Trigger()

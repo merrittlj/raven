@@ -227,8 +227,8 @@ namespace Display
         lv_obj_add_flag(musicAlbum, LV_OBJ_FLAG_HIDDEN);  /* We will display album art anyways */
 
         musicBG = lv_image_create(musicScreen);
-        lv_obj_align(musicBG, LV_ALIGN_CENTER, 0, 0);
         lv_image_set_src(musicBG, &flag);
+        lv_obj_align(musicBG, LV_ALIGN_CENTER, 0, 0);
         lv_obj_move_background(musicBG);
 
 
@@ -337,19 +337,17 @@ namespace Display
         lv_label_set_text(musicArtist, info.artist.c_str());
         lv_label_set_text(musicAlbum, info.album.c_str());
 
-        /* const lv_image_dsc_t albumArt = { */
-        /*     { */
-        /*         LV_IMAGE_HEADER_MAGIC,  /1* .magic *1/ */
-        /*         LV_COLOR_FORMAT_I1,  /1* .cf *1/ */
-        /*         0,  /1* .flags *1/ */
-        /*         200,  /1* .w *1/ */
-        /*         200,  /1* .h *1/ */
-        /*         13  /1* .stride *1/ */
-        /*     }, */
-        /*     sizeof(info.albumArt),  /1* .data_size *1/ */
-        /*     info.albumArt,  /1* .data *1/ */
-        /* }; */
-        /* lv_image_set_src(musicBG, &albumArt); */
+        lv_image_dsc_t albumArt;
+
+        albumArt.header.w = 200;
+        albumArt.header.h = 200;
+        albumArt.header.stride = 28;  /* 25 bytes per row, round to 4-byte aligned 28 */
+        albumArt.header.cf = LV_COLOR_FORMAT_I1;
+
+        albumArt.data_size = 5000;
+        albumArt.data = info.albumArt;
+
+        lv_image_set_src(musicBG, &albumArt);
 
         if (!state->Is_Screen_Active(Sys::Screen::MUSIC)) {
             lv_scr_load(musicScreen);

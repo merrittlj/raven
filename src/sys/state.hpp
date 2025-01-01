@@ -65,7 +65,7 @@ namespace Sys
         std::string track;
         std::string artist;
         std::string album;
-        uint8_t *albumArt;
+        uint8_t *albumArt;  /* Make sure to initialize!(done in State) */
     };
 
     enum class Scheme {
@@ -97,15 +97,18 @@ namespace Sys
             EventInfo Event_Builder;
 
             MusicInfo Music_Builder;
+            const size_t capacity = 5000;
+            const size_t chunkSize = 512;
+            size_t chunkOffset = 0;
 
             NavInfo Nav_Builder;
 
             /* Component index of the Red LED */
-            uint32_t LED_Red_Index;
+            uint32_t LED_Red_Index = 0;
             /* Component index of the Green LED */
-            uint32_t LED_Green_Index;
+            uint32_t LED_Green_Index = 0;
             /* Component index of the Blue LED */
-            uint32_t LED_Blue_Index;
+            uint32_t LED_Blue_Index = 0;
         public:
             /* PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static uint8_t EvtPool[EVENT_POOL_SIZE]; */
             PLACE_IN_SECTION("MB_MEM2") ALIGN(4) inline static uint8_t EvtPool[EVENT_POOL_SIZE];
