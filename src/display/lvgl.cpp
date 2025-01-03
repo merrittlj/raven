@@ -226,6 +226,10 @@ namespace Display
         lv_obj_align(musicAlbum, LV_ALIGN_BOTTOM_MID, 0, -20);
         lv_obj_add_flag(musicAlbum, LV_OBJ_FLAG_HIDDEN);  /* We will display album art anyways */
 
+        /* Hide for album art testing */
+        lv_obj_add_flag(musicArtist, LV_OBJ_FLAG_HIDDEN);  
+        lv_obj_add_flag(musicTrack, LV_OBJ_FLAG_HIDDEN);  
+
         musicBG = lv_image_create(musicScreen);
         lv_image_set_src(musicBG, &flag);
         lv_obj_align(musicBG, LV_ALIGN_CENTER, 0, 0);
@@ -235,7 +239,6 @@ namespace Display
         aboutScreen = lv_obj_create(NULL);
 
         lv_obj_t *ravenIcon = lv_image_create(aboutScreen);
-        /* lv_image_set_src(ravenIcon, &raven); */
         lv_image_set_src(ravenIcon, &flag);
         lv_obj_align(ravenIcon, LV_ALIGN_CENTER, 0, 0);
 
@@ -337,15 +340,35 @@ namespace Display
         lv_label_set_text(musicArtist, info.artist.c_str());
         lv_label_set_text(musicAlbum, info.album.c_str());
 
-        lv_image_dsc_t albumArt;
+        static lv_image_dsc_t albumArt;
 
+        /* The first 8 bytes of the data should be a palette */
+        const size_t dataSize = 5000 + 8;
+        albumArt.header.magic = LV_IMAGE_HEADER_MAGIC;
+        albumArt.header.flags = 0;
         albumArt.header.w = 200;
         albumArt.header.h = 200;
-        albumArt.header.stride = 28;  /* 25 bytes per row, round to 4-byte aligned 28 */
+        albumArt.header.stride = 25;
         albumArt.header.cf = LV_COLOR_FORMAT_I1;
+        albumArt.data_size = dataSize;
 
-        albumArt.data_size = 5000;
-        albumArt.data = info.albumArt;
+        static uint8_t builder[dataSize];
+        /* Apparently data is stored w/ a palette, 1st 4 bytes are black, 2nd 4 bytes are white */
+        uint8_t palette[8] = {0x00,0x00,0x00,0xff,   0xff,0xff,0xff,0xff};
+        memcpy(builder, palette, 8);
+        memcpy(&builder[8], info.albumArt, dataSize - 8);
+
+        /* Checkerboard */
+        /* for (uint32_t i = 8; i < dataSize; ++i) { */
+        /*     // Alternate between 0x55 and 0xAA to create a checkerboard pattern */
+        /*     if ((i / albumArt.header.stride) % 2 == 0) { */
+        /*         cb[i] = 0x55;  // 01010101 (checkerboard-like pattern) */
+        /*     } else { */
+        /*         cb[i] = 0xAA;  // 10101010 (opposite pattern) */
+        /*     } */
+        /* } */
+
+        albumArt.data = builder;
 
         lv_image_set_src(musicBG, &albumArt);
 

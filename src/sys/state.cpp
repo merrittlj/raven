@@ -190,17 +190,16 @@ namespace Sys
         Music_Builder.album = str;
     }
 
-    void State::Music_Build_Album_Art(uint8_t *arr)
+    void State::Music_Build_Album_Art(uint8_t *arr, size_t length)
     {
-        if (chunkSize > capacity || chunkSize <= 0 || !arr) return;  /* Invalid inputs */
+        if (!arr || length <= 0 || length > capacity) return;  /* Invalid inputs */
 
-        /* Album Art is built in passed 512-byte chunks, not much logic needed, just append given chunks */
         size_t available = capacity - chunkOffset;
 
         /* Full chunk can fit */
-        if (available >= chunkSize) {
-            memcpy(&(Music_Builder.albumArt[chunkOffset]), arr, chunkSize);
-            chunkOffset += chunkSize;
+        if (available >= length) {
+            memcpy(&(Music_Builder.albumArt[chunkOffset]), arr, length);
+            chunkOffset += length;
         /* Partial chunk can fit */
         } else if (available > 0) {
             memcpy(&(Music_Builder.albumArt[chunkOffset]), arr, available);
@@ -212,6 +211,7 @@ namespace Sys
     void State::Music_Trigger()
     {
         Display::Controller::Instance()->Music_Send(Music_Builder);
+        chunkOffset = 0;
         /* Music_Builder = {"", "", "", NULL}; */
     }
 

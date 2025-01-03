@@ -98,7 +98,6 @@ namespace Sys
 
             MusicInfo Music_Builder;
             const size_t capacity = 5000;
-            const size_t chunkSize = 512;
             size_t chunkOffset = 0;
 
             NavInfo Nav_Builder;
@@ -180,7 +179,7 @@ namespace Sys
             void Music_Build_Artist(std::string str);
             void Music_Build_Track(std::string str);
             void Music_Build_Album(std::string str);
-            void Music_Build_Album_Art(uint8_t *arr);
+            void Music_Build_Album_Art(uint8_t *arr, size_t length);
             void Music_Trigger();
 
             void Register_LED_Red(uint32_t pIndex);

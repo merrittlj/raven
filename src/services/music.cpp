@@ -61,20 +61,20 @@ SVCCTL_EvtAckStatus_t BLE::MusicService::Event_Handler(void *Event)
                     case ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE:
                         attribute_modified = (aci_gatt_attribute_modified_event_rp0*)blecore_evt->data;
                         uint8_t *data;
-                        uint16_t length;
+                        size_t length;
                         data = attribute_modified->Attr_Data;
-                        length = attribute_modified->Attr_Data_Length;
+                        length = (size_t)(attribute_modified->Attr_Data_Length);
                         if (attribute_modified->Attr_Handle == (artist.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Music_Build_Artist(std::string((const char *)data, (size_t)length));
+                            sysState->Music_Build_Artist(std::string((const char *)data, length));
                         }
                         if (attribute_modified->Attr_Handle == (track.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Music_Build_Track(std::string((const char *)data, (size_t)length));
+                            sysState->Music_Build_Track(std::string((const char *)data, length));
                         }
                         if (attribute_modified->Attr_Handle == (album.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Music_Build_Album(std::string((const char *)data, (size_t)length));
+                            sysState->Music_Build_Album(std::string((const char *)data, length));
                         }
                         if (attribute_modified->Attr_Handle == (albumArt.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Music_Build_Album_Art(data);
+                            sysState->Music_Build_Album_Art(data, length);
                         }
                         if (attribute_modified->Attr_Handle == (trigger.Get_Handle() + CHAR_VALUE_OFFSET)) {
                             sysState->Music_Trigger();
