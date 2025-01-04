@@ -207,17 +207,31 @@ namespace Display
 
         musicScreen = lv_obj_create(NULL);
 
+        static lv_style_t flexBox;
+        lv_style_set_border_width(&flexBox, 2);
+        lv_style_set_border_color(&flexBox, lv_color_hex(0x000000));
+        lv_style_set_bg_color(&flexBox, lv_color_hex(0xffffff));
+        lv_style_set_bg_opa(&flexBox, LV_OPA_100);
+        lv_style_set_radius(&flexBox, 5);
+        lv_style_set_pad_top(&flexBox, 1);
+        lv_style_set_pad_bottom(&flexBox, 1);
+        lv_style_set_pad_left(&flexBox, 3);
+        lv_style_set_pad_right(&flexBox, 3);
+
+
         musicTrack = lv_label_create(musicScreen);
         lv_obj_add_style(musicTrack, &texts, 0);
+        lv_obj_add_style(musicTrack, &flexBox, 0);
         lv_label_set_text(musicTrack, "Track");
-        lv_obj_set_style_text_font(musicTrack, &axel_22_ui, 0);
-        lv_obj_align(musicTrack, LV_ALIGN_TOP_LEFT, 10, 10);
+        lv_obj_set_style_text_font(musicTrack, &axel_20_text, 0);
+        lv_obj_align(musicTrack, LV_ALIGN_BOTTOM_LEFT, 0, -25);
 
         musicArtist = lv_label_create(musicScreen);
         lv_obj_add_style(musicArtist, &texts, 0);
+        lv_obj_add_style(musicArtist, &flexBox, 0);
         lv_label_set_text(musicArtist, "Artist");
         lv_obj_set_style_text_font(musicArtist, &axel_20_text, 0);
-        lv_obj_align(musicArtist, LV_ALIGN_TOP_LEFT, 10, 50);
+        lv_obj_align(musicArtist, LV_ALIGN_BOTTOM_LEFT, 0, 0);
 
         musicAlbum = lv_label_create(musicScreen);
         lv_obj_add_style(musicAlbum, &texts, 0);
@@ -225,10 +239,6 @@ namespace Display
         lv_obj_set_style_text_font(musicAlbum, &axel_20_text, 0);
         lv_obj_align(musicAlbum, LV_ALIGN_BOTTOM_MID, 0, -20);
         lv_obj_add_flag(musicAlbum, LV_OBJ_FLAG_HIDDEN);  /* We will display album art anyways */
-
-        /* Hide for album art testing */
-        lv_obj_add_flag(musicArtist, LV_OBJ_FLAG_HIDDEN);  
-        lv_obj_add_flag(musicTrack, LV_OBJ_FLAG_HIDDEN);  
 
         musicBG = lv_image_create(musicScreen);
         lv_image_set_src(musicBG, &flag);
@@ -334,10 +344,29 @@ namespace Display
         }
     }
 
+    std::string LVGL::Truncate_Text(std::string text, uint32_t limit)
+    {
+        /* Note: assumes axel_20_text font! */
+        lv_point_t p;
+        std::string newText = text;
+        lv_text_get_size(&p, newText.c_str(), &axel_20_text, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_EXPAND);
+        if ((uint32_t)p.x > limit) {
+            lv_point_t p2;
+            lv_text_get_size(&p2, ">", &axel_20_text, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_EXPAND);
+            do {
+                newText.pop_back();
+                lv_text_get_size(&p, newText.c_str(), &axel_20_text, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_EXPAND);
+            } while ((uint32_t)(p.x + p2.x) > limit);
+            newText += ">";
+        }
+
+        return newText;
+    }
+
     void LVGL::Music(Sys::MusicInfo info)
     {
-        lv_label_set_text(musicTrack, info.track.c_str());
-        lv_label_set_text(musicArtist, info.artist.c_str());
+        lv_label_set_text(musicTrack, Truncate_Text(info.track, 200).c_str());
+        lv_label_set_text(musicArtist, Truncate_Text(info.artist, 200).c_str());
         lv_label_set_text(musicAlbum, info.album.c_str());
 
         static lv_image_dsc_t albumArt;

@@ -70,6 +70,8 @@ namespace Display
             /* Handles lists with groups(first button press) and items(second button press) */
             uint16_t List_Handler(uint8_t group, uint8_t item);
 
+            std::string Truncate_Text(std::string text, uint32_t limit);
+
         public:
             LVGL();
             LVGL(Display::Manager man, Sys::State *sysState);

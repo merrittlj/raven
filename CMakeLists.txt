@@ -131,8 +131,7 @@ add_custom_target(flash
 )
 
 add_custom_target(debug
-    COMMAND openocd -f interface/stlink.cfg -f board/st_nucleo_wb55.cfg -c "init" &
-    COMMAND arm-none-eabi-gdb ${PROJECT_NAME} -x ${CMAKE_SOURCE_DIR}/.gdbconf
+    COMMAND ${CMAKE_SOURCE_DIR}/debug.sh
     DEPENDS ${PROJECT_NAME}
 )
 
