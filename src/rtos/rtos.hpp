@@ -5,6 +5,7 @@
 #include "sys/state.hpp"
 #include "display/controller.hpp"
 #include "gpio/gpio.hpp"
+#include "services/info.hpp"
 
 #include "button_debounce.h"
 
@@ -20,6 +21,11 @@ namespace RTOS
         Process_Params();
     };
 
+    struct Startup_Params {
+        Sys::State *sysState;
+        BLE::InfoService *info;
+    };
+
     struct Button_Params {
         Debouncer *btnPort;
         GPIO::Controller *gpioCtrl;
@@ -33,8 +39,13 @@ namespace RTOS
         Button_Params();
     };
 
+    static uint8_t sentReset = 0;
+
     /* Event processing(CPU2, BLE, display) task, runs processing whenever possible, but w/ low priority */
     void Process_Task(void *params);
+
+    /* Startup code, such as sending reset notify char */
+    void Startup_Task(void *params);
 
     /* Button processing task, runs every ms, with higher priority then process */
     void Button_Task(void *params);

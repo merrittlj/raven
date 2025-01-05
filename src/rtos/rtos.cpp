@@ -1,5 +1,9 @@
 #include "rtos/rtos.hpp"
 
+#include "sys/state.hpp"
+#include "ble/uuid.hpp"
+#include "services/info.hpp"
+
 #include "FreeRTOS.h"
 #include "task.h"
 
@@ -20,6 +24,26 @@ namespace RTOS
             p->evtP->Sys_ProcessEvent();
 
             p->displayCtrl->Process();
+        }
+    }
+
+    void Startup_Task(void *params)
+    {
+        Startup_Params *p = (Startup_Params *)params;
+        for (;;) {
+            if (p->sysState->App_Flag_Get(Sys::State::App_Flag::BLE_CONNECTED) == Sys::State::Flag_Val::SET && !sentReset) {
+                /* This is a ridiculous hack, but to properly reset GB variables through a reset(even if a BLE connection is maintained), we have to notify it */
+                vTaskDelay(1000);
+
+                /* Writing device reset info char for GB */
+                uint8_t resetData = 0x01;
+                if (p->info->Update_Char_Value(BLE::UUID::ExtractUUID16FromLE(p->info->deviceReset.Get_UUID()),
+                            p->info->deviceReset.Get_Value_Length(),
+                            &resetData) != BLE_STATUS_SUCCESS)
+                    Sys::Error_Handler();
+
+                sentReset = 1;
+            }
         }
     }
 

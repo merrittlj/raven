@@ -18,6 +18,7 @@
 #include "services/nav.hpp"
 #include "services/music.hpp"
 #include "services/event.hpp"
+#include "services/info.hpp"
 #include "display/controller.hpp"
 #include "rtos/rtos.hpp"
 
@@ -56,13 +57,14 @@ int main()
     App::Debug_Controller debugCtrl = App::Debug_Controller();
     GPIO::Controller gpioCtrl = GPIO::Controller();
     Sys::Event_Processor sysEvtP = Sys::Event_Processor(&sysState);
-    BLE::App bleApp = BLE::App(&gpioCtrl, &sysState);
     BLE::TimeService timeService = BLE::TimeService(&gpioCtrl, &sysState);
     BLE::NotifyService notifyService = BLE::NotifyService(&gpioCtrl, &sysState);
     BLE::PrefService prefService = BLE::PrefService(&gpioCtrl, &sysState);
     BLE::NavService navService = BLE::NavService(&gpioCtrl, &sysState);
     BLE::MusicService musicService = BLE::MusicService(&gpioCtrl, &sysState);
     BLE::EventService eventService = BLE::EventService(&gpioCtrl, &sysState);
+    BLE::InfoService infoService = BLE::InfoService(&gpioCtrl, &sysState);
+    BLE::App bleApp = BLE::App(&gpioCtrl, &sysState);
 
     /* Configure the debug support if needed */
     debugCtrl.Init();
@@ -119,8 +121,10 @@ int main()
     notifyService.Init();
     prefService.Init();
     navService.Init();
+    infoService.Init();
     musicService.Init();
-    /* eventService.Init(); */
+    eventService.Init();
+
     bleApp.Advertising(SET);
 
     Display::Controller displayCtrl = Display::Controller(200, 200, spiCtrl, &sysState);
@@ -135,6 +139,11 @@ int main()
     processParams->evtP = &sysEvtP;
     processParams->displayCtrl = &displayCtrl;
     xTaskCreate(RTOS::Process_Task, "Process", configMINIMAL_STACK_SIZE, (void *)processParams, tskIDLE_PRIORITY, (TaskHandle_t *)NULL);
+
+    RTOS::Startup_Params *startupParams = new RTOS::Startup_Params;
+    startupParams->sysState = &sysState;
+    startupParams->info = &infoService;
+    xTaskCreate(RTOS::Startup_Task, "Startup", configMINIMAL_STACK_SIZE, (void *)startupParams, tskIDLE_PRIORITY, (TaskHandle_t *)NULL);
 
     uint32_t buttonState = 0;
     RTOS::Button_Params *buttonParams = new RTOS::Button_Params;

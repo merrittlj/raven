@@ -1,4 +1,4 @@
-#include "services/time.hpp"
+#include "services/info.hpp"
 
 #include "ble/char.hpp"
 #include "ble/uuid.hpp"
@@ -11,23 +11,23 @@
 #include "ble_types.h"
 
 
-BLE::TimeService::TimeService(GPIO::Controller *pGpioCtrl, Sys::State *pSysState)
+BLE::InfoService::InfoService(GPIO::Controller *pGpioCtrl, Sys::State *pSysState)
 {
     this->gpioCtrl = pGpioCtrl;
     this->sysState = pSysState;
 
-    BLE::TimeService::Instance(this);
+    BLE::InfoService::Instance(this);
 }
 
-BLE::TimeService::~TimeService()
+BLE::InfoService::~InfoService()
 {}
 
-tBleStatus BLE::TimeService::Add()
+tBleStatus BLE::InfoService::Add()
 {
     uint16_t retHandle;
-    /* 0x1805: Current Time Service */
-    Char_UUID_t serviceUUID = BLE::UUID::CreateCharUUID(0x1805);
-    tBleStatus ret = aci_gatt_add_service(UUID_TYPE_16, (Service_UUID_t *)&serviceUUID,
+    
+    Char_UUID_t serviceUUID = BLE::UUID::CreateCharUUID({0xb2,0x6b,0x80,0xc0,0xcb,0x1b,0x11,0xef,0xa8,0xfa,0x08,0x00,0x20,0x0c,0x9a,0x66});
+    tBleStatus ret = aci_gatt_add_service(UUID_TYPE_128, (Service_UUID_t *)&serviceUUID,
             PRIMARY_SERVICE,
             SERVICE_MAX_ATT_RECORDS,
             &retHandle);
@@ -35,9 +35,9 @@ tBleStatus BLE::TimeService::Add()
     return ret;
 }
 
-SVCCTL_EvtAckStatus_t BLE::TimeService::Static_Event_Handler(void *Event)
+SVCCTL_EvtAckStatus_t BLE::InfoService::Static_Event_Handler(void *Event)
 {
-    return BLE::TimeService::Instance()->Event_Handler(Event);
+    return BLE::InfoService::Instance()->Event_Handler(Event);
 }
 
 /**
@@ -45,7 +45,7 @@ SVCCTL_EvtAckStatus_t BLE::TimeService::Static_Event_Handler(void *Event)
  * @param  Event: Address of the buffer holding the Event
  * @retval Ack: Return whether the Event has been managed or not
  */
-SVCCTL_EvtAckStatus_t BLE::TimeService::Event_Handler(void *Event)
+SVCCTL_EvtAckStatus_t BLE::InfoService::Event_Handler(void *Event)
 {
     SVCCTL_EvtAckStatus_t return_value;
     hci_event_pckt *event_pckt;
@@ -63,12 +63,6 @@ SVCCTL_EvtAckStatus_t BLE::TimeService::Event_Handler(void *Event)
                         attribute_modified = (aci_gatt_attribute_modified_event_rp0*)blecore_evt->data;
                         uint8_t *data;
                         data = attribute_modified->Attr_Data;
-                        if (attribute_modified->Attr_Handle == (currentTime.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Update_Time(Sys::TimeInfo{data[2], data[3], data[4], data[5], data[6]});
-                            gpioCtrl->Write_Component(this->sysState->Fetch_LED_Blue(), SET);
-                            HAL_Delay(50);
-                            gpioCtrl->Write_Component(this->sysState->Fetch_LED_Blue(), RESET);
-                        }
                         break;
 
                     default:
@@ -80,15 +74,16 @@ SVCCTL_EvtAckStatus_t BLE::TimeService::Event_Handler(void *Event)
         default:
             break;
     }
+
     return(return_value);
 }
 
-uintptr_t BLE::TimeService::Get_Handle() const
+uintptr_t BLE::InfoService::Get_Handle() const
 {
     return this->handle;
 }
 
-void BLE::TimeService::Set_Handle(uintptr_t pHandle)
+void BLE::InfoService::Set_Handle(uintptr_t pHandle)
 {
     this->handle = pHandle;
 }
@@ -98,39 +93,24 @@ void BLE::TimeService::Set_Handle(uintptr_t pHandle)
  * @param  None
  * @retval None
  */
-void BLE::TimeService::Init()
+void BLE::InfoService::Init()
 {
     /* Register the event handler to the BLE controller */
-    SVCCTL_RegisterSvcHandler(BLE::TimeService::Static_Event_Handler);
+    SVCCTL_RegisterSvcHandler(BLE::InfoService::Static_Event_Handler);
 
     /* Add Service */
     if (this->Add() != BLE_STATUS_SUCCESS)
         Sys::Error_Handler(); /* UNEXPECTED */
 
-    Char_UUID_t *currentTimeUUID = new Char_UUID_t;
-    /* 0x2A2B: Current Time Characteristic */
-    *currentTimeUUID = BLE::UUID::CreateCharUUID(0x2A2B);
-    currentTime = BLE::Char(UUID_TYPE_16, currentTimeUUID,
-            10,
-            CHAR_PROP_READ | CHAR_PROP_WRITE | CHAR_PROP_NOTIFY,
+    Char_UUID_t deviceResetUUID = BLE::UUID::CreateCharUUID({0xb2,0x6b,0x80,0xc1,0xcb,0x1b,0x11,0xef,0xa8,0xfa,0x08,0x00,0x20,0x0c,0x9a,0x66});
+    deviceReset = BLE::Char(UUID_TYPE_128, &deviceResetUUID,
+            1,
+            CHAR_PROP_NOTIFY,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
             10,
             (uint8_t)VALUE_VARIABLE_LENGTH);
-    if (currentTime.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
-        Sys::Error_Handler(); /* UNEXPECTED */
-
-    Char_UUID_t *localTimeUUID = new Char_UUID_t;
-    /* 0x2A0F: Local Time Information Characteristic */
-    *localTimeUUID = BLE::UUID::CreateCharUUID(0x2A0F);
-    localTime = BLE::Char(UUID_TYPE_16, localTimeUUID,
-            18,
-            CHAR_PROP_READ | CHAR_PROP_WRITE,
-            ATTR_PERMISSION_NONE,
-            GATT_NOTIFY_ATTRIBUTE_WRITE,
-            10,
-            (uint8_t)VALUE_VARIABLE_LENGTH);
-    if (localTime.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
+    if (deviceReset.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
         Sys::Error_Handler(); /* UNEXPECTED */
 }
 
@@ -140,8 +120,18 @@ void BLE::TimeService::Init()
  * @param newValueLength: Length of the new value data to be written
  * @param pNewValue: Pointer to the new value data 
  */
-tBleStatus BLE::TimeService::Update_Char_Value(uint16_t UUID16, uint16_t newValueLength, uint8_t *pNewValue)
+tBleStatus BLE::InfoService::Update_Char_Value(uint16_t UUID16, uint16_t newValueLength, uint8_t *pNewValue)
 {
     tBleStatus ret = BLE_STATUS_INVALID_PARAMS;
+    if (UUID16 == BLE::UUID::ExtractUUID16FromLE(deviceReset.Get_UUID())) {
+        if (newValueLength <= deviceReset.Get_Value_Length())
+        {
+            ret = aci_gatt_update_char_value(this->Get_Handle(),
+                    deviceReset.Get_Handle(),
+                    0, /* charValOffset */
+                    newValueLength, /* charValueLen */
+                    (uint8_t *)pNewValue);
+        }
+    }
     return ret;
 }

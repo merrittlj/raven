@@ -37,7 +37,8 @@
  * Maximum number of Services that can be stored in the GATT database.
  * Note that the GAP and GATT services are automatically added so this parameter should be 2 plus the number of user services
  */
-#define CFG_BLE_NUM_GATT_SERVICES   8
+/* #define CFG_BLE_NUM_GATT_SERVICES   8 */
+#define CFG_BLE_NUM_GATT_SERVICES   15
 
 /**
  * Maximum number of Attributes
@@ -46,7 +47,8 @@
  * Note that certain characteristics and relative descriptors are added automatically during device initialization
  * so this parameters should be 9 plus the number of user Attributes
  */
-#define CFG_BLE_NUM_GATT_ATTRIBUTES 68
+/* #define CFG_BLE_NUM_GATT_ATTRIBUTES 68 */
+#define CFG_BLE_NUM_GATT_ATTRIBUTES 100
 
 /**
  * Maximum supported ATT_MTU size
@@ -66,7 +68,8 @@
  *  The total amount of memory needed is the sum of the above quantities for each attribute.
  * This parameter is ignored by the CPU2 when CFG_BLE_OPTIONS has SHCI_C2_BLE_INIT_OPTIONS_LL_ONLY flag set
  */
-#define CFG_BLE_ATT_VALUE_ARRAY_SIZE    (1344)
+/* #define CFG_BLE_ATT_VALUE_ARRAY_SIZE    (1344) */
+#define CFG_BLE_ATT_VALUE_ARRAY_SIZE    (2000)
 
 /**
  * Prepare Write List size in terms of number of packet
