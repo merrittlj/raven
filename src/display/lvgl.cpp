@@ -101,7 +101,7 @@ namespace Display
 
         alertScreen = lv_obj_create(NULL);
         static lv_style_t box;
-        lv_style_set_border_width(&box, 3);
+        lv_style_set_border_width(&box, 2);
         lv_style_set_border_color(&box, lv_color_hex(0x000000));
         lv_style_set_bg_color(&box, lv_color_hex(0xffffff));
         lv_style_set_radius(&box, 5);
