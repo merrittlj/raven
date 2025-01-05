@@ -285,6 +285,11 @@ namespace Display
         lv_display_flush_ready(display);
     }
 
+    void LVGL::Tag()
+    {
+        lv_scr_load(tagScreen);
+    }
+
     void LVGL::Time(Sys::TimeInfo value)
     {
         lv_label_set_text(time, ((value.hour < 10 ? "0" : "") + std::to_string(value.hour) + ":" + (value.minute < 10 ? "0" : "") + std::to_string(value.minute)).c_str());

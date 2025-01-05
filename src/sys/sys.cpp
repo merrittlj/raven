@@ -10,6 +10,18 @@
 #include "stm32wbxx_hal.h"
 #include "svc_ctl.h"
 
+#include "FreeRTOS.h"
+#include "task.h"
+#include "semphr.h"
+
+
+void Sys::Delay(uint32_t amt)
+{
+    /* Safe delay: if FreeRTOS is not started yet, do not use non-blocking delay */
+    if(xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
+        vTaskDelay(amt);
+    else HAL_Delay(amt);
+}
 
 /**
  * @brief  This function is executed in case of error occurrence.

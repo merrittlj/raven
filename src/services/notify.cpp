@@ -76,7 +76,7 @@ SVCCTL_EvtAckStatus_t BLE::NotifyService::Event_Handler(void *Event)
                         if (attribute_modified->Attr_Handle == (trigger.Get_Handle() + CHAR_VALUE_OFFSET)) {
                             sysState->Alert_Trigger();
                             gpioCtrl->Write_Component(this->sysState->Fetch_LED_Red(), SET);
-                            HAL_Delay(50);
+                            Sys::Delay(50);
                             gpioCtrl->Write_Component(this->sysState->Fetch_LED_Red(), RESET);
                         }
                         break;

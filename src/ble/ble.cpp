@@ -4,6 +4,7 @@
 #include "services/time.hpp"
 #include "sys/sys.hpp"
 #include "sys/state.hpp"
+#include "display/controller.hpp"
 
 #include "shci.h"
 #include "otp.h"
@@ -333,6 +334,9 @@ SVCCTL_UserEvtFlowStatus_t BLE::App::SVCCTL_Notification_Handler(void *pckt)
     {
         case HCI_DISCONNECTION_COMPLETE_EVT_CODE:
             this->sysState->App_Flag_Reset(Sys::State::App_Flag::BLE_CONNECTED);
+
+            Display::Controller::Instance()->Tag_Screen();
+
             /* Start advertising */
             this->Advertising(SET);
             break; /* HCI_DISCONNECTION_COMPLETE_EVT_CODE */

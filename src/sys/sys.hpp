@@ -11,6 +11,7 @@
 
 namespace Sys
 {
+    void Delay(uint32_t amt);
     void Error_Handler();
 
     class Controller

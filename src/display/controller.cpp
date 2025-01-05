@@ -56,6 +56,11 @@ namespace Display
         lv_timer_periodic_handler();
     }
 
+    void Controller::Tag_Screen()
+    {
+        lvgl.Tag();
+    }
+
     void Controller::Update_Time(Sys::TimeInfo value)
     {
         lvgl.Time(value);

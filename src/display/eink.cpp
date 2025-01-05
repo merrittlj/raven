@@ -1,5 +1,6 @@
 #include "display/eink.hpp"
 
+#include "sys/sys.hpp"
 #include "sys/spi.hpp"
 #include "sys/state.hpp"
 
@@ -276,6 +277,6 @@ namespace Display
     {
         spi.SendCommand(0x10);  /* Deep sleep mode control */
         spi.SendData(0x01);
-        HAL_Delay(100);
+        Sys::Delay(100);
     }
 }
