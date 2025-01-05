@@ -5,6 +5,7 @@
 #include "gpio/gpio.hpp"
 #include "sys/sys.hpp"
 #include "sys/state.hpp"
+#include "display/controller.hpp"
 
 #include "ble_common.h"
 #include "ble.h"
@@ -64,6 +65,7 @@ SVCCTL_EvtAckStatus_t BLE::PrefService::Event_Handler(void *Event)
                         data = attribute_modified->Attr_Data;
                         if (attribute_modified->Attr_Handle == (colorScheme.Get_Handle() + CHAR_VALUE_OFFSET)) {
                             sysState->Get_Pref()->scheme = ((Sys::Scheme)data[0]);
+                            Display::Controller::Instance()->Refresh();
                         }
                         break;
 

@@ -285,6 +285,11 @@ namespace Display
         lv_display_flush_ready(display);
     }
 
+    void LVGL::Refresh()
+    {
+        lv_obj_invalidate(lv_screen_active());
+    }
+
     void LVGL::Tag()
     {
         lv_scr_load(tagScreen);

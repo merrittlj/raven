@@ -79,6 +79,7 @@ namespace Display
             void Init();
             void Create();
             static void Flush(lv_display_t *display, const lv_area_t *area, uint8_t *px_map);
+            void Refresh();
 
             void Tag();
             void Time(Sys::TimeInfo value);

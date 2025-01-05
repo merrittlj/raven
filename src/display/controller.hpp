@@ -35,6 +35,7 @@ namespace Display
 
             void Init();
             void Process();
+            void Refresh();
 
             void Tag_Screen();
             void Update_Time(Sys::TimeInfo value);

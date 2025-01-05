@@ -233,8 +233,9 @@ namespace Display
             for (uint16_t i = 0; i < widthBytes; i++) {
                 if (state->Get_Pref()->scheme == Sys::Scheme::LIGHT)
                     spi.SendData(buf.at(i + (j * widthBytes)));
+                /* TODO: more complex dark mode beyond inversion */
                 if (state->Get_Pref()->scheme == Sys::Scheme::DARK)
-                    spi.SendData(buf.at(i + (j * widthBytes)) ^ 1);  /* Simple inversion */
+                    spi.SendData(~(buf.at(i + (j * widthBytes))));  /* Simple inversion */
             }
         }
         TurnOnDisplay();
