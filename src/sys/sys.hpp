@@ -9,6 +9,8 @@
 #include "stm32wbxx_hal.h"
 
 
+extern RTC_HandleTypeDef *ghrtc;
+
 namespace Sys
 {
     void Delay(uint32_t amt);
@@ -18,6 +20,7 @@ namespace Sys
     {
         private:
             Sys::State *sysState;
+            RTC_HandleTypeDef hrtc;
             SPI_HandleTypeDef spi1;
 
         public:
@@ -25,6 +28,8 @@ namespace Sys
             ~Controller();
 
             void Config_SysClk();
+            void Config_RTC();
+            void Get_RTC(RTC_DateTypeDef *date, RTC_TimeTypeDef *time);
             void Config_HSE();
             SPI_HandleTypeDef *Config_SPI();
             void Init_CPU2();
@@ -60,6 +65,13 @@ namespace Sys
 /* As the library requires these functions globally??? */
 void shci_notify_asynch_evt(void *pdata);
 void hci_notify_asynch_evt(void *pdata);
+
+extern "C" {
+    void HAL_RTC_MspInit(RTC_HandleTypeDef* hrtc);
+    void HAL_RTC_MspDeInit(RTC_HandleTypeDef* hrtc);
+    void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc);
+    void HAL_RTCEx_AlarmBEventCallback(RTC_HandleTypeDef *hrtc);
+}
 
 
 #endif /* SYS_HPP */

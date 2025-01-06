@@ -21,6 +21,8 @@ extern "C" {
 
     void IPCC_C1_TX_IRQHandler(void);
     void IPCC_C1_RX_IRQHandler(void);
+
+    void RTC_Alarm_IRQHandler(void);
 }
 
 

@@ -1,6 +1,7 @@
 #include "sys/sys.hpp"
 
 #include "sys/state.hpp"
+#include "display/controller.hpp"
 
 #include "shci.h"
 #include "hci_tl.h"
@@ -14,6 +15,8 @@
 #include "task.h"
 #include "semphr.h"
 
+
+RTC_HandleTypeDef *ghrtc;
 
 void Sys::Delay(uint32_t amt)
 {
@@ -95,6 +98,136 @@ void Sys::Controller::Config_SysClk()
     if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
         Error_Handler();
 }
+
+void Sys::Controller::Config_RTC()
+{
+    RTC_TimeTypeDef sTime = {0};
+    RTC_DateTypeDef sDate = {0};
+    RTC_AlarmTypeDef sAlarm = {0};
+
+    hrtc = {0};
+    /** Initialize RTC Only
+    */
+    hrtc.Instance = RTC;
+    hrtc.Init.HourFormat = RTC_HOURFORMAT_24;
+    hrtc.Init.AsynchPrediv = 127;
+    hrtc.Init.SynchPrediv = 255;
+    hrtc.Init.OutPut = RTC_OUTPUT_DISABLE;
+    hrtc.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
+    hrtc.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
+    hrtc.Init.OutPutRemap = RTC_OUTPUT_REMAP_NONE;
+    HAL_StatusTypeDef ret = HAL_RTC_Init(&hrtc);
+    if (ret != HAL_OK)
+        Error_Handler();
+
+    /** Initialize RTC and set the Time and Date
+    */
+    sTime.Hours = 0x0;
+    sTime.Minutes = 0x0;
+    sTime.Seconds = 0x0;
+    sTime.SubSeconds = 0x0;
+    sTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
+    sTime.StoreOperation = RTC_STOREOPERATION_RESET;
+    if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
+        Error_Handler();
+
+    sDate.WeekDay = RTC_WEEKDAY_MONDAY;
+    sDate.Month = RTC_MONTH_JANUARY;
+    sDate.Date = 0x1;
+    sDate.Year = 0x0;
+    if (HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BIN) != HAL_OK)
+        Error_Handler();
+
+    /** Enable the Alarm A
+    */
+    sAlarm.AlarmTime.Hours = 0x0;
+    sAlarm.AlarmTime.Minutes = 0x0;
+    sAlarm.AlarmTime.Seconds = 0x0;
+    sAlarm.AlarmTime.SubSeconds = 0x0;
+    sAlarm.AlarmTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
+    sAlarm.AlarmTime.StoreOperation = RTC_STOREOPERATION_RESET;
+    sAlarm.AlarmMask = RTC_ALARMMASK_DATEWEEKDAY|RTC_ALARMMASK_HOURS
+        |RTC_ALARMMASK_MINUTES;
+    sAlarm.AlarmSubSecondMask = RTC_ALARMSUBSECONDMASK_ALL;
+    sAlarm.AlarmDateWeekDaySel = RTC_ALARMDATEWEEKDAYSEL_DATE;
+    sAlarm.AlarmDateWeekDay = 0x1;
+    sAlarm.Alarm = RTC_ALARM_A;
+    if (HAL_RTC_SetAlarm_IT(&hrtc, &sAlarm, RTC_FORMAT_BIN) != HAL_OK)
+        Error_Handler();
+
+    ghrtc = &hrtc;
+}
+
+void Sys::Controller::Get_RTC(RTC_DateTypeDef *date, RTC_TimeTypeDef *time)
+{
+    HAL_RTC_GetTime(&hrtc, time, RTC_FORMAT_BIN);
+    HAL_RTC_GetDate(&hrtc, date, RTC_FORMAT_BIN);
+}
+
+extern "C" {
+    void HAL_RTC_MspInit(RTC_HandleTypeDef* hrtc)
+    {
+        RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
+        if(hrtc->Instance==RTC)
+        {
+            /** Initializes the peripherals clock
+            */
+            PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC;
+            PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
+            if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
+            {
+                Sys::Error_Handler();
+            }
+
+            /* Peripheral clock enable */
+            __HAL_RCC_RTC_ENABLE();
+            __HAL_RCC_RTCAPB_CLK_ENABLE();
+
+            HAL_NVIC_SetPriority(RTC_Alarm_IRQn, 0, 0);
+            HAL_NVIC_EnableIRQ(RTC_Alarm_IRQn);
+        }
+    }
+
+    void HAL_RTC_MspDeInit(RTC_HandleTypeDef* hrtc)
+    {
+        if(hrtc->Instance==RTC)
+        {
+            /* Peripheral clock disable */
+            __HAL_RCC_RTC_DISABLE();
+            __HAL_RCC_RTCAPB_CLK_DISABLE();
+        }
+    }
+
+    void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
+    {
+        UNUSED(hrtc);
+
+        RTC_AlarmTypeDef alarm;
+        HAL_RTC_GetAlarm(hrtc, &alarm, RTC_ALARM_A, FORMAT_BIN);
+        if (HAL_RTC_SetAlarm_IT(hrtc, &alarm, RTC_FORMAT_BIN) != HAL_OK)
+            Sys::Error_Handler();
+
+        RTC_DateTypeDef date = {0};
+        RTC_TimeTypeDef time = {0};
+
+        HAL_RTC_GetTime(hrtc, &time, RTC_FORMAT_BIN);
+        HAL_RTC_GetDate(hrtc, &date, RTC_FORMAT_BIN);
+
+        Sys::TimeInfo info;
+
+        info.month = date.Month;
+        info.day = date.Date;
+
+        info.hour = time.Hours;
+        info.minute = time.Minutes;
+        info.second = time.Seconds;
+
+        Display::Controller::Instance()->Update_Time(info);
+    }
+
+    void HAL_RTCEx_AlarmBEventCallback(RTC_HandleTypeDef *hrtc)
+    {}
+};
 
 /**
  * @brief Read the HSE trimming value from OTP memory

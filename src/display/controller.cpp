@@ -71,6 +71,11 @@ namespace Display
         lvgl.Time(value);
     }
 
+    void Controller::State_Update_Time(Sys::TimeInfo value)
+    {
+        state->Update_Time(value);
+    }
+
     void Controller::Alert_Send(Sys::AlertInfo alert)
     {
         lvgl.Alert(alert);

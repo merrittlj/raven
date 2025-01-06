@@ -16,7 +16,7 @@ set(CMAKE_STRIP                 ${TC_PATH}strip)
 
 # Device-specific
 set(DFLAGS "-mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16")
-set(DEFINES "-DUSE_HAL_DRIVER -DSTM32WB55xx -DSTM32WB -DHAL_SPI_MODULE_ENABLED")
+set(DEFINES "-DUSE_HAL_DRIVER -DSTM32WB55xx -DSTM32WB")
 set(LDFLAGS "-T../src/linker.ld -nostartfiles --specs=nano.specs --specs=nosys.specs -Wl,-Map=out.map -Wl,--gc-sections")
 
 set(CMAKE_C_FLAGS                   "-Wall -Wextra -Werror -Wundef -Wshadow -Wdouble-promotion -Wformat-truncation -Wno-padded -Wconversion -Wno-missing-field-initializers -Wno-unused-variable -Wno-unused-but-set-variable -ffunction-sections -fdata-sections -fno-common")

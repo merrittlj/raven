@@ -39,8 +39,6 @@ namespace RTOS
         Button_Params();
     };
 
-    static uint8_t sentReset = 0;
-
     /* Event processing(CPU2, BLE, display) task, runs processing whenever possible, but w/ low priority */
     void Process_Task(void *params);
 

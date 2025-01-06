@@ -29,9 +29,10 @@ namespace RTOS
 
     void Startup_Task(void *params)
     {
+        uint8_t sentReset = 0;
         Startup_Params *p = (Startup_Params *)params;
         for (;;) {
-            if (p->sysState->App_Flag_Get(Sys::State::App_Flag::BLE_CONNECTED) == Sys::State::Flag_Val::SET && !sentReset) {
+            if (!sentReset && p->sysState->App_Flag_Get(Sys::State::App_Flag::BLE_CONNECTED) == Sys::State::Flag_Val::SET) {
                 /* This is a ridiculous hack, but to properly reset GB variables through a reset(even if a BLE connection is maintained), we have to notify it */
                 vTaskDelay(1000);
 

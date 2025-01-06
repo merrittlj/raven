@@ -7,6 +7,7 @@
 
 #include "stm32/stm32wbxx_it.h"
 #include "core/main.hpp"
+#include "sys/sys.hpp"
 
 #include "hw.h"
 
@@ -82,5 +83,10 @@ extern "C" {
     void IPCC_C1_RX_IRQHandler(void)
     {
         HW_IPCC_Rx_Handler();
+    }
+
+    void RTC_Alarm_IRQHandler(void)
+    {
+        HAL_RTC_AlarmIRQHandler(ghrtc);
     }
 }

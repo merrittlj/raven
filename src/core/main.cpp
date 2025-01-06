@@ -132,6 +132,8 @@ int main()
 
     Debouncer btnPort(BUTTON_PIN_0 | BUTTON_PIN_1 | BUTTON_PIN_2 | BUTTON_PIN_3);
 
+    sysCtrl.Config_RTC();
+
     /* FreeRTOS */
     NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
 

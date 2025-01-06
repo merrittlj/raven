@@ -297,6 +297,7 @@ namespace Display
 
     void LVGL::Time(Sys::TimeInfo value)
     {
+        volatile Sys::TimeInfo debugInfo = value;
         lv_label_set_text(time, ((value.hour < 10 ? "0" : "") + std::to_string(value.hour) + ":" + (value.minute < 10 ? "0" : "") + std::to_string(value.minute)).c_str());
         const std::string months[12] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
         std::string day = std::to_string(value.day);
