@@ -3,6 +3,7 @@
 
 
 #include "sys/state.hpp"
+#include "sys/sys.hpp"
 
 #include "display/display.hpp"
 #include "display/eink.hpp"
@@ -19,6 +20,7 @@ namespace Display
             inline static Controller *theInstance;
 
             Sys::State *state;
+            Sys::Controller *sysCtrl;
 
             Display::Manager manager;
 
@@ -27,7 +29,7 @@ namespace Display
 
         public:
             Controller();
-            Controller(uint16_t displayWidth, uint16_t displayHeight, Sys::SPIController ctrl, Sys::State *sysState);
+            Controller(uint16_t displayWidth, uint16_t displayHeight, Sys::SPIController ctrl, Sys::State *sysState, Sys::Controller *userSys);
             ~Controller();
 
             static Controller *Instance(Controller *cur = nullptr);
@@ -38,8 +40,8 @@ namespace Display
             void Refresh();
 
             void Tag_Screen();
+            void Set_Time(Sys::TimeInfo value);
             void Update_Time(Sys::TimeInfo value);
-            void State_Update_Time(Sys::TimeInfo value);
 
             void Alert_Send(Sys::AlertInfo alert);
             void Event_Send(Sys::EventInfo event);

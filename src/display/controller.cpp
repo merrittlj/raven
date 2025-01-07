@@ -1,5 +1,7 @@
 #include "display/controller.hpp"
 
+#include "sys/sys.hpp"
+
 
 namespace Display
 {
@@ -8,9 +10,10 @@ namespace Display
 
     }
 
-    Controller::Controller(uint16_t displayWidth, uint16_t displayHeight, Sys::SPIController ctrl, Sys::State *sysState)
+    Controller::Controller(uint16_t displayWidth, uint16_t displayHeight, Sys::SPIController ctrl, Sys::State *sysState, Sys::Controller *userSys)
     {
         state = sysState;
+        sysCtrl = userSys;
 
         Controller::Instance(this);
 
@@ -66,14 +69,15 @@ namespace Display
         lvgl.Tag();
     }
 
+    void Controller::Set_Time(Sys::TimeInfo value)
+    {
+        sysCtrl->Set_RTC(value);
+        Update_Time(value);
+    }
+
     void Controller::Update_Time(Sys::TimeInfo value)
     {
         lvgl.Time(value);
-    }
-
-    void Controller::State_Update_Time(Sys::TimeInfo value)
-    {
-        state->Update_Time(value);
     }
 
     void Controller::Alert_Send(Sys::AlertInfo alert)

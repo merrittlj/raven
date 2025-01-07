@@ -140,14 +140,14 @@ void Sys::Controller::Config_RTC()
 
     /** Enable the Alarm A
     */
-    sAlarm.AlarmTime.Hours = 0x0;
-    sAlarm.AlarmTime.Minutes = 0x0;
-    sAlarm.AlarmTime.Seconds = 0x0;
-    sAlarm.AlarmTime.SubSeconds = 0x0;
+    sAlarm.AlarmTime.Hours = 0;
+    sAlarm.AlarmTime.Minutes = 1;
+    sAlarm.AlarmTime.Seconds = 0;
+    sAlarm.AlarmTime.SubSeconds = 0;
     sAlarm.AlarmTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
     sAlarm.AlarmTime.StoreOperation = RTC_STOREOPERATION_RESET;
     sAlarm.AlarmMask = RTC_ALARMMASK_DATEWEEKDAY|RTC_ALARMMASK_HOURS
-        |RTC_ALARMMASK_MINUTES;
+        |RTC_ALARMMASK_SECONDS;
     sAlarm.AlarmSubSecondMask = RTC_ALARMSUBSECONDMASK_ALL;
     sAlarm.AlarmDateWeekDaySel = RTC_ALARMDATEWEEKDAYSEL_DATE;
     sAlarm.AlarmDateWeekDay = 0x1;
@@ -162,6 +162,32 @@ void Sys::Controller::Get_RTC(RTC_DateTypeDef *date, RTC_TimeTypeDef *time)
 {
     HAL_RTC_GetTime(&hrtc, time, RTC_FORMAT_BIN);
     HAL_RTC_GetDate(&hrtc, date, RTC_FORMAT_BIN);
+}
+
+void Sys::Controller::Set_RTC(Sys::TimeInfo info)
+{
+    RTC_TimeTypeDef time = {0};
+    time.Hours = info.hour;
+    time.Minutes = info.minute;
+    time.Seconds = info.second;
+    time.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
+    time.StoreOperation = RTC_STOREOPERATION_RESET;
+    if (HAL_RTC_SetTime(&hrtc, &time, RTC_FORMAT_BIN) != HAL_OK)
+        Sys::Error_Handler();
+
+    RTC_DateTypeDef date = {0};
+    date.WeekDay = 1;  /* TODO */
+    date.Month = info.month;
+    date.Date = info.day;
+    date.Year = 99;  /* TODO */
+    if (HAL_RTC_SetDate(&hrtc, &date, RTC_FORMAT_BIN) != HAL_OK)
+        Sys::Error_Handler();
+
+    RTC_AlarmTypeDef alarm;
+    HAL_RTC_GetAlarm(&hrtc, &alarm, RTC_ALARM_A, FORMAT_BIN);
+    alarm.AlarmTime.Minutes = time.Minutes + 1;
+    if (HAL_RTC_SetAlarm_IT(&hrtc, &alarm, RTC_FORMAT_BIN) != HAL_OK)
+        Sys::Error_Handler();
 }
 
 extern "C" {
@@ -200,10 +226,13 @@ extern "C" {
 
     void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
     {
-        UNUSED(hrtc);
-
         RTC_AlarmTypeDef alarm;
         HAL_RTC_GetAlarm(hrtc, &alarm, RTC_ALARM_A, FORMAT_BIN);
+        if(alarm.AlarmTime.Minutes > 58) {
+            alarm.AlarmTime.Minutes = 0;
+        } else {
+            alarm.AlarmTime.Minutes += 1;
+        }
         if (HAL_RTC_SetAlarm_IT(hrtc, &alarm, RTC_FORMAT_BIN) != HAL_OK)
             Sys::Error_Handler();
 
@@ -222,7 +251,9 @@ extern "C" {
         info.minute = time.Minutes;
         info.second = time.Seconds;
 
-        Display::Controller::Instance()->Update_Time(info);
+        /* Display::Controller::Instance()->Update_Time(info); */
+
+        HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_1);
     }
 
     void HAL_RTCEx_AlarmBEventCallback(RTC_HandleTypeDef *hrtc)

@@ -41,12 +41,11 @@ namespace Sys
 
     void State::Set_Time(TimeInfo value)
     {
-        Current_Time = value;
+        Display::Controller::Instance()->Set_Time(value);
     }
 
     void State::Update_Time(TimeInfo value)
     {
-        Set_Time(value);
         Display::Controller::Instance()->Update_Time(value);
     }
 

@@ -127,7 +127,7 @@ int main()
 
     bleApp.Advertising(SET);
 
-    Display::Controller displayCtrl = Display::Controller(200, 200, spiCtrl, &sysState);
+    Display::Controller displayCtrl = Display::Controller(200, 200, spiCtrl, &sysState, &sysCtrl);
     displayCtrl.Init();
 
     Debouncer btnPort(BUTTON_PIN_0 | BUTTON_PIN_1 | BUTTON_PIN_2 | BUTTON_PIN_3);
