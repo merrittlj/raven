@@ -39,13 +39,19 @@ namespace Sys
         return &pref;
     }
 
+    TimeInfo State::Get_Time()
+    {
+        return curTime;
+    }
+
     void State::Set_Time(TimeInfo value)
     {
-        Display::Controller::Instance()->Set_Time(value);
+        curTime = value;
     }
 
     void State::Update_Time(TimeInfo value)
     {
+        Set_Time(value);
         Display::Controller::Instance()->Update_Time(value);
     }
 

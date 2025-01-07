@@ -88,7 +88,7 @@ namespace Sys
 
             Preferences pref;
 
-            TimeInfo Current_Time;
+            TimeInfo curTime;
 
             std::vector<AlertInfo> alerts;
             AlertInfo Alert_Builder;
@@ -126,7 +126,8 @@ namespace Sys
                 HCI_EVENT_PENDING = 18,
                 SHCI_EVENT_PENDING,
                 CPU2_ERROR = 24,
-                BLE_INITIALIZATION_ERROR
+                BLE_INITIALIZATION_ERROR,
+                LOGIC_TIME_UPDATE_PENDING = 55,
             };
 
             enum class Flag_Val : uint8_t {
@@ -144,6 +145,7 @@ namespace Sys
             Preferences *Get_Pref();
 
             /* Setting time, vs updating(setting & displaying) */
+            TimeInfo Get_Time();
             void Set_Time(TimeInfo value);
             void Update_Time(TimeInfo value);
 

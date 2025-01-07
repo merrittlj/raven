@@ -251,8 +251,8 @@ extern "C" {
         info.minute = time.Minutes;
         info.second = time.Seconds;
 
-        /* Display::Controller::Instance()->Update_Time(info); */
-
+        sysState->Set_Time(info);
+        sysState->App_Flag_Set(Sys::State::App_Flag::LOGIC_TIME_UPDATE_PENDING);
         HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_1);
     }
 

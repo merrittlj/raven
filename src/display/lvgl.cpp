@@ -269,6 +269,20 @@ namespace Display
         lv_label_set_text(credit, "Designer/Programmer:\nLucas Merritt\n(merrittlj)");
         lv_obj_set_style_text_font(credit, &axel_22_ui, 0);
         lv_obj_align(credit, LV_ALIGN_CENTER, 0, 70);
+
+
+        lv_timer_t *checkUpdate = lv_timer_create(LVGL::Timer_Check_Update, 500, this);
+    }
+
+    void LVGL::Timer_Check_Update(lv_timer_t *timer)
+    {
+        LVGL data = timer->user_data;
+     
+        /* If to update, set timer from saved sys state value */
+        if (this->sysState->App_Flag_Get(Sys::State::App_Flag::LOGIC_TIME_UPDATE_PENDING) == Sys::State::Flag_Val::SET) {
+            data.Time(data.sysState->Get_Time());
+            data.sysState->App_Flag_Reset(Sys::State::App_Flag::LOGIC_TIME_UPDATE_PENDING);
+        }
     }
 
     void LVGL::Flush(lv_display_t *display, const lv_area_t *area, uint8_t *px_map)

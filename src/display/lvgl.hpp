@@ -67,6 +67,8 @@ namespace Display
             void Alerts_List_Screen();
             void Events_List_Screen();
 
+            static void Timer_Check_Update(lv_timer_t *timer);
+
             /* Handles lists with groups(first button press) and items(second button press) */
             uint16_t List_Handler(uint8_t group, uint8_t item);
 
