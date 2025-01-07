@@ -43,6 +43,11 @@ namespace Display
         return manager;
     }
 
+    Sys::State *Controller::Get_State()
+    {
+        return state;
+    }
+
     void Controller::Init()
     {
         display.Init();
@@ -56,7 +61,9 @@ namespace Display
 
     void Controller::Process()
     {
+        lv_lock();
         lv_timer_periodic_handler();
+        lv_unlock();
     }
 
     void Controller::Refresh()
@@ -69,13 +76,17 @@ namespace Display
         lvgl.Tag();
     }
 
-    void Controller::Set_Time(Sys::TimeInfo value)
+    Sys::TimeInfo Controller::Get_RTC()
     {
-        sysCtrl->Set_RTC(value);
-        Update_Time(value);
+        return sysCtrl->Get_RTC();
     }
 
-    void Controller::Update_Time(Sys::TimeInfo value)
+    void Controller::Set_RTC(Sys::TimeInfo value)
+    {
+        sysCtrl->Set_RTC(value);
+    }
+
+    void Controller::Time(Sys::TimeInfo value)
     {
         lvgl.Time(value);
     }

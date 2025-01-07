@@ -88,8 +88,6 @@ namespace Sys
 
             Preferences pref;
 
-            TimeInfo curTime;
-
             std::vector<AlertInfo> alerts;
             AlertInfo Alert_Builder;
 
@@ -147,7 +145,7 @@ namespace Sys
             /* Setting time, vs updating(setting & displaying) */
             TimeInfo Get_Time();
             void Set_Time(TimeInfo value);
-            void Update_Time(TimeInfo value);
+            void Display_Time();
 
             void Screen_Activate(Screen s);
             void Screen_Deactivate(Screen s);

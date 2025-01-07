@@ -158,10 +158,17 @@ void Sys::Controller::Config_RTC()
     ghrtc = &hrtc;
 }
 
-void Sys::Controller::Get_RTC(RTC_DateTypeDef *date, RTC_TimeTypeDef *time)
+Sys::TimeInfo Sys::Controller::Get_RTC()
 {
-    HAL_RTC_GetTime(&hrtc, time, RTC_FORMAT_BIN);
-    HAL_RTC_GetDate(&hrtc, date, RTC_FORMAT_BIN);
+    RTC_TimeTypeDef time = {0};
+    HAL_RTC_GetTime(&hrtc, &time, RTC_FORMAT_BIN);
+
+    Sys::TimeInfo info;
+    info.hour = time.Hours;
+    info.minute = time.Minutes;
+    info.second = time.Seconds;
+
+    return info;
 }
 
 void Sys::Controller::Set_RTC(Sys::TimeInfo info)
@@ -251,8 +258,8 @@ extern "C" {
         info.minute = time.Minutes;
         info.second = time.Seconds;
 
-        sysState->Set_Time(info);
-        sysState->App_Flag_Set(Sys::State::App_Flag::LOGIC_TIME_UPDATE_PENDING);
+        Sys::State *state = Display::Controller::Instance()->Get_State();
+        state->App_Flag_Set(Sys::State::App_Flag::LOGIC_TIME_UPDATE_PENDING);
         HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_1);
     }
 

@@ -29,7 +29,7 @@ namespace Sys
 
             void Config_SysClk();
             void Config_RTC();
-            void Get_RTC(RTC_DateTypeDef *date, RTC_TimeTypeDef *time);
+            Sys::TimeInfo Get_RTC();
             void Set_RTC(Sys::TimeInfo info);
             void Config_HSE();
             SPI_HandleTypeDef *Config_SPI();

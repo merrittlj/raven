@@ -6,6 +6,7 @@
 
 #include "stm32wbxx_hal.h"
 #include "lvgl.h"
+#include "src/misc/lv_timer_private.h"
 
 #include <array>
 #include <vector>
@@ -276,12 +277,12 @@ namespace Display
 
     void LVGL::Timer_Check_Update(lv_timer_t *timer)
     {
-        LVGL data = timer->user_data;
+        LVGL *data = static_cast<LVGL *>(timer->user_data);
      
         /* If to update, set timer from saved sys state value */
-        if (this->sysState->App_Flag_Get(Sys::State::App_Flag::LOGIC_TIME_UPDATE_PENDING) == Sys::State::Flag_Val::SET) {
-            data.Time(data.sysState->Get_Time());
-            data.sysState->App_Flag_Reset(Sys::State::App_Flag::LOGIC_TIME_UPDATE_PENDING);
+        if (data->state->App_Flag_Get(Sys::State::App_Flag::LOGIC_TIME_UPDATE_PENDING) == Sys::State::Flag_Val::SET) {
+            data->state->Display_Time();
+            data->state->App_Flag_Reset(Sys::State::App_Flag::LOGIC_TIME_UPDATE_PENDING);
         }
     }
 

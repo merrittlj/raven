@@ -41,18 +41,17 @@ namespace Sys
 
     TimeInfo State::Get_Time()
     {
-        return curTime;
+        return Display::Controller::Instance()->Get_RTC();
     }
 
     void State::Set_Time(TimeInfo value)
     {
-        curTime = value;
+        Display::Controller::Instance()->Set_RTC(value);
     }
 
-    void State::Update_Time(TimeInfo value)
+    void State::Display_Time()
     {
-        Set_Time(value);
-        Display::Controller::Instance()->Update_Time(value);
+        Display::Controller::Instance()->Time(Get_Time());
     }
 
     void State::Screen_Activate(Screen s)

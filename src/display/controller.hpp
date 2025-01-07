@@ -35,13 +35,16 @@ namespace Display
             static Controller *Instance(Controller *cur = nullptr);
             Manager Get_Manager();
 
+            Sys::State *Get_State();
+
             void Init();
             void Process();
             void Refresh();
 
             void Tag_Screen();
-            void Set_Time(Sys::TimeInfo value);
-            void Update_Time(Sys::TimeInfo value);
+            Sys::TimeInfo Get_RTC();
+            void Set_RTC(Sys::TimeInfo value);
+            void Time(Sys::TimeInfo value);
 
             void Alert_Send(Sys::AlertInfo alert);
             void Event_Send(Sys::EventInfo event);
