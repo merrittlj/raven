@@ -42,6 +42,7 @@ namespace Display
             void Refresh();
 
             void Tag_Screen();
+            void Update_Face();
             Sys::TimeInfo Get_RTC();
             void Set_RTC(Sys::TimeInfo value);
             void Time(Sys::TimeInfo value);

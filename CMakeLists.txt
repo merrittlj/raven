@@ -73,10 +73,11 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCE_DIR}/display/lvgl.cpp
     ${PROJECT_SOURCE_DIR}/display/eink.cpp
 
-    ${PROJECT_SOURCE_DIR}/display/fonts/gloock_18_date.c
-    ${PROJECT_SOURCE_DIR}/display/fonts/gloock_70_time.c
-    ${PROJECT_SOURCE_DIR}/display/fonts/axel_22_ui.c
-    ${PROJECT_SOURCE_DIR}/display/fonts/axel_20_text.c
+    ${PROJECT_SOURCE_DIR}/display/fonts/gloock_date.c
+    ${PROJECT_SOURCE_DIR}/display/fonts/gloock_time.c
+    ${PROJECT_SOURCE_DIR}/display/fonts/seg.c
+    ${PROJECT_SOURCE_DIR}/display/fonts/axel_ui.c
+    ${PROJECT_SOURCE_DIR}/display/fonts/axel_text.c
     ${PROJECT_SOURCE_DIR}/display/fonts/tag.c
 
     ${PROJECT_SOURCE_DIR}/display/icons/close.c

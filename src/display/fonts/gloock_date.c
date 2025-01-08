@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Size: 18 px
  * Bpp: 1
- * Opts: --bpp 1 --size 18 --font Gloock-Regular.ttf --symbols 0123456789abcdefghijlmnoprstuvyJFMASOND --format lvgl -o gloock_18_date.c
+ * Opts: --bpp 1 --size 18 --font Gloock-Regular.ttf --symbols 0123456789abcdefghijlmnoprstuvyJFMASOND --format lvgl -o gloock_date.c
  ******************************************************************************/
 
 #ifdef LV_LVGL_H_INCLUDE_SIMPLE
@@ -10,11 +10,11 @@
 #include "lvgl/lvgl.h"
 #endif
 
-#ifndef GLOOCK_18_DATE
-#define GLOOCK_18_DATE 1
+#ifndef GLOOCK_DATE
+#define GLOOCK_DATE 1
 #endif
 
-#if GLOOCK_18_DATE
+#if GLOOCK_DATE
 
 /*-----------------
  *    BITMAPS
@@ -488,9 +488,9 @@ extern const lv_font_t lv_font_montserrat_28;
 
 /*Initialize a public general font descriptor*/
 #if LVGL_VERSION_MAJOR >= 8
-const lv_font_t gloock_18_date = {
+const lv_font_t gloock_date = {
 #else
-lv_font_t gloock_18_date = {
+lv_font_t gloock_date = {
 #endif
     .get_glyph_dsc = lv_font_get_glyph_dsc_fmt_txt,    /*Function pointer to get glyph's data*/
     .get_glyph_bitmap = lv_font_get_bitmap_fmt_txt,    /*Function pointer to get glyph's bitmap*/
@@ -512,5 +512,5 @@ lv_font_t gloock_18_date = {
 
 
 
-#endif /*#if GLOOCK_18_DATE*/
+#endif /*#if GLOOCK_DATE*/
 

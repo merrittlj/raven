@@ -13,6 +13,11 @@
 
 namespace Display
 {
+    enum class Face : uint8_t {
+        BIG_TICK_ENERGY,
+        DIGITAL,
+    };
+
     class LVGL
     {
         private:
@@ -28,9 +33,15 @@ namespace Display
 
             lv_obj_t *tagScreen;
 
-            lv_obj_t *faceScreen;
-            lv_obj_t *time;
-            lv_obj_t *date;
+            Face curFace;
+
+            /* This is the large time/small date face :) */
+            lv_obj_t *bigTickEnergy;
+            lv_obj_t *bigTime;
+            lv_obj_t *bigDate;
+
+            lv_obj_t *digital;
+            lv_obj_t *digitalTime;
 
             lv_obj_t *alertScreen;
             lv_obj_t *source;
@@ -83,6 +94,8 @@ namespace Display
             static void Flush(lv_display_t *display, const lv_area_t *area, uint8_t *px_map);
             void Refresh();
 
+            void Set_Face(Face face);
+            void Load_Face_Screen();
             void Tag();
             void Time(Sys::TimeInfo value);
             void Alert(Sys::AlertInfo info);

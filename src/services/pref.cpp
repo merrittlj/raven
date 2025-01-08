@@ -62,7 +62,13 @@ SVCCTL_EvtAckStatus_t BLE::PrefService::Event_Handler(void *Event)
                     case ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE:
                         attribute_modified = (aci_gatt_attribute_modified_event_rp0*)blecore_evt->data;
                         uint8_t *data;
+                        size_t length;
                         data = attribute_modified->Attr_Data;
+                        length = (size_t)(attribute_modified->Attr_Data_Length);
+                        if (attribute_modified->Attr_Handle == (face.Get_Handle() + CHAR_VALUE_OFFSET)) {
+                            sysState->Get_Pref()->face = std::string((const char *)data, length);
+                            Display::Controller::Instance()->Update_Face();
+                        }
                         if (attribute_modified->Attr_Handle == (colorScheme.Get_Handle() + CHAR_VALUE_OFFSET)) {
                             sysState->Get_Pref()->scheme = ((Sys::Scheme)data[0]);
                             Display::Controller::Instance()->Refresh();
@@ -106,7 +112,18 @@ void BLE::PrefService::Init()
     if (this->Add() != BLE_STATUS_SUCCESS)
         Sys::Error_Handler(); /* UNEXPECTED */
 
-    Char_UUID_t colorSchemeUUID = BLE::UUID::CreateCharUUID({0xbd,0x77,0x11,0xb1,0xbb,0x11,0x11,0xef,0x99,0x08,0x08,0x00,0x20,0x0c,0x9a,0x66});
+    Char_UUID_t faceUUID = BLE::UUID::CreateCharUUID({0xbd,0x77,0x11,0xb1,0xbb,0x11,0x11,0xef,0x99,0x08,0x08,0x00,0x20,0x0c,0x9a,0x66});
+    face = BLE::Char(UUID_TYPE_128, &faceUUID,
+            30,
+            CHAR_PROP_WRITE,
+            ATTR_PERMISSION_NONE,
+            GATT_NOTIFY_ATTRIBUTE_WRITE,
+            10,
+            (uint8_t)VALUE_VARIABLE_LENGTH);
+    if (face.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
+        Sys::Error_Handler(); /* UNEXPECTED */
+
+    Char_UUID_t colorSchemeUUID = BLE::UUID::CreateCharUUID({0xbd,0x77,0x11,0xb2,0xbb,0x11,0x11,0xef,0x99,0x08,0x08,0x00,0x20,0x0c,0x9a,0x66});
     colorScheme = BLE::Char(UUID_TYPE_128, &colorSchemeUUID,
             1,
             CHAR_PROP_WRITE,
@@ -116,7 +133,6 @@ void BLE::PrefService::Init()
             (uint8_t)VALUE_VARIABLE_LENGTH);
     if (colorScheme.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
         Sys::Error_Handler(); /* UNEXPECTED */
-
 }
 
 /**

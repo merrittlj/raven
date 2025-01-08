@@ -73,6 +73,8 @@ namespace Sys
         DARK
     };
     struct Preferences {
+        /* Not Display::Face strings, "big", "digital", etc. */
+        std::string face;
         /* Flipped/inverted when using dark mode */
         Scheme scheme;
     };

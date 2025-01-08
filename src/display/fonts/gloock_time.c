@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Size: 70 px
  * Bpp: 1
- * Opts: --bpp 1 --size 70 --font Gloock-Regular.ttf --symbols 1234567890: --format lvgl -o gloock_70_time.c
+ * Opts: --bpp 1 --size 70 --font Gloock-Regular.ttf --symbols 1234567890: --format lvgl -o gloock_time.c
  ******************************************************************************/
 
 #ifdef LV_LVGL_H_INCLUDE_SIMPLE
@@ -10,11 +10,11 @@
 #include "lvgl/lvgl.h"
 #endif
 
-#ifndef GLOOCK_70_TIME
-#define GLOOCK_70_TIME 1
+#ifndef GLOOCK_TIME
+#define GLOOCK_TIME 1
 #endif
 
-#if GLOOCK_70_TIME
+#if GLOOCK_TIME
 
 /*-----------------
  *    BITMAPS
@@ -479,9 +479,9 @@ extern const lv_font_t lv_font_montserrat_28;
 
 /*Initialize a public general font descriptor*/
 #if LVGL_VERSION_MAJOR >= 8
-const lv_font_t gloock_70_time = {
+const lv_font_t gloock_time = {
 #else
-lv_font_t gloock_70_time = {
+lv_font_t gloock_time = {
 #endif
     .get_glyph_dsc = lv_font_get_glyph_dsc_fmt_txt,    /*Function pointer to get glyph's data*/
     .get_glyph_bitmap = lv_font_get_bitmap_fmt_txt,    /*Function pointer to get glyph's bitmap*/
@@ -503,5 +503,5 @@ lv_font_t gloock_70_time = {
 
 
 
-#endif /*#if GLOOCK_70_TIME*/
+#endif /*#if GLOOCK_TIME*/
 

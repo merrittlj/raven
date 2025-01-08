@@ -24,7 +24,7 @@ namespace BLE
              * service_max_attribute_record = 1 for service +
              *                                2 for each Write/Notify characteristic +
              *                                1 for client char configuration descriptor + */
-            const uint8_t SERVICE_MAX_ATT_RECORDS = 4;
+            const uint8_t SERVICE_MAX_ATT_RECORDS = 6;
 
             GPIO::Controller *gpioCtrl;
             Sys::State *sysState;
@@ -35,6 +35,7 @@ namespace BLE
             SVCCTL_EvtAckStatus_t Event_Handler(void *pckt);
 
         public:
+            BLE::Char face;
             BLE::Char colorScheme;
 
             PrefService(GPIO::Controller *pGpioCtrl, Sys::State *pSysState);

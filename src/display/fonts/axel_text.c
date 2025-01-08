@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Size: 20 px
  * Bpp: 1
- * Opts: --bpp 1 --size 20 --font AxelRegular.TTF --symbols ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789`~!@#$%^&*()-_=+[]{}|;:'",.<>?/\ --format lvgl -o axel_20_text.c
+ * Opts: --bpp 1 --size 20 --font AxelRegular.TTF --symbols ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789`~!@#$%^&*()-_=+[]{}|;:'",.<>?/\ --format lvgl -o axel_text.c
  ******************************************************************************/
 
 #ifdef LV_LVGL_H_INCLUDE_SIMPLE
@@ -10,11 +10,11 @@
 #include "lvgl/lvgl.h"
 #endif
 
-#ifndef AXEL_20_TEXT
-#define AXEL_20_TEXT 1
+#ifndef AXEL_TEXT
+#define AXEL_TEXT 1
 #endif
 
-#if AXEL_20_TEXT
+#if AXEL_TEXT
 
 /*-----------------
  *    BITMAPS
@@ -731,9 +731,9 @@ extern const lv_font_t lv_font_montserrat_28;
 
 /*Initialize a public general font descriptor*/
 #if LVGL_VERSION_MAJOR >= 8
-const lv_font_t axel_20_text = {
+const lv_font_t axel_text = {
 #else
-lv_font_t axel_20_text = {
+lv_font_t axel_text = {
 #endif
     .get_glyph_dsc = lv_font_get_glyph_dsc_fmt_txt,    /*Function pointer to get glyph's data*/
     .get_glyph_bitmap = lv_font_get_bitmap_fmt_txt,    /*Function pointer to get glyph's bitmap*/
@@ -755,5 +755,5 @@ lv_font_t axel_20_text = {
 
 
 
-#endif /*#if AXEL_20_TEXT*/
+#endif /*#if AXEL_TEXT*/
 

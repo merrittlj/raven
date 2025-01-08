@@ -25,6 +25,8 @@ namespace Display
         manager.displayCallback = &display;
 
         lvgl = Display::LVGL(manager, sysState);
+        lvgl.Set_Face(Face::BIG_TICK_ENERGY);
+        /* lvgl.Set_Face(Face::DIGITAL); */
     }
 
     Controller::~Controller()
@@ -75,6 +77,14 @@ namespace Display
     void Controller::Tag_Screen()
     {
         lvgl.Tag();
+    }
+
+    void Controller::Update_Face()
+    {
+        std::string pref = state->Get_Pref()->face;
+        if (pref == "big") lvgl.Set_Face(Face::BIG_TICK_ENERGY);
+        else if (pref == "digital") lvgl.Set_Face(Face::DIGITAL);
+        Time(Get_RTC());
     }
 
     Sys::TimeInfo Controller::Get_RTC()

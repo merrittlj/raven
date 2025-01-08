@@ -17,11 +17,12 @@
 #define LV_ATTRIBUTE_MEM_ALIGN
 #endif
 
-LV_FONT_DECLARE(gloock_18_date)
-LV_FONT_DECLARE(gloock_70_time)
-LV_FONT_DECLARE(axel_22_ui)
-LV_FONT_DECLARE(axel_20_text)
-LV_FONT_DECLARE(tag)  /* 110 font size */
+LV_FONT_DECLARE(gloock_time)  /* 70 regular */
+LV_FONT_DECLARE(gloock_date)  /* 18 regular */
+LV_FONT_DECLARE(seg)  /* 55 bold */
+LV_FONT_DECLARE(axel_ui)  /* 22 bold */
+LV_FONT_DECLARE(axel_text)  /* 20 regular */
+LV_FONT_DECLARE(tag)  /* 110 regular */
 
 LV_IMAGE_DECLARE(cont);
 LV_IMAGE_DECLARE(cont_left);
@@ -76,7 +77,7 @@ namespace Display
         static lv_style_t texts;
         lv_style_init(&texts);
         lv_style_set_text_color(&texts, lv_color_hex(0x000000));
-        lv_style_set_text_font(&texts, &gloock_70_time);
+        lv_style_set_text_font(&texts, &gloock_time);
 
         tagScreen = lv_screen_active();
         lv_obj_t *tagText = lv_label_create(tagScreen);
@@ -86,18 +87,27 @@ namespace Display
         lv_obj_align(tagText, LV_ALIGN_CENTER, 0, 0);
 
 
-        faceScreen = lv_obj_create(NULL);
+        bigTickEnergy = lv_obj_create(NULL);
 
-        time = lv_label_create(faceScreen);
-        lv_obj_add_style(time, &texts, 0);
-        lv_label_set_text(time, "00:00");
-        lv_obj_align(time, LV_ALIGN_CENTER, 0, -10);
+        bigTime = lv_label_create(bigTickEnergy);
+        lv_obj_add_style(bigTime, &texts, 0);
+        lv_label_set_text(bigTime, "00:00");
+        lv_obj_align(bigTime, LV_ALIGN_CENTER, 0, -10);
 
-        date = lv_label_create(faceScreen);
-        lv_obj_add_style(date, &texts, 0);
-        lv_label_set_text(date, "Month Day Year");
-        lv_obj_set_style_text_font(date, &gloock_18_date, 0);
-        lv_obj_align(date, LV_ALIGN_CENTER, 0, 45);
+        bigDate = lv_label_create(bigTickEnergy);
+        lv_obj_add_style(bigDate, &texts, 0);
+        lv_label_set_text(bigDate, "Month Day Year");
+        lv_obj_set_style_text_font(bigDate, &gloock_date, 0);
+        lv_obj_align(bigDate, LV_ALIGN_CENTER, 0, 45);
+
+
+        digital = lv_obj_create(NULL);
+
+        digitalTime = lv_label_create(digital);
+        lv_obj_add_style(digitalTime, &texts, 0);
+        lv_label_set_text(digitalTime, "00:00");
+        lv_obj_set_style_text_font(digitalTime, &seg, 0);
+        lv_obj_align(digitalTime, LV_ALIGN_CENTER, 0, 0);
 
 
         alertScreen = lv_obj_create(NULL);
@@ -128,21 +138,21 @@ namespace Display
         source = lv_label_create(alertScreen);
         lv_obj_add_style(source, &texts, 0);
         lv_label_set_text(source, "Alert Source");
-        lv_obj_set_style_text_font(source, &axel_22_ui, 0);
+        lv_obj_set_style_text_font(source, &axel_ui, 0);
         lv_obj_set_style_max_width(source, 185, 0);
         lv_obj_align(source, LV_ALIGN_TOP_LEFT, 15, 10);
 
         title = lv_label_create(alertScreen);
         lv_obj_add_style(title, &texts, 0);
         lv_label_set_text(title, "Alert Title");
-        lv_obj_set_style_text_font(title, &axel_22_ui, 0);
+        lv_obj_set_style_text_font(title, &axel_ui, 0);
         lv_obj_set_style_max_width(title, 185, 0);
         lv_obj_align(title, LV_ALIGN_TOP_LEFT, 15, 45);
 
         body = lv_label_create(alertScreen);
         lv_obj_add_style(body, &texts, 0);
         lv_label_set_text(body, "Alert Body");
-        lv_obj_set_style_text_font(body, &axel_20_text, 0);
+        lv_obj_set_style_text_font(body, &axel_text, 0);
         lv_obj_set_style_max_width(body, 185, 0);
         lv_obj_align(body, LV_ALIGN_TOP_LEFT, 15, 85);
 
@@ -166,7 +176,7 @@ namespace Display
         lv_obj_t *activeTitle = lv_label_create(activeScreen);
         lv_obj_add_style(activeTitle, &texts, 0);
         lv_label_set_text(activeTitle, "Active Screens");
-        lv_obj_set_style_text_font(activeTitle, &axel_22_ui, 0);
+        lv_obj_set_style_text_font(activeTitle, &axel_ui, 0);
         lv_obj_align(activeTitle, LV_ALIGN_CENTER, 0, 0);
 
         activeList = Create_List(activeScreen, "Screens");
@@ -185,19 +195,19 @@ namespace Display
         lv_obj_add_style(navInstruction, &texts, 0);
         lv_label_set_text(navInstruction, "Instruction");
         lv_obj_set_style_max_width(navInstruction, 185, 0);
-        lv_obj_set_style_text_font(navInstruction, &axel_22_ui, 0);
+        lv_obj_set_style_text_font(navInstruction, &axel_ui, 0);
         lv_obj_align(navInstruction, LV_ALIGN_BOTTOM_MID, 0, 0);
 
         navDistance = lv_label_create(navScreen);
         lv_obj_add_style(navDistance, &texts, 0);
         lv_label_set_text(navDistance, "Distance");
-        lv_obj_set_style_text_font(navDistance, &axel_22_ui, 0);
+        lv_obj_set_style_text_font(navDistance, &axel_ui, 0);
         lv_obj_align(navDistance, LV_ALIGN_LEFT_MID, 10, 0);
 
         navETA = lv_label_create(navScreen);
         lv_obj_add_style(navETA, &texts, 0);
         lv_label_set_text(navETA, "ETA");
-        lv_obj_set_style_text_font(navETA, &axel_22_ui, 0);
+        lv_obj_set_style_text_font(navETA, &axel_ui, 0);
         lv_obj_align(navETA, LV_ALIGN_RIGHT_MID, -10, 0);
 
         navAction = lv_image_create(navScreen);
@@ -224,20 +234,20 @@ namespace Display
         lv_obj_add_style(musicTrack, &texts, 0);
         lv_obj_add_style(musicTrack, &flexBox, 0);
         lv_label_set_text(musicTrack, "Track");
-        lv_obj_set_style_text_font(musicTrack, &axel_20_text, 0);
+        lv_obj_set_style_text_font(musicTrack, &axel_text, 0);
         lv_obj_align(musicTrack, LV_ALIGN_BOTTOM_LEFT, 0, -25);
 
         musicArtist = lv_label_create(musicScreen);
         lv_obj_add_style(musicArtist, &texts, 0);
         lv_obj_add_style(musicArtist, &flexBox, 0);
         lv_label_set_text(musicArtist, "Artist");
-        lv_obj_set_style_text_font(musicArtist, &axel_20_text, 0);
+        lv_obj_set_style_text_font(musicArtist, &axel_text, 0);
         lv_obj_align(musicArtist, LV_ALIGN_BOTTOM_LEFT, 0, 0);
 
         musicAlbum = lv_label_create(musicScreen);
         lv_obj_add_style(musicAlbum, &texts, 0);
         lv_label_set_text(musicAlbum, "Album");
-        lv_obj_set_style_text_font(musicAlbum, &axel_20_text, 0);
+        lv_obj_set_style_text_font(musicAlbum, &axel_text, 0);
         lv_obj_align(musicAlbum, LV_ALIGN_BOTTOM_MID, 0, -20);
         lv_obj_add_flag(musicAlbum, LV_OBJ_FLAG_HIDDEN);  /* We will display album art anyways */
 
@@ -256,19 +266,19 @@ namespace Display
         lv_obj_t *version = lv_label_create(aboutScreen);
         lv_obj_add_style(version, &texts, 0);
         lv_label_set_text(version, "V0.7");
-        lv_obj_set_style_text_font(version, &axel_22_ui, 0);
+        lv_obj_set_style_text_font(version, &axel_ui, 0);
         lv_obj_align(version, LV_ALIGN_CENTER, 0, 30);
 
         lv_obj_t *edition = lv_label_create(aboutScreen);
         lv_obj_add_style(edition, &texts, 0);
         lv_label_set_text(edition, "Edition #1");
-        lv_obj_set_style_text_font(edition, &axel_22_ui, 0);
+        lv_obj_set_style_text_font(edition, &axel_ui, 0);
         lv_obj_align(edition, LV_ALIGN_CENTER, 0, 50);
 
         lv_obj_t *credit = lv_label_create(aboutScreen);
         lv_obj_add_style(credit, &texts, 0);
         lv_label_set_text(credit, "Designer/Programmer:\nLucas Merritt\n(merrittlj)");
-        lv_obj_set_style_text_font(credit, &axel_22_ui, 0);
+        lv_obj_set_style_text_font(credit, &axel_ui, 0);
         lv_obj_align(credit, LV_ALIGN_CENTER, 0, 70);
 
 
@@ -280,7 +290,7 @@ namespace Display
     void LVGL::Timer_Check_Update(lv_timer_t *timer)
     {
         LVGL *data = static_cast<LVGL *>(timer->user_data);
-     
+
         /* If to update, set timer from saved sys state value */
         if (data->state->App_Flag_Get(Sys::State::App_Flag::LOGIC_TIME_UPDATE_PENDING) == Sys::State::Flag_Val::SET) {
             data->state->Display_Time();
@@ -307,6 +317,11 @@ namespace Display
         lv_obj_invalidate(lv_screen_active());
     }
 
+    void LVGL::Set_Face(Face face)
+    {
+        curFace = face;
+    }
+
     void LVGL::Tag()
     {
         lv_scr_load(tagScreen);
@@ -314,17 +329,30 @@ namespace Display
 
     void LVGL::Time(Sys::TimeInfo value)
     {
-        volatile Sys::TimeInfo debugInfo = value;
-        lv_label_set_text(time, ((value.hour < 10 ? "0" : "") + std::to_string(value.hour) + ":" + (value.minute < 10 ? "0" : "") + std::to_string(value.minute)).c_str());
-        const std::string months[12] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
-        std::string day = std::to_string(value.day);
-        if (value.day % 10 == 1 && value.day != 11) day += "st";
-        else if (value.day % 10 == 2 && value.day != 12) day += "nd";
-        else if (value.day % 10 == 3 && value.day != 13) day += "rd";
-        else day += "th";
-        lv_label_set_text(date, (months[value.month - 1] + " " + day).c_str());
+        std::string time = (value.hour < 10 ? "0" : "") + std::to_string(value.hour) + ":" + (value.minute < 10 ? "0" : "") + std::to_string(value.minute);
+        if (curFace == Face::BIG_TICK_ENERGY) {
+            lv_label_set_text(bigTime, time.c_str());
 
-        lv_scr_load(faceScreen);
+            const std::string months[12] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
+            std::string day = std::to_string(value.day);
+            if (value.day % 10 == 1 && value.day != 11) day += "st";
+            else if (value.day % 10 == 2 && value.day != 12) day += "nd";
+            else if (value.day % 10 == 3 && value.day != 13) day += "rd";
+            else day += "th";
+            lv_label_set_text(bigDate, (months[value.month - 1] + " " + day).c_str());
+
+            lv_scr_load(bigTickEnergy);
+        } else if (curFace == Face::DIGITAL) {
+            lv_label_set_text(digitalTime, time.c_str());
+
+            lv_scr_load(digital);
+        }
+    }
+
+    void LVGL::Load_Face_Screen()
+    {
+        if (curFace == Face::BIG_TICK_ENERGY) lv_scr_load(bigTickEnergy);
+        else if (curFace == Face::DIGITAL) lv_scr_load(digital);
     }
 
     void LVGL::Alert(Sys::AlertInfo info)
@@ -374,16 +402,16 @@ namespace Display
 
     std::string LVGL::Truncate_Text(std::string text, uint32_t limit)
     {
-        /* Note: assumes axel_20_text font! */
+        /* Note: assumes axel_text font! */
         lv_point_t p;
         std::string newText = text;
-        lv_text_get_size(&p, newText.c_str(), &axel_20_text, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_EXPAND);
+        lv_text_get_size(&p, newText.c_str(), &axel_text, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_EXPAND);
         if ((uint32_t)p.x > limit) {
             lv_point_t p2;
-            lv_text_get_size(&p2, ">", &axel_20_text, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_EXPAND);
+            lv_text_get_size(&p2, ">", &axel_text, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_EXPAND);
             do {
                 newText.pop_back();
-                lv_text_get_size(&p, newText.c_str(), &axel_20_text, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_EXPAND);
+                lv_text_get_size(&p, newText.c_str(), &axel_text, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_EXPAND);
             } while ((uint32_t)(p.x + p2.x) > limit);
             newText += ">";
         }
@@ -483,7 +511,7 @@ namespace Display
     {
         if (b == 1) {
             /* All screens: load face */
-            lv_scr_load(faceScreen);
+            Load_Face_Screen();
         }
 
         if (b == 2) {
@@ -498,14 +526,14 @@ namespace Display
                 /* Deactivate on empty, safe doing here as all dismissals are routed here */
                 if (state->Get_Alerts()->size() == 0)
                     state->Screen_Deactivate(Sys::Screen::ALERTS_LIST);
-                lv_scr_load(faceScreen);
+                Load_Face_Screen();
             }
             else if (lv_screen_active() == eventScreen) {
                 state->Event_Dismiss(eventIndex);
                 /* Deactivate on empty, safe doing here as all dismissals are routed here */
                 if (state->Get_Events().size() == 0)
                     state->Screen_Deactivate(Sys::Screen::EVENTS_LIST);
-                lv_scr_load(faceScreen);
+                Load_Face_Screen();
             }
             /* Active screen: selector */
             else if (lv_screen_active() == activeScreen) {
