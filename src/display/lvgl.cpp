@@ -273,6 +273,8 @@ namespace Display
 
 
         lv_timer_t *checkUpdate = lv_timer_create(LVGL::Timer_Check_Update, 500, this);
+        lv_timer_set_repeat_count(checkUpdate, -1);
+        lv_timer_enable(checkUpdate);
     }
 
     void LVGL::Timer_Check_Update(lv_timer_t *timer)

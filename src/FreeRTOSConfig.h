@@ -52,9 +52,8 @@
 #define configCPU_CLOCK_HZ				( 32000000U )  /* Sucks to have to use this instead of include, but includes were not working */
 #define configTICK_RATE_HZ				( ( TickType_t ) 1000 )
 #define configMAX_PRIORITIES			( 5 )
-/* #define configMINIMAL_STACK_SIZE		( ( unsigned short ) 130 ) */
-#define configMINIMAL_STACK_SIZE		( ( unsigned short ) 2000 )  /* How large is necessary? */
-#define configTOTAL_HEAP_SIZE			( ( size_t ) ( 75 * 1024 ) )
+#define configMINIMAL_STACK_SIZE		( ( unsigned short ) 1000 )  /* How large is necessary? */
+#define configTOTAL_HEAP_SIZE			( ( size_t ) ( 64 * 1024 ) )
 #define configMAX_TASK_NAME_LEN			( 10 )
 #define configUSE_TRACE_FACILITY		1
 #define configUSE_16_BIT_TICKS			0

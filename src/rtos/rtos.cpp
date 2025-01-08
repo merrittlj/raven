@@ -4,6 +4,7 @@
 #include "ble/uuid.hpp"
 #include "services/info.hpp"
 
+#include "lvgl.h"
 #include "FreeRTOS.h"
 #include "task.h"
 
@@ -32,6 +33,7 @@ namespace RTOS
         uint8_t sentReset = 0;
         Startup_Params *p = (Startup_Params *)params;
         for (;;) {
+            vTaskDelay(1000);
             if (!sentReset && p->sysState->App_Flag_Get(Sys::State::App_Flag::BLE_CONNECTED) == Sys::State::Flag_Val::SET) {
                 /* This is a ridiculous hack, but to properly reset GB variables through a reset(even if a BLE connection is maintained), we have to notify it */
                 vTaskDelay(1000);
@@ -87,7 +89,9 @@ namespace RTOS
 extern "C"
 {
     void vApplicationTickHook()
-    {}
+    {
+        lv_tick_inc(1);
+    }
 
     void vApplicationMallocFailedHook()
     {

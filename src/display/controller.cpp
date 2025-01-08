@@ -61,9 +61,10 @@ namespace Display
 
     void Controller::Process()
     {
-        lv_lock();
+        /* lv_timer_handler does its own locking */
+        /* lv_lock(); */
         lv_timer_periodic_handler();
-        lv_unlock();
+        /* lv_unlock(); */
     }
 
     void Controller::Refresh()

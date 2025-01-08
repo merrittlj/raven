@@ -140,7 +140,7 @@ int main()
     RTOS::Process_Params *processParams = new RTOS::Process_Params;
     processParams->evtP = &sysEvtP;
     processParams->displayCtrl = &displayCtrl;
-    xTaskCreate(RTOS::Process_Task, "Process", configMINIMAL_STACK_SIZE, (void *)processParams, tskIDLE_PRIORITY, (TaskHandle_t *)NULL);
+    xTaskCreate(RTOS::Process_Task, "Process", configMINIMAL_STACK_SIZE, (void *)processParams, tskIDLE_PRIORITY + 1, (TaskHandle_t *)NULL);
 
     RTOS::Startup_Params *startupParams = new RTOS::Startup_Params;
     startupParams->sysState = &sysState;
@@ -157,7 +157,7 @@ int main()
     for (uint8_t i = 0; i < 4; ++i) {
         buttonParams->button = i;
         buttonParams->buttonIndex = btns.at(i);
-        xTaskCreate(RTOS::Button_Task, "ButtonX", configMINIMAL_STACK_SIZE, (void *)buttonParams, tskIDLE_PRIORITY + 1, (TaskHandle_t *)NULL);
+        xTaskCreate(RTOS::Button_Task, "ButtonX", configMINIMAL_STACK_SIZE, (void *)buttonParams, tskIDLE_PRIORITY + 2, (TaskHandle_t *)NULL);
     }
 
     vTaskStartScheduler();
