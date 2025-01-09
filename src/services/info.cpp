@@ -112,6 +112,17 @@ void BLE::InfoService::Init()
             (uint8_t)VALUE_VARIABLE_LENGTH);
     if (deviceReset.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
         Sys::Error_Handler(); /* UNEXPECTED */
+
+    Char_UUID_t musicButtonUUID = BLE::UUID::CreateCharUUID({0xb2,0x6b,0x80,0xc2,0xcb,0x1b,0x11,0xef,0xa8,0xfa,0x08,0x00,0x20,0x0c,0x9a,0x66});
+    musicButton = BLE::Char(UUID_TYPE_128, &musicButtonUUID,
+            1,  /* Enough options */
+            CHAR_PROP_NOTIFY,
+            ATTR_PERMISSION_NONE,
+            GATT_NOTIFY_ATTRIBUTE_WRITE,
+            10,
+            (uint8_t)VALUE_VARIABLE_LENGTH);
+    if (musicButton.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
+        Sys::Error_Handler(); /* UNEXPECTED */
 }
 
 /**
@@ -128,6 +139,16 @@ tBleStatus BLE::InfoService::Update_Char_Value(uint16_t UUID16, uint16_t newValu
         {
             ret = aci_gatt_update_char_value(this->Get_Handle(),
                     deviceReset.Get_Handle(),
+                    0, /* charValOffset */
+                    newValueLength, /* charValueLen */
+                    (uint8_t *)pNewValue);
+        }
+    }
+    else if (UUID16 == BLE::UUID::ExtractUUID16FromLE(musicButton.Get_UUID())) {
+        if (newValueLength <= musicButton.Get_Value_Length())
+        {
+            ret = aci_gatt_update_char_value(this->Get_Handle(),
+                    musicButton.Get_Handle(),
                     0, /* charValOffset */
                     newValueLength, /* charValueLen */
                     (uint8_t *)pNewValue);

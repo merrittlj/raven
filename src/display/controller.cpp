@@ -1,6 +1,7 @@
 #include "display/controller.hpp"
-
 #include "sys/sys.hpp"
+#include "ble/uuid.hpp"
+#include "services/info.hpp"
 
 
 namespace Display
@@ -10,10 +11,12 @@ namespace Display
 
     }
 
-    Controller::Controller(uint16_t displayWidth, uint16_t displayHeight, Sys::SPIController ctrl, Sys::State *sysState, Sys::Controller *userSys)
+    Controller::Controller(uint16_t displayWidth, uint16_t displayHeight, Sys::SPIController ctrl, Sys::State *sysState, Sys::Controller *userSys, BLE::InfoService *infoService)
     {
         state = sysState;
         sysCtrl = userSys;
+        
+        info = infoService;
 
         Controller::Instance(this);
 
@@ -24,7 +27,7 @@ namespace Display
         display = Display::EInk(manager, ctrl, sysState);
         manager.displayCallback = &display;
 
-        lvgl = Display::LVGL(manager, sysState);
+        lvgl = Display::LVGL(manager, sysState, infoService);
         lvgl.Set_Face(Face::BIG_TICK_ENERGY);
         /* lvgl.Set_Face(Face::DIGITAL); */
     }

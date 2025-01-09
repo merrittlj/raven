@@ -24,7 +24,7 @@ namespace BLE
              * service_max_attribute_record = 1 for service +
              *                                2 for each Write/Notify characteristic +
              *                                1 for client char configuration descriptor + */
-            const uint8_t SERVICE_MAX_ATT_RECORDS = 4;
+            const uint8_t SERVICE_MAX_ATT_RECORDS = 7;
 
             GPIO::Controller *gpioCtrl;
             Sys::State *sysState;
@@ -36,6 +36,7 @@ namespace BLE
 
         public:
             BLE::Char deviceReset;
+            BLE::Char musicButton;
 
             InfoService(GPIO::Controller *pGpioCtrl, Sys::State *pSysState);
             ~InfoService();

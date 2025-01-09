@@ -8,6 +8,7 @@
 #include "display/display.hpp"
 #include "display/eink.hpp"
 #include "display/lvgl.hpp"
+#include "services/info.hpp"
 
 #include <cstdint>
 
@@ -22,6 +23,8 @@ namespace Display
             Sys::State *state;
             Sys::Controller *sysCtrl;
 
+            BLE::InfoService *info;
+
             Display::Manager manager;
 
             Display::EInk display;
@@ -29,7 +32,7 @@ namespace Display
 
         public:
             Controller();
-            Controller(uint16_t displayWidth, uint16_t displayHeight, Sys::SPIController ctrl, Sys::State *sysState, Sys::Controller *userSys);
+            Controller(uint16_t displayWidth, uint16_t displayHeight, Sys::SPIController ctrl, Sys::State *sysState, Sys::Controller *userSys, BLE::InfoService *infoService);
             ~Controller();
 
             static Controller *Instance(Controller *cur = nullptr);

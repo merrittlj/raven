@@ -1,8 +1,8 @@
 #include "display/lvgl.hpp"
-
 #include "display/controller.hpp"
-
 #include "sys/state.hpp"
+#include "ble/uuid.hpp"
+#include "services/info.hpp"
 
 #include "stm32wbxx_hal.h"
 #include "lvgl.h"
@@ -46,10 +46,11 @@ namespace Display
 
     }
 
-    LVGL::LVGL(Display::Manager man, Sys::State *sysState)
+    LVGL::LVGL(Display::Manager man, Sys::State *sysState, BLE::InfoService *infoService)
     {
         manager = man;
         state = sysState;
+        infoServ = infoService;
     }
 
     void LVGL::Init()
@@ -567,6 +568,14 @@ namespace Display
                 }
                 else prevButton = 1;
             }
+            /* Music screen: playpause notify */
+            else if (lv_screen_active() == musicScreen) {
+                uint8_t musicData[1] = {1};
+                if (infoServ->Update_Char_Value(BLE::UUID::ExtractUUID16FromLE(infoServ->musicButton.Get_UUID()),
+                            infoServ->musicButton.Get_Value_Length(),
+                            musicData) != BLE_STATUS_SUCCESS)
+                    Sys::Error_Handler();
+            }
         }
 
         if (b == 4) {
@@ -605,6 +614,14 @@ namespace Display
                 }
                 else prevButton = 2;
             }
+            /* Music screen: next notify */
+            else if (lv_screen_active() == musicScreen) {
+                uint8_t musicData[1] = {2};
+                if (infoServ->Update_Char_Value(BLE::UUID::ExtractUUID16FromLE(infoServ->musicButton.Get_UUID()),
+                            infoServ->musicButton.Get_Value_Length(),
+                            musicData) != BLE_STATUS_SUCCESS)
+                    Sys::Error_Handler();
+            }
         }
     }
 
@@ -622,6 +639,14 @@ namespace Display
                 /* We only have two items so double selector only applies for groups */
                 if (prevButton == 0)
                     prevButton = 3;  /* TODO: prev button defines */
+            }
+            /* Music screen: previous notify */
+            else if (lv_screen_active() == musicScreen) {
+                uint8_t musicData[1] = {3};
+                if (infoServ->Update_Char_Value(BLE::UUID::ExtractUUID16FromLE(infoServ->musicButton.Get_UUID()),
+                            infoServ->musicButton.Get_Value_Length(),
+                            musicData) != BLE_STATUS_SUCCESS)
+                    Sys::Error_Handler();
             }
         }
     }

@@ -4,6 +4,7 @@
 
 #include "display/display.hpp"
 #include "sys/state.hpp"
+#include "services/info.hpp"
 
 #include "lvgl.h"
 
@@ -22,6 +23,7 @@ namespace Display
     {
         private:
             Sys::State *state;
+            BLE::InfoService *infoServ;
 
             Display::Manager manager;
             std::vector<uint8_t> buf1;
@@ -87,7 +89,7 @@ namespace Display
 
         public:
             LVGL();
-            LVGL(Display::Manager man, Sys::State *sysState);
+            LVGL(Display::Manager man, Sys::State *sysState, BLE::InfoService *infoService);
 
             void Init();
             void Create();
