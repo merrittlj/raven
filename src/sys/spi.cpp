@@ -5,12 +5,12 @@
 #include "stm32wbxx_hal.h"
 
 
-Sys::SPIController::SPIController()
+Sys::SPI_Controller::SPI_Controller()
 {
 
 }
 
-Sys::SPIController::SPIController(SPI_HandleTypeDef *handle, GPIO::Controller *gpio, SPIManager spiM)
+Sys::SPI_Controller::SPI_Controller(SPI_HandleTypeDef *handle, GPIO::Controller *gpio, SPI_Manager spiM)
 {
     this->spi = handle;
     this->gpioCtrl = gpio;
@@ -18,7 +18,7 @@ Sys::SPIController::SPIController(SPI_HandleTypeDef *handle, GPIO::Controller *g
 }
 
 
-void Sys::SPIController::WriteByte(uint8_t value)
+void Sys::SPI_Controller::WriteByte(uint8_t value)
 {
     /* 1(1000ms) second timeout */
     HAL_StatusTypeDef ret = HAL_SPI_Transmit(spi, &value, 1, 1000);
@@ -26,7 +26,7 @@ void Sys::SPIController::WriteByte(uint8_t value)
         Error_Handler();
 }
 
-void Sys::SPIController::WriteBytes(uint8_t *value, uint16_t len)
+void Sys::SPI_Controller::WriteBytes(uint8_t *value, uint16_t len)
 {
     /* 1(1000ms) second timeout */
     HAL_StatusTypeDef ret = HAL_SPI_Transmit(spi, value, len, 1000);
@@ -34,7 +34,7 @@ void Sys::SPIController::WriteBytes(uint8_t *value, uint16_t len)
         Error_Handler();
 }
 
-void Sys::SPIController::SendCommand(uint8_t reg)
+void Sys::SPI_Controller::SendCommand(uint8_t reg)
 {
     gpioCtrl->Write_Component(manager.dc, RESET);
     gpioCtrl->Write_Component(manager.cs, RESET);
@@ -42,7 +42,7 @@ void Sys::SPIController::SendCommand(uint8_t reg)
     gpioCtrl->Write_Component(manager.cs, SET);
 }
 
-void Sys::SPIController::SendData(uint8_t data)
+void Sys::SPI_Controller::SendData(uint8_t data)
 {
     gpioCtrl->Write_Component(manager.dc, SET);
     gpioCtrl->Write_Component(manager.cs, RESET);
@@ -50,7 +50,7 @@ void Sys::SPIController::SendData(uint8_t data)
     gpioCtrl->Write_Component(manager.cs, SET);
 }
 
-void Sys::SPIController::Reset()
+void Sys::SPI_Controller::Reset()
 {
     gpioCtrl->Write_Component(manager.rst, SET);
     gpioCtrl->Write_Component(manager.rst, RESET);
@@ -59,18 +59,18 @@ void Sys::SPIController::Reset()
     Delay(10);
 }
 
-void Sys::SPIController::BlockBusy()
+void Sys::SPI_Controller::BlockBusy()
 {
     while (gpioCtrl->Read_Component(manager.busy) == SET)
         Delay(10);
 }
 
-void Sys::SPIController::Enable()
+void Sys::SPI_Controller::Enable()
 {
     gpioCtrl->Write_Component(manager.pwr, SET);
 }
 
-void Sys::SPIController::Disable()
+void Sys::SPI_Controller::Disable()
 {
     gpioCtrl->Write_Component(manager.pwr, RESET);
 }

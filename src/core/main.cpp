@@ -12,6 +12,7 @@
 #include "sys/sys.hpp"
 #include "sys/state.hpp"
 #include "sys/spi.hpp"
+#include "sys/i2c.hpp"
 #include "services/time.hpp"
 #include "services/notify.hpp"
 #include "services/pref.hpp"
@@ -94,7 +95,10 @@ int main()
     gpioCtrl.Config();
     gpioCtrl.Init();
     SPI_HandleTypeDef *spi = sysCtrl.Config_SPI();
-    Sys::SPIController spiCtrl = Sys::SPIController(spi, &gpioCtrl, Sys::SPIManager{busy,rst,dc,cs,pwr});
+    Sys::SPI_Controller spiCtrl = Sys::SPI_Controller(spi, &gpioCtrl, Sys::SPI_Manager{busy,rst,dc,cs,pwr});
+    I2C_HandleTypeDef *i2c = sysCtrl.Config_I2C();
+    Sys::I2C_Controller i2cCtrl = Sys::I2C_Controller(i2c, 0x00, &gpioCtrl, Sys::I2C_Manager{scl,sda});
+    Haptic::Driver driver = Haptic::Driver(&i2cCtrl);
     
     /* Set the red LED On to indicate that the CPU2 is initializing */
     gpioCtrl.Write_Component(sysState.Fetch_LED_Red(), SET);

@@ -22,6 +22,7 @@ namespace Sys
             Sys::State *sysState;
             RTC_HandleTypeDef hrtc;
             SPI_HandleTypeDef spi1;
+            I2C_HandleTypeDef hi2c1;
 
         public:
             Controller(Sys::State *state);
@@ -31,6 +32,7 @@ namespace Sys
             void Config_RTC();
             Sys::TimeInfo Get_RTC();
             void Set_RTC(Sys::TimeInfo info);
+            I2C_HandleTypeDef *Config_I2C();
             void Config_HSE();
             SPI_HandleTypeDef *Config_SPI();
             void Init_CPU2();
@@ -68,8 +70,8 @@ void shci_notify_asynch_evt(void *pdata);
 void hci_notify_asynch_evt(void *pdata);
 
 extern "C" {
-    void HAL_RTC_MspInit(RTC_HandleTypeDef* hrtc);
-    void HAL_RTC_MspDeInit(RTC_HandleTypeDef* hrtc);
+    void HAL_RTC_MspInit(RTC_HandleTypeDef *hrtc);
+    void HAL_RTC_MspDeInit(RTC_HandleTypeDef *hrtc);
     void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc);
     void HAL_RTCEx_AlarmBEventCallback(RTC_HandleTypeDef *hrtc);
 }

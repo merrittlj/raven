@@ -47,6 +47,9 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCE_DIR}/sys/sys.cpp
     ${PROJECT_SOURCE_DIR}/sys/state.cpp
     ${PROJECT_SOURCE_DIR}/sys/spi.cpp
+    ${PROJECT_SOURCE_DIR}/sys/i2c.cpp
+
+    ${PROJECT_SOURCE_DIR}/haptic/haptic.cpp
 
     ${PROJECT_SOURCE_DIR}/stm32/stm32wbxx_it.cpp
 

@@ -58,7 +58,7 @@ namespace Display
     EInk::EInk()
     {}
 
-    EInk::EInk(Display::Manager man, Sys::SPIController ctrl, Sys::State *sysState)
+    EInk::EInk(Display::Manager man, Sys::SPI_Controller ctrl, Sys::State *sysState)
     {
         manager = man;
         spi = ctrl;

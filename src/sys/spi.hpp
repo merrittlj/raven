@@ -9,7 +9,7 @@
 
 namespace Sys
 {
-    struct SPIManager
+    struct SPI_Manager
     {
         uint8_t busy;
         uint8_t rst;
@@ -18,16 +18,16 @@ namespace Sys
         uint8_t pwr;
     };
 
-    class SPIController
+    class SPI_Controller
     {
         private:
             SPI_HandleTypeDef *spi;
             GPIO::Controller *gpioCtrl;
-            SPIManager manager;
+            SPI_Manager manager;
 
         public:
-            SPIController();
-            SPIController(SPI_HandleTypeDef *handle, GPIO::Controller *gpio, SPIManager spiM);
+            SPI_Controller();
+            SPI_Controller(SPI_HandleTypeDef *handle, GPIO::Controller *gpio, SPI_Manager spiM);
 
             void WriteByte(uint8_t value);
             void WriteBytes(uint8_t *value, uint16_t len);

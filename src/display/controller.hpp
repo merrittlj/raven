@@ -32,7 +32,7 @@ namespace Display
 
         public:
             Controller();
-            Controller(uint16_t displayWidth, uint16_t displayHeight, Sys::SPIController ctrl, Sys::State *sysState, Sys::Controller *userSys, BLE::InfoService *infoService);
+            Controller(uint16_t displayWidth, uint16_t displayHeight, Sys::SPI_Controller ctrl, Sys::State *sysState, Sys::Controller *userSys, BLE::InfoService *infoService);
             ~Controller();
 
             static Controller *Instance(Controller *cur = nullptr);

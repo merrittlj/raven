@@ -17,7 +17,7 @@ namespace Display
     {
         private:
             Manager manager;
-            Sys::SPIController spi;
+            Sys::SPI_Controller spi;
             std::vector<uint8_t> buf;
             Sys::State *state;
 
@@ -30,7 +30,7 @@ namespace Display
 
         public:
             EInk();
-            EInk(Display::Manager man, Sys::SPIController ctrl, Sys::State *sysState);
+            EInk(Display::Manager man, Sys::SPI_Controller ctrl, Sys::State *sysState);
 
             std::vector<uint8_t> *GetBuf();
 
