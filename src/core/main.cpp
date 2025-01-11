@@ -22,6 +22,7 @@
 #include "services/info.hpp"
 #include "display/controller.hpp"
 #include "rtos/rtos.hpp"
+#include "haptic/haptic.hpp"
 
 #include "FreeRTOS.h" /* Must come first. */
 #include "task.h" /* RTOS task related API prototypes. */
@@ -97,7 +98,7 @@ int main()
     SPI_HandleTypeDef *spi = sysCtrl.Config_SPI();
     Sys::SPI_Controller spiCtrl = Sys::SPI_Controller(spi, &gpioCtrl, Sys::SPI_Manager{busy,rst,dc,cs,pwr});
     I2C_HandleTypeDef *i2c = sysCtrl.Config_I2C();
-    Sys::I2C_Controller i2cCtrl = Sys::I2C_Controller(i2c, 0x00, &gpioCtrl, Sys::I2C_Manager{scl,sda});
+    Sys::I2C_Controller i2cCtrl = Sys::I2C_Controller(i2c, 0x00, &gpioCtrl);
     Haptic::Driver driver = Haptic::Driver(&i2cCtrl);
     
     /* Set the red LED On to indicate that the CPU2 is initializing */

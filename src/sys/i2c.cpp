@@ -1,4 +1,5 @@
 #include "sys/i2c.hpp"
+#include "sys/sys.hpp"
 
 
 namespace Sys
@@ -6,12 +7,11 @@ namespace Sys
     I2C_Controller::I2C_Controller()
     {}
 
-    I2C_Controller::I2C_Controller(I2C_HandleTypeDef *handle, uint8_t address, GPIO::Controller *gpio, I2C_Manager i2cM)
+    I2C_Controller::I2C_Controller(I2C_HandleTypeDef *handle, uint8_t address, GPIO::Controller *gpio)
     {
         i2c = handle;
         addr = address;
         gpioCtrl = gpio;
-        manager = i2cM;
     }
 
     // This generic function handles I2C write commands for modifying individual
@@ -25,12 +25,12 @@ namespace Sys
         write &= (mask);                   // Mask the position we want to write to.
         write |= (bits << pos); // Write the given bits to the variable
 
-        writeRegister(reg, &write);
+        return writeRegister(reg, &write);
     }
 
     bool I2C_Controller::writeRegister(uint8_t reg, uint8_t data[])
     {
-        if (HAL_I2C_Mem_Write(&i2c, addr, reg, 1, &data, 1, 1000) != HAL_OK) return false;
+        if (HAL_I2C_Mem_Write(i2c, addr, reg, 1, data, 1, 1000) != HAL_OK) return false;
         else return true;
     }
 
@@ -39,55 +39,17 @@ namespace Sys
     uint8_t I2C_Controller::readRegister(uint8_t reg)
     {
         uint8_t data;
-        if (HAL_I2C_Mem_Read(&i2c, addr, reg, 1, &data, 1, 1000) != HAL_OK) Sys::Error_Handler();
+        if (HAL_I2C_Mem_Read(i2c, addr, reg, 1, &data, 1, 1000) != HAL_OK) Sys::Error_Handler();
         return data;
     }
 
-    // Consecutive Write Mode: I2C_WR_MODE = 0
-    // Allows for n-number of writes on consecutive registers, beginning at the
-    // given register.
-    // This particular write does not care what is currently in the register and
-    // overwrites whatever is there.
-    bool I2C_Controller::writeConsReg(uint8_t regs[], size_t numWrites)
+    bool I2C_Controller::writeWaveFormMemory(uint8_t waveFormArray[], uint8_t numSnippetsReg, size_t begin, size_t end)
     {
-        writeRegister(CIF_I2C1, 0x7F, 0, 7);
-
-        for (size_t i = 0; i <= numWrites; ++i)
-        {
-            HAL_StatusTypeDef regTransmit = HAL_I2C_Master_Transmit(i2c, addr, regs[i], 1, 1000);
-            if (regTransmit != HAL_OK) return false;
-        }
-
-        return true;
-    }
-
-    // Non-Consecutive Write Mode: I2C_WR_MODE = 1
-    // Allows for n-number of writes on non-consecutive registers, beginning at the
-    // given register but able to jump locations by giving another address.
-    // This particular write does not care what is currently in the register and
-    // overwrites whatever is there.
-    bool I2C_Controller::writeNonConsReg(uint8_t regs[], size_t numWrites)
-    {
-        writeRegister(CIF_I2C1, 0x7F, 1, 7);
-
-        for (size_t i = 0; i <= numWrites; ++i)
-        {
-            // Here's to hoping that the register pointer will indeed jump locations as
-            // advertised.
-            HAL_StatusTypeDef regTransmit = HAL_I2C_Master_Transmit(i2c, addr, regs[i], 1, 1000);
-            if (regTransmit != HAL_OK) return false;
-        }
-
-        return true;
-    }
-
-    bool I2C_Controller::writeWaveFormMemory(uint8_t waveFormArray[], size_t numSnippets)
-    {
-        HAL_StatusTypeDef snippetsTransmit = HAL_I2C_Master_Transmit(i2c, addr, (uint16_t)numSnippets, 1, 1000);  /* Move pointer to register */
+        HAL_StatusTypeDef snippetsTransmit = HAL_I2C_Master_Transmit(i2c, addr, &numSnippetsReg, 1, 1000);  /* Move pointer to register */
         if (snippetsTransmit != HAL_OK) return false;
-        for (size_t i = BEGIN_SNP_MEM; i < TOTAL_MEM_REGISTERS; ++i)
+        for (size_t i = begin; i < end; ++i)
         {
-            HAL_StatusTypeDef regTransmit = HAL_I2C_Master_Transmit(i2c, addr, waveFormArray[i], 1, 1000);
+            HAL_StatusTypeDef regTransmit = HAL_I2C_Master_Transmit(i2c, addr, &waveFormArray[i], 1, 1000);
             if (regTransmit != HAL_OK) return false;
         }
 
@@ -142,3 +104,4 @@ namespace Sys
             }
         }
     }
+}

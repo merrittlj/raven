@@ -262,6 +262,7 @@ extern "C" {
 
 I2C_HandleTypeDef *Sys::Controller::Config_I2C()
 {
+    hi2c1 = { 0 };
     hi2c1.Instance = I2C1;
     hi2c1.Init.Timing = 0x00707CBB;
     hi2c1.Init.OwnAddress1 = 0;

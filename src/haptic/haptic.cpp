@@ -4,6 +4,8 @@
 #include "sys/sys.hpp"
 #include "sys/i2c.hpp"
 
+#include <math.h>
+
 
 namespace Haptic
 {
@@ -17,9 +19,9 @@ namespace Haptic
     bool Driver::begin()
     {
         Sys::Delay(2);
-        uint8_t chipRev;
+        uint8_t chipRev = 0;
 
-        uint8_t tempRegVal = i2c.readRegister(CHIP_REV_REG);
+        uint8_t tempRegVal = i2c->readRegister(CHIP_REV_REG);
         chipRev |= tempRegVal << 8;
         chipRev |= tempRegVal;
 
@@ -37,7 +39,7 @@ namespace Haptic
         if (actuator != LRA_TYPE && actuator != ERM_TYPE)
             return false;
 
-        if (i2c.writeRegister(TOP_CFG1, 0xDF, actuator, 5))
+        if (i2c->writeRegister(TOP_CFG1, 0xDF, actuator, 5))
             return true;
         else
             return false;
@@ -52,7 +54,7 @@ namespace Haptic
         if (mode < 0 || mode > 3)
             return false;
 
-        if (i2c.writeRegister(TOP_CTL1, 0xF8, mode, 0))
+        if (i2c->writeRegister(TOP_CTL1, 0xF8, mode, 0))
             return true;
         else
             return false;
@@ -66,7 +68,7 @@ namespace Haptic
     // Mode), or ETWM_MODE (Edge-Triggered-Waveform-Memory Mode).
     uint8_t Driver::getOperationMode()
     {
-        uint8_t mode = i2c.readRegister(TOP_CTL1);
+        uint8_t mode = i2c->readRegister(TOP_CTL1);
         return (mode & 0x07);
     }
 
@@ -96,11 +98,11 @@ namespace Haptic
     {
         hapticSettings temp;
         uint16_t v2i_factor;
-        temp.nomVolt = i2c.readRegister(ACTUATOR1) * (23.4 * pow(10, -3));
-        temp.absVolt = i2c.readRegister(ACTUATOR2) * (23.4 * pow(10, -3));
-        temp.currMax = (i2c.readRegister(ACTUATOR3) * 7.2) + 28.6;
-        v2i_factor = (i2c.readRegister(CALIB_V2I_H) << 8) | i2c.readRegister(CALIB_IMP_L);
-        temp.impedance = (v2i_factor * 1.6104) / (i2c.readRegister(ACTUATOR3) + 4);
+        temp.nomVolt = i2c->readRegister(ACTUATOR1) * (23.4 * pow(10, -3));
+        temp.absVolt = i2c->readRegister(ACTUATOR2) * (23.4 * pow(10, -3));
+        temp.currMax = (i2c->readRegister(ACTUATOR3) * 7.2) + 28.6;
+        v2i_factor = (i2c->readRegister(CALIB_V2I_H) << 8) | i2c->readRegister(CALIB_IMP_L);
+        temp.impedance = (v2i_factor * 1.6104) / (i2c->readRegister(ACTUATOR3) + 4);
         return temp;
     }
 
@@ -121,12 +123,12 @@ namespace Haptic
     // be paired with the motor driver IC. Argument is of float type, and in volts.
     bool Driver::setActuatorABSVolt(float absVolt)
     {
-        if (absVolt < 0 || absVolt > 6.0)
+        if (absVolt < 0 || absVolt > 6.0f)
             return false;
 
-        absVolt = absVolt / (23.4 * pow(10, -3));
+        absVolt = absVolt / (float)(23.4 * pow(10, -3));
 
-        if (i2c.writeRegister(ACTUATOR2, 0x00, static_cast<uint8_t>(absVolt), 0))
+        if (i2c->writeRegister(ACTUATOR2, 0x00, static_cast<uint8_t>(absVolt), 0))
             return true;
         else
             return false;
@@ -136,7 +138,7 @@ namespace Haptic
     // Function returns the value in the register below.
     float Driver::getActuatorABSVolt()
     {
-        uint8_t regVal = i2c.readRegister(ACTUATOR2);
+        uint8_t regVal = i2c->readRegister(ACTUATOR2);
 
         return (regVal * (23.4 * pow(10, -3)));
     }
@@ -146,12 +148,12 @@ namespace Haptic
     // be paired with the motor driver IC. Argument is of float type, and in volts.
     bool Driver::setActuatorNOMVolt(float rmsVolt)
     {
-        if (rmsVolt < 0 || rmsVolt > 3.3)
+        if (rmsVolt < 0 || rmsVolt > 3.3f)
             return false;
 
-        rmsVolt = rmsVolt / (23.4 * pow(10, -3));
+        rmsVolt = rmsVolt / (float)(23.4 * pow(10, -3));
 
-        if (i2c.writeRegister(ACTUATOR1, 0x00, static_cast<uint8_t>(rmsVolt), 0))
+        if (i2c->writeRegister(ACTUATOR1, 0x00, static_cast<uint8_t>(rmsVolt), 0))
             return true;
         else
             return false;
@@ -161,7 +163,7 @@ namespace Haptic
     // Function returns the value in the register below.
     float Driver::getActuatorNOMVolt()
     {
-        uint8_t regVal = i2c.readRegister(ACTUATOR1);
+        uint8_t regVal = i2c->readRegister(ACTUATOR1);
 
         return (regVal * (23.4 * pow(10, -3)));
     }
@@ -172,12 +174,12 @@ namespace Haptic
     // milliamps.
     bool Driver::setActuatorIMAX(float maxCurr)
     {
-        if (maxCurr < 0 || maxCurr > 300.0) // Random upper limit
+        if (maxCurr < 0 || maxCurr > 300.0f) // Random upper limit
             return false;
 
-        maxCurr = (maxCurr - 28.6) / 7.2;
+        maxCurr = (maxCurr - 28.6f) / 7.2f;
 
-        if (i2c.writeRegister(ACTUATOR3, 0xE0, static_cast<uint8_t>(maxCurr), 0))
+        if (i2c->writeRegister(ACTUATOR3, 0xE0, static_cast<uint8_t>(maxCurr), 0))
             return true;
         else
             return false;
@@ -187,7 +189,7 @@ namespace Haptic
     // Function returns the value in the register below.
     uint16_t Driver::getActuatorIMAX()
     {
-        uint8_t regVal = i2c.readRegister(ACTUATOR3);
+        uint8_t regVal = i2c->readRegister(ACTUATOR3);
         regVal &= 0x1F;
 
         return (regVal * 7.2) + 28.6;
@@ -201,19 +203,19 @@ namespace Haptic
     // ohms.
     bool Driver::setActuatorImpedance(float motorImpedance)
     {
-        if (motorImpedance < 0 || motorImpedance > 50.0)
+        if (motorImpedance < 0 || motorImpedance > 50.0f)
             return false;
 
         uint8_t msbImpedance;
         uint8_t lsbImpedance;
         uint16_t v2iFactor;
-        uint8_t maxCurr = i2c.readRegister(ACTUATOR3) | 0x1F;
+        uint8_t maxCurr = i2c->readRegister(ACTUATOR3) | 0x1F;
 
-        v2iFactor = (motorImpedance * (maxCurr + 4)) / 1.6104;
+        v2iFactor = (motorImpedance * (maxCurr + 4)) / 1.6104f;
         msbImpedance = (v2iFactor - (v2iFactor & 0x00FF)) / 256;
         lsbImpedance = (v2iFactor - (256 * (v2iFactor & 0x00FF)));
 
-        if (i2c.writeRegister(CALIB_V2I_L, 0x00, lsbImpedance, 0) && i2c.writeRegister(CALIB_V2I_H, 0x00, msbImpedance, 0))
+        if (i2c->writeRegister(CALIB_V2I_L, 0x00, lsbImpedance, 0) && i2c->writeRegister(CALIB_V2I_H, 0x00, msbImpedance, 0))
             return true;
         else
             return false;
@@ -223,9 +225,9 @@ namespace Haptic
     // Function returns the value in the register below.
     uint16_t Driver::getActuatorImpedance()
     {
-        uint16_t regValMSB = i2c.readRegister(CALIB_V2I_H);
-        uint8_t regValLSB = i2c.readRegister(CALIB_V2I_L);
-        uint8_t currVal = i2c.readRegister(ACTUATOR3) & 0x1F;
+        uint16_t regValMSB = i2c->readRegister(CALIB_V2I_H);
+        uint8_t regValLSB = i2c->readRegister(CALIB_V2I_L);
+        uint8_t currVal = i2c->readRegister(ACTUATOR3) & 0x1F;
 
         uint16_t v2iFactor = (regValMSB << 8) | regValLSB;
 
@@ -240,18 +242,18 @@ namespace Haptic
     // ohms.
     bool Driver::setActuatorLRAfreq(float frequency)
     {
-        if (frequency < 0 || frequency > 500.0)
+        if (frequency < 0 || frequency > 500.0f)
             return false;
 
         uint8_t msbFrequency;
         uint8_t lsbFrequency;
         uint16_t lraPeriod;
 
-        lraPeriod = 1 / (frequency * (1333.32 * pow(10, -9)));
+        lraPeriod = 1 / ((double)frequency * (1333.32 * pow(10, -9)));
         msbFrequency = (lraPeriod - (lraPeriod & 0x007F)) / 128;
         lsbFrequency = (lraPeriod - 128 * (lraPeriod & 0xFF00));
 
-        if (i2c.writeRegister(FRQ_LRA_PER_H, 0x00, msbFrequency, 0) && i2c.writeRegister(FRQ_LRA_PER_L, 0x80, lsbFrequency, 0))
+        if (i2c->writeRegister(FRQ_LRA_PER_H, 0x00, msbFrequency, 0) && i2c->writeRegister(FRQ_LRA_PER_L, 0x80, lsbFrequency, 0))
         {
             return true;
         }
@@ -263,10 +265,10 @@ namespace Haptic
     // This function returns the adjusted impedance of the motor, calculated by the
     // IC on playback. This is meant to adjust for the motor's variation in
     // impedance given manufacturing tolerances. Value is in Ohms.
-    uint16_t Driver::i2c.readImpAdjus()
+    uint16_t Driver::readImpAdjus()
     {
-        uint8_t tempMSB = i2c.readRegister(CALIB_IMP_H);
-        uint8_t tempLSB = i2c.readRegister(CALIB_IMP_L);
+        uint8_t tempMSB = i2c->readRegister(CALIB_IMP_H);
+        uint8_t tempLSB = i2c->readRegister(CALIB_IMP_L);
 
         uint16_t totalImp = (4 * 62.5 * pow(10, -3) * tempMSB) + (62.5 * pow(10, -3) * tempLSB);
         return totalImp;
@@ -287,7 +289,7 @@ namespace Haptic
     // Enables or disables active acceleration.
     bool Driver::enableAcceleration(bool enable)
     {
-        if (i2c.writeRegister(TOP_CFG1, 0xFB, enable, 2))
+        if (i2c->writeRegister(TOP_CFG1, 0xFB, enable, 2))
             return true;
         else
             return false;
@@ -297,7 +299,7 @@ namespace Haptic
     // Enables or disables the "rapid stop" technology.
     bool Driver::enableRapidStop(bool enable)
     {
-        if (i2c.writeRegister(TOP_CFG1, 0xFD, enable, 1))
+        if (i2c->writeRegister(TOP_CFG1, 0xFD, enable, 1))
             return true;
         else
             return false;
@@ -307,7 +309,7 @@ namespace Haptic
     // Enables or disables the "amplitude PID" technology.
     bool Driver::enableAmpPid(bool enable)
     {
-        if (i2c.writeRegister(TOP_CFG1, 0xFE, enable, 0))
+        if (i2c->writeRegister(TOP_CFG1, 0xFE, enable, 0))
             return true;
         else
             return false;
@@ -317,7 +319,7 @@ namespace Haptic
     // Enables or disables the "frequency tracking" technology.
     bool Driver::enableFreqTrack(bool enable)
     {
-        if (i2c.writeRegister(TOP_CFG1, 0xF7, enable, 3))
+        if (i2c->writeRegister(TOP_CFG1, 0xF7, enable, 3))
             return true;
         else
             return false;
@@ -328,7 +330,7 @@ namespace Haptic
     // disabled when using custom waveform or wideband operation.
     bool Driver::setBemfFaultLimit(bool enable)
     {
-        if (i2c.writeRegister(TOP_CFG1, 0xEF, enable, 4))
+        if (i2c->writeRegister(TOP_CFG1, 0xEF, enable, 4))
             return true;
         else
             return false;
@@ -339,7 +341,7 @@ namespace Haptic
     // disabled when using custom waveform or wideband operation.
     bool Driver::enableV2iFactorFreeze(bool enable)
     {
-        if (i2c.writeRegister(TOP_CFG4, 0x7F, enable, 7))
+        if (i2c->writeRegister(TOP_CFG4, 0x7F, enable, 7))
             return true;
         else
             return false;
@@ -349,7 +351,7 @@ namespace Haptic
     // Enables or disables automatic updates to impedance value.
     bool Driver::calibrateImpedanceDistance(bool enable)
     {
-        if (i2c.writeRegister(TOP_CFG4, 0xBF, enable, 6))
+        if (i2c->writeRegister(TOP_CFG4, 0xBF, enable, 6))
             return true;
         else
             return false;
@@ -364,7 +366,7 @@ namespace Haptic
         if (val < 0)
             return false;
 
-        uint8_t accelState = i2c.readRegister(TOP_CFG1);
+        uint8_t accelState = i2c->readRegister(TOP_CFG1);
         accelState &= 0x04;
         accelState = accelState >> 2;
 
@@ -379,25 +381,25 @@ namespace Haptic
                 val = 0xFF; // Just limit the argument to the physical limit
         }
 
-        if (i2c.writeRegister(TOP_CTL2, 0x00, val, 0))
+        if (i2c->writeRegister(TOP_CTL2, 0x00, val, 0))
             return true;
         else
             return false;
     }
 
     // Address: 0x23, bit[7:0]
-    // Reads the vibration value. This will have a result when the user i2c.writes to
+    // Reads the vibration value. This will have a result when the user i2c->writes to
     // this register and also when a PWM_MODE is enabled and a duty cycle is
     // applied to the GPI0/PWM pin.
     uint8_t Driver::getVibrate()
     {
-        uint8_t vibVal = i2c.readRegister(TOP_CTL2);
+        uint8_t vibVal = i2c->readRegister(TOP_CTL2);
         return vibVal;
     }
 
     float Driver::getFullBrake()
     {
-        uint8_t tempThresh = i2c.readRegister(TOP_CFG2);
+        uint8_t tempThresh = i2c->readRegister(TOP_CFG2);
         return (tempThresh & 0x0F) * 6.66;
     }
 
@@ -406,7 +408,7 @@ namespace Haptic
         if (thresh < 0 || thresh > 15)
             return false;
 
-        if (i2c.writeRegister(TOP_CFG2, 0xF0, thresh, 0))
+        if (i2c->writeRegister(TOP_CFG2, 0xF0, thresh, 0))
             return true;
         else
             return false;
@@ -416,7 +418,7 @@ namespace Haptic
     // Function sets the register to ignore the given "mask" i.e. irq event.
     bool Driver::setMask(uint8_t mask)
     {
-        if (i2c.writeRegister(IRQ_MASK1, 0x00, mask, 0))
+        if (i2c->writeRegister(IRQ_MASK1, 0x00, mask, 0))
             return true;
         else
             return false;
@@ -426,7 +428,7 @@ namespace Haptic
     // Function returns the event ignoring register.
     uint8_t Driver::getMask()
     {
-        uint8_t regVal = i2c.readRegister(IRQ_MASK1);
+        uint8_t regVal = i2c->readRegister(IRQ_MASK1);
         return regVal;
     }
 
@@ -438,7 +440,7 @@ namespace Haptic
         if (val < 0 || val > 3)
             return false;
 
-        if (i2c.writeRegister(TOP_INT_CFG1, 0xFC, val, 0))
+        if (i2c->writeRegister(TOP_INT_CFG1, 0xFC, val, 0))
             return true;
         else
             return false;
@@ -448,7 +450,7 @@ namespace Haptic
     // Returns the BEMF value in millivolts (mV).
     float Driver::getBemf()
     {
-        int bemf = i2c.readRegister(TOP_INT_CFG1);
+        int bemf = i2c->readRegister(TOP_INT_CFG1);
 
         switch (bemf)
         {
@@ -461,6 +463,7 @@ namespace Haptic
             case 0x03:
                 return 49.9;
         }
+        return 0.0;
     }
 
     void Driver::createHeader(uint8_t numSnippets, uint8_t numSequences)
@@ -469,34 +472,34 @@ namespace Haptic
 
     void Driver::clearIrq(uint8_t irq)
     {
-        i2c.writeRegister(IRQ_EVENT1, ~irq, irq, 0);
+        i2c->writeRegister(IRQ_EVENT1, ~irq, irq, 0);
     }
 
     bool Driver::addSnippet(uint8_t ramp, uint8_t timeBase, uint8_t amplitude)
     {
-        if (ramp < 0 | ramp > 1)
+        if (ramp < 0 || ramp > 1)
             return false;
 
-        if (amplitude < 0 | amplitude > 15)
+        if (amplitude < 0 || amplitude > 15)
             return false;
 
-        if (timeBase < 0 | timeBase > 7)
+        if (timeBase < 0 || timeBase > 7)
             return false;
 
         setOperationMode(INACTIVE);
 
-        if ((i2c.readRegister(MEM_CTL2) >> 7) == LOCKED)
-            i2c.writeRegister(MEM_CTL2, 0x7F, UNLOCKED, 7);
+        if ((i2c->readRegister(MEM_CTL2) >> 7) == LOCKED)
+            i2c->writeRegister(MEM_CTL2, 0x7F, UNLOCKED, 7);
 
         uint8_t pwlVal = (ramp << 7) | (timeBase << 4) | (amplitude << 0);
-        uint8_t snipAddrLoc = i2c.readRegister(MEM_CTL1);
+        uint8_t snipAddrLoc = i2c->readRegister(MEM_CTL1);
 
         snpMemCopy[NUM_SNIPPETS] = snpMemCopy[NUM_SNIPPETS] + 1;   // Number of Snippets
         snpMemCopy[NUM_SEQUENCES] = snpMemCopy[NUM_SEQUENCES] + 1; // Number of sequences
 
         uint8_t frameByte = addFrame(0, 3, 1);
 
-        for (uint8_t i = 0; i < snpMemCopy[NUM_SNIPPETS]; i++)
+        for (uint8_t i = 0; i < snpMemCopy[NUM_SNIPPETS]; ++i)
         {
             snpMemCopy[SNP_ENDPOINTERS + i] = SNP_ENDPOINTERS_REGS + i; // snippet endpointer
             lastPosWritten = SNP_ENDPOINTERS + i;
@@ -504,7 +507,7 @@ namespace Haptic
 
         lastPosWritten = lastPosWritten + 1;
 
-        for (uint8_t i = 0; i < snpMemCopy[NUM_SEQUENCES]; i++)
+        for (uint8_t i = 0; i < snpMemCopy[NUM_SEQUENCES]; ++i)
         {
             snpMemCopy[lastPosWritten] = SNP_ENDPOINTERS_REGS + snpMemCopy[NUM_SNIPPETS] + i; // sequence endpointer
             lastPosWritten = SNP_ENDPOINTERS + snpMemCopy[NUM_SNIPPETS] + i;
@@ -517,7 +520,7 @@ namespace Haptic
 
         setSeqControl(1, 0);
 
-        if (i2c.writeWaveFormMemory(snpMemCopy))
+        if (i2c->writeWaveFormMemory(snpMemCopy, NUM_SNIPPETS_REG, BEGIN_SNP_MEM, TOTAL_MEM_REGISTERS))
             return true;
         else
             return false;
@@ -537,7 +540,7 @@ namespace Haptic
 
     bool Driver::playFromMemory(bool enable)
     {
-        if (i2c.writeRegister(TOP_CTL1, 0xEF, enable, 4))
+        if (i2c->writeRegister(TOP_CTL1, 0xEF, enable, 4))
             return true;
         else
             return false;
@@ -545,11 +548,11 @@ namespace Haptic
 
     void Driver::eraseWaveformMemory(uint8_t mode)
     {
-        for (uint8_t i; i = BEGIN_SNP_MEM; i < TOTAL_MEM_REGISTERS)
+        for (uint8_t i = BEGIN_SNP_MEM; i < TOTAL_MEM_REGISTERS; ++i)
         {
             snpMemCopy[i] = 0;
         }
-        i2c.writeWaveFormMemory(snpMemCopy);
+        i2c->writeWaveFormMemory(snpMemCopy, NUM_SNIPPETS_REG, BEGIN_SNP_MEM, TOTAL_MEM_REGISTERS);
     }
 
     // Address: 0x03, bit[7:0]
@@ -557,7 +560,7 @@ namespace Haptic
     // found or success otherwise.
     event_t Driver::getIrqEvent()
     {
-        uint8_t irqEvent = i2c.readRegister(IRQ_EVENT1);
+        uint8_t irqEvent = i2c->readRegister(IRQ_EVENT1);
 
         if (!irqEvent)
             return HAPTIC_SUCCESS;
@@ -590,7 +593,7 @@ namespace Haptic
     // this returns further information on the error.
     diag_status_t Driver::getEventDiag()
     {
-        uint8_t diag = i2c.readRegister(IRQ_EVENT_SEQ_DIAG);
+        uint8_t diag = i2c->readRegister(IRQ_EVENT_SEQ_DIAG);
 
         switch (diag)
         {
@@ -609,7 +612,7 @@ namespace Haptic
     // Retu
     status_t Driver::getIrqStatus()
     {
-        uint8_t status = i2c.readRegister(IRQ_STATUS1);
+        uint8_t status = i2c->readRegister(IRQ_STATUS1);
 
         switch (status)
         {
@@ -636,13 +639,13 @@ namespace Haptic
 
     bool Driver::setSeqControl(uint8_t repetitions, uint8_t sequenceID)
     {
-        if (sequenceID < 0 | sequenceID > 15)
+        if (sequenceID < 0 || sequenceID > 15)
             return false;
 
-        if (repetitions < 0 | repetitions > 15)
+        if (repetitions < 0 || repetitions > 15)
             return false;
 
-        if (i2c.writeRegister(SEQ_CTL2, 0xF0, sequenceID, 0) && i2c.writeRegister(SEQ_CTL2, 0x0F, repetitions, 4))
+        if (i2c->writeRegister(SEQ_CTL2, 0xF0, sequenceID, 0) && i2c->writeRegister(SEQ_CTL2, 0x0F, repetitions, 4))
             return true;
         else
             return false;
