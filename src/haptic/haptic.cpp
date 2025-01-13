@@ -78,12 +78,13 @@ namespace Haptic
     // function calls - see datasheet on the motor being used.
     bool Driver::defaultMotor()
     {
+        /* For VG0832009L */
         sparkSettings.motorType = LRA_TYPE;
-        sparkSettings.nomVolt = 2.106;  // volts - set to 2.5 when acceleration is ON
-        sparkSettings.absVolt = 2.26;   // volts - when acceleration is off, set this only
-        sparkSettings.currMax = 165.4;  // milliamps -
-        sparkSettings.impedance = 13.8; // ohms
-        sparkSettings.lraFreq = 170;    // hertz
+        sparkSettings.nomVolt = 1.8;  // volts
+        sparkSettings.absVolt = 1.8;   // volts
+        sparkSettings.currMax = 80;  // milliamps
+        sparkSettings.impedance = 22.5; // ohms, resistance in datasheet
+        sparkSettings.lraFreq = 235;    // hertz
 
         if (setActuatorType(sparkSettings.motorType) && setActuatorABSVolt(sparkSettings.absVolt) &&
                 setActuatorNOMVolt(sparkSettings.nomVolt) && setActuatorIMAX(sparkSettings.currMax) &&

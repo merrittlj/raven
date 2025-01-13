@@ -107,11 +107,17 @@ int main()
     Haptic::Driver driver = Haptic::Driver(&i2cCtrl);
     Haptic::Controller hapticCtrl = Haptic::Controller(tim2, TIM_CHANNEL_1);
 
+    if (!driver.begin()) Sys::Error_Handler();
+    if (!driver.defaultMotor()) Sys::Error_Handler();
+    driver.enableFreqTrack(false);
+    driver.setOperationMode(Haptic::PWM_MODE);
+
     for (;;) {
+        driver.clearIrq(driver.getIrqEvent());
         hapticCtrl.Vibrate_Pulse(10);
         Sys::Delay(5000);
     }
-    
+
     /* Set the red LED On to indicate that the CPU2 is initializing */
     gpioCtrl.Write_Component(sysState.Fetch_LED_Red(), SET);
 
