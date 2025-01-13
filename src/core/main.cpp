@@ -100,11 +100,17 @@ int main()
 
     TIM_HandleTypeDef *tim2 = sysCtrl.Config_TIM2();
     __HAL_TIM_SetCompare(tim2, TIM_CHANNEL_1, (136170 / 2));
-    HAL_TIM_PWM_Start(tim2, TIM_CHANNEL_1);
+    /* HAL_TIM_PWM_Start(tim2, TIM_CHANNEL_1); */
 
     I2C_HandleTypeDef *i2c = sysCtrl.Config_I2C();
     Sys::I2C_Controller i2cCtrl = Sys::I2C_Controller(i2c, 0x4A, &gpioCtrl);
     Haptic::Driver driver = Haptic::Driver(&i2cCtrl);
+    Haptic::Controller hapticCtrl = Haptic::Controller(tim2, TIM_CHANNEL_1);
+
+    for (;;) {
+        hapticCtrl.Vibrate_Pulse(10);
+        Sys::Delay(5000);
+    }
     
     /* Set the red LED On to indicate that the CPU2 is initializing */
     gpioCtrl.Write_Component(sysState.Fetch_LED_Red(), SET);
@@ -137,7 +143,7 @@ int main()
 
     bleApp.Advertising(SET);
 
-    Display::Controller displayCtrl = Display::Controller(200, 200, spiCtrl, &sysState, &sysCtrl, &infoService);
+    Display::Controller displayCtrl = Display::Controller(200, 200, spiCtrl, &sysState, &sysCtrl, &hapticCtrl, &infoService);
     displayCtrl.Init();
 
     Debouncer btnPort(BUTTON_PIN_0 | BUTTON_PIN_1 | BUTTON_PIN_2 | BUTTON_PIN_3);

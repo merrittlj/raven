@@ -650,4 +650,25 @@ namespace Haptic
         else
             return false;
     }
+
+    Controller::Controller(TIM_HandleTypeDef *timHandle, uint32_t timChannel)
+    {
+        tim = timHandle;
+        channel = timChannel;
+    }
+
+    void Controller::Vibrate_Pulse(size_t length)
+    {
+        HAL_TIM_PWM_Start(tim, channel);
+        Sys::Delay(length);
+        HAL_TIM_PWM_Stop(tim, channel);
+    }
+
+    void Controller::Vibrate_Cons(size_t length, size_t pulses, size_t delay)
+    {
+        for (size_t i = 0; i < pulses; ++i) {
+            Vibrate_Pulse(length);
+            if (i < pulses - 1) Sys::Delay(delay);
+        }
+    }
 }

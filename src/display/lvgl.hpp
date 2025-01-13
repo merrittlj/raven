@@ -4,6 +4,7 @@
 
 #include "display/display.hpp"
 #include "sys/state.hpp"
+#include "haptic/haptic.hpp"
 #include "services/info.hpp"
 
 #include "lvgl.h"
@@ -23,6 +24,7 @@ namespace Display
     {
         private:
             Sys::State *state;
+            Haptic::Controller *hapticCtrl;
             BLE::InfoService *infoServ;
 
             Display::Manager manager;
@@ -89,7 +91,7 @@ namespace Display
 
         public:
             LVGL();
-            LVGL(Display::Manager man, Sys::State *sysState, BLE::InfoService *infoService);
+            LVGL(Display::Manager man, Sys::State *sysState, Haptic::Controller *ctrl, BLE::InfoService *infoService);
 
             void Init();
             void Create();

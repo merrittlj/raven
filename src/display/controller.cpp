@@ -11,7 +11,7 @@ namespace Display
 
     }
 
-    Controller::Controller(uint16_t displayWidth, uint16_t displayHeight, Sys::SPI_Controller ctrl, Sys::State *sysState, Sys::Controller *userSys, BLE::InfoService *infoService)
+    Controller::Controller(uint16_t displayWidth, uint16_t displayHeight, Sys::SPI_Controller ctrl, Sys::State *sysState, Sys::Controller *userSys, Haptic::Controller *userHaptic, BLE::InfoService *infoService)
     {
         state = sysState;
         sysCtrl = userSys;
@@ -27,7 +27,7 @@ namespace Display
         display = Display::EInk(manager, ctrl, sysState);
         manager.displayCallback = &display;
 
-        lvgl = Display::LVGL(manager, sysState, infoService);
+        lvgl = Display::LVGL(manager, sysState, userHaptic, infoService);
         lvgl.Set_Face(Face::BIG_TICK_ENERGY);
         /* lvgl.Set_Face(Face::DIGITAL); */
     }

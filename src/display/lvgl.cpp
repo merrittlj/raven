@@ -46,10 +46,11 @@ namespace Display
 
     }
 
-    LVGL::LVGL(Display::Manager man, Sys::State *sysState, BLE::InfoService *infoService)
+    LVGL::LVGL(Display::Manager man, Sys::State *sysState, Haptic::Controller *ctrl, BLE::InfoService *infoService)
     {
         manager = man;
         state = sysState;
+        hapticCtrl = ctrl;
         infoServ = infoService;
     }
 
