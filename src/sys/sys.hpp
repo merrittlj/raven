@@ -21,6 +21,7 @@ namespace Sys
         private:
             Sys::State *sysState;
             RTC_HandleTypeDef hrtc;
+            TIM_HandleTypeDef htim2;
             SPI_HandleTypeDef spi1;
             I2C_HandleTypeDef hi2c1;
 
@@ -34,6 +35,7 @@ namespace Sys
             void Set_RTC(Sys::TimeInfo info);
             I2C_HandleTypeDef *Config_I2C();
             void Config_HSE();
+            TIM_HandleTypeDef *Config_TIM2();
             SPI_HandleTypeDef *Config_SPI();
             void Init_CPU2();
     };
@@ -74,6 +76,10 @@ extern "C" {
     void HAL_RTC_MspDeInit(RTC_HandleTypeDef *hrtc);
     void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc);
     void HAL_RTCEx_AlarmBEventCallback(RTC_HandleTypeDef *hrtc);
+
+    void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base);
+    void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim);
+    void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* htim_base);
 }
 
 

@@ -258,6 +258,42 @@ extern "C" {
 
     void HAL_RTCEx_AlarmBEventCallback(RTC_HandleTypeDef *hrtc)
     {}
+
+    void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
+    {
+        if(htim_base->Instance==TIM2)
+        {
+            /* Peripheral clock enable */
+            __HAL_RCC_TIM2_CLK_ENABLE();
+        }
+    }
+
+    void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim)
+    {
+        GPIO_InitTypeDef GPIO_InitStruct = {0};
+        if(htim->Instance==TIM2)
+        {
+            __HAL_RCC_GPIOA_CLK_ENABLE();
+            /**TIM2 GPIO Configuration
+              PA0     ------> TIM2_CH1
+              */
+            GPIO_InitStruct.Pin = GPIO_PIN_0;
+            GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+            GPIO_InitStruct.Pull = GPIO_NOPULL;
+            GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+            GPIO_InitStruct.Alternate = GPIO_AF1_TIM2;
+            HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+        }
+    }
+
+    void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* htim_base)
+    {
+        if(htim_base->Instance==TIM2)
+        {
+            /* Peripheral clock disable */
+            __HAL_RCC_TIM2_CLK_DISABLE();
+        }
+    }
 };
 
 I2C_HandleTypeDef *Sys::Controller::Config_I2C()
@@ -308,6 +344,46 @@ void Sys::Controller::Config_HSE()
     {
         LL_RCC_HSE_SetCapacitorTuning(p_otp->hse_tuning);
     }
+}
+
+TIM_HandleTypeDef *Sys::Controller::Config_TIM2()
+{
+    TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+    TIM_MasterConfigTypeDef sMasterConfig = {0};
+    TIM_OC_InitTypeDef sConfigOC = {0};
+    htim2 = { 0 };
+
+    htim2.Instance = TIM2;
+    htim2.Init.Prescaler = 0;
+    htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+    htim2.Init.Period = 136170-1;
+    htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+    htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+    if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+        Sys::Error_Handler();
+
+    sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+    if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+        Sys::Error_Handler();
+
+    if (HAL_TIM_PWM_Init(&htim2) != HAL_OK)
+        Sys::Error_Handler();
+
+    sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+    sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+    if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
+        Sys::Error_Handler();
+
+    sConfigOC.OCMode = TIM_OCMODE_PWM1;
+    sConfigOC.Pulse = 0;
+    sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+    sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+    if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+        Error_Handler();
+
+    HAL_TIM_MspPostInit(&htim2);
+
+    return &htim2;
 }
 
 SPI_HandleTypeDef *Sys::Controller::Config_SPI()
