@@ -20,13 +20,13 @@ namespace Sys
     enum class Screen : uint8_t {
         TAG,  /* Default active */
         FACE,  /* Default active */
+        SUMMARY,  /* Default active */
         ALERT,  /* Default active */
         ACTIVE,  /* Default active */
         ALERTS_LIST,  /* Default inactive */
         EVENTS_LIST, /* Default inactive */
         NAVIGATION,  /* Default inactive */
         MUSIC,  /* Default inactive */
-        ABOUT,  /* Default active */
         Enum_Length
     };
 

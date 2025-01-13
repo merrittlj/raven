@@ -259,29 +259,28 @@ namespace Display
         lv_obj_move_background(musicBG);
 
 
-        aboutScreen = lv_obj_create(NULL);
+        summaryScreen = lv_obj_create(NULL);
 
-        lv_obj_t *ravenIcon = lv_image_create(aboutScreen);
-        lv_image_set_src(ravenIcon, &flag);
-        lv_obj_align(ravenIcon, LV_ALIGN_CENTER, 0, 0);
+        summaryDateTime = lv_label_create(summaryScreen);
+        lv_obj_add_style(summaryDateTime, &texts, 0);
+        lv_label_set_text(summaryDateTime, "x/x/x xx:xx");
+        lv_obj_set_style_text_font(summaryDateTime, &axel_text, 0);
+        lv_obj_align(summaryDateTime, LV_ALIGN_TOP_LEFT, 0, 0);
 
-        lv_obj_t *version = lv_label_create(aboutScreen);
-        lv_obj_add_style(version, &texts, 0);
-        lv_label_set_text(version, "V0.7");
-        lv_obj_set_style_text_font(version, &axel_ui, 0);
-        lv_obj_align(version, LV_ALIGN_CENTER, 0, 30);
+        summaryBattery = lv_label_create(summaryScreen);
+        lv_obj_add_style(summaryBattery, &texts, 0);
+        lv_label_set_text(summaryBattery, "xx%");
+        lv_obj_set_style_text_font(summaryBattery, &axel_text, 0);
+        lv_obj_align(summaryBattery, LV_ALIGN_TOP_MID, 0, 0);
 
-        lv_obj_t *edition = lv_label_create(aboutScreen);
-        lv_obj_add_style(edition, &texts, 0);
-        lv_label_set_text(edition, "Edition #1");
-        lv_obj_set_style_text_font(edition, &axel_ui, 0);
-        lv_obj_align(edition, LV_ALIGN_CENTER, 0, 50);
+        summaryWeather = lv_label_create(summaryScreen);
+        lv_obj_add_style(summaryWeather, &texts, 0);
+        lv_label_set_text(summaryWeather, "xxF");
+        lv_obj_set_style_text_font(summaryWeather, &axel_text, 0);
+        lv_obj_align(summaryWeather, LV_ALIGN_TOP_RIGHT, 0, 0);
 
-        lv_obj_t *credit = lv_label_create(aboutScreen);
-        lv_obj_add_style(credit, &texts, 0);
-        lv_label_set_text(credit, "Designer/Programmer:\nLucas Merritt\n(merrittlj)");
-        lv_obj_set_style_text_font(credit, &axel_ui, 0);
-        lv_obj_align(credit, LV_ALIGN_CENTER, 0, 70);
+        /* summaryRecent = Create_List(summaryScreen, "Recent"); */
+        /* summaryUpcoming = Create_List(summaryScreen, "Upcoming"); */
 
 
         lv_timer_t *checkUpdate = lv_timer_create(LVGL::Timer_Check_Update, 500, this);
@@ -327,6 +326,30 @@ namespace Display
     void LVGL::Tag()
     {
         lv_scr_load(tagScreen);
+    }
+
+    void LVGL::Summary()
+    {
+        Sys::TimeInfo timeInfo = state->Get_Time();
+
+        std::string time = (timeInfo.hour < 10 ? "0" : "") + std::to_string(timeInfo.hour) + ":" + (timeInfo.minute < 10 ? "0" : "") + std::to_string(timeInfo.minute);
+        std::string date = std::to_string(timeInfo.month) + "/" + std::to_string(timeInfo.day) + "/" + std::to_string(timeInfo.year);
+        lv_label_set_text(summaryDateTime, date + " " + time);
+
+        /* Sys::WeatherInfo batteryInfo = state->Get_Battery(); */
+        /* lv_label_set_text(summaryBattery, std::to_string(batteryInfo.percent) + "%"); */
+
+        /* Sys::WeatherInfo weatherInfo = state->Get_Weather(); */
+        /* lv_label_set_text(summaryWeather, std::to_string(weatherInfo.fahrenheit) + "F"); */
+
+        /* Recent alerts */
+        std::vector<Sys::AlertInfo> *stateAlerts = state->Get_Alerts();
+        alertsList = Create_List(alertsListScreen, "Alerts");
+        for (Sys::AlertInfo alert : *stateAlerts) {
+            lv_list_add_button(alertsList, NULL, (alert.source).c_str());
+        }
+
+        lv_scr_load(summaryScreen);
     }
 
     void LVGL::Time(Sys::TimeInfo value)
@@ -473,13 +496,13 @@ namespace Display
             if (!s) continue;
             if ((Sys::Screen)i == Sys::Screen::TAG) continue; /* Accessible through startup/shutdown */
             if ((Sys::Screen)i == Sys::Screen::FACE) lv_list_add_button(activeList, NULL, "Watch Face");
+            if ((Sys::Screen)i == Sys::Screen::SUMMARY) lv_list_add_button(activeList, NULL, "Summary");  /* Only accessed through shortcut */
             if ((Sys::Screen)i == Sys::Screen::ALERT) continue;  /* Alert is inaccessible directly, but it shouldn't be active anyways */
             if ((Sys::Screen)i == Sys::Screen::ACTIVE) continue;  /* Shouldn't be set active, text is redundant */
             if ((Sys::Screen)i == Sys::Screen::ALERTS_LIST) lv_list_add_button(activeList, NULL, "Unread Alerts");
             if ((Sys::Screen)i == Sys::Screen::EVENTS_LIST) lv_list_add_button(activeList, NULL, "Upcoming Events");
             if ((Sys::Screen)i == Sys::Screen::NAVIGATION) lv_list_add_button(activeList, NULL, "Navigation");
             if ((Sys::Screen)i == Sys::Screen::MUSIC) lv_list_add_button(activeList, NULL, "Music");
-            if ((Sys::Screen)i == Sys::Screen::ABOUT) continue;  /* Only accessed through shortcut */
         }
         lv_scr_load(activeScreen);
     }
@@ -631,8 +654,8 @@ namespace Display
         /* Button 1 & 2 double press */
         /* Button 3 & 4 double press */
         if ((b1 == 1 && b2 == 2) || (b1 == 2 && b2 == 1)) {
-            /* Global about screen */
-            lv_scr_load(aboutScreen);
+            /* Global summary screen */
+            Summary();
         }
         if ((b1 == 3 && b2 == 4) || (b1 == 4 && b2 == 3)) {
             /* Alerts list screen: selector */

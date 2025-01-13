@@ -75,7 +75,11 @@ namespace Display
             lv_obj_t *musicAlbum;
             lv_obj_t *musicBG;
 
-            lv_obj_t *aboutScreen;
+            lv_obj_t *summaryScreen;
+            lv_obj_t *summaryDateTime;
+            lv_obj_t *summaryBattery;
+            lv_obj_t *summaryRecent;
+            lv_obj_t *summaryUpcoming;
 
             lv_obj_t *Create_List(lv_obj_t *screen, std::string text);
             void Active_Screen();
@@ -101,6 +105,7 @@ namespace Display
             void Set_Face(Face face);
             void Load_Face_Screen();
             void Tag();
+            void Summary();
             void Time(Sys::TimeInfo value);
             void Alert(Sys::AlertInfo info);
             void Event(Sys::EventInfo info);
