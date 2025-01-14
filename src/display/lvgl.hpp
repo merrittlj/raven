@@ -78,6 +78,7 @@ namespace Display
             lv_obj_t *summaryScreen;
             lv_obj_t *summaryDateTime;
             lv_obj_t *summaryBattery;
+            lv_obj_t *summaryWeather;
             lv_obj_t *summaryRecent;
             lv_obj_t *summaryUpcoming;
 

@@ -168,6 +168,7 @@ Sys::TimeInfo Sys::Controller::Get_RTC()
 
     Sys::TimeInfo info;
 
+    info.year = (date.Year & 3);
     info.month = date.Month;
     info.day = date.Date;
 

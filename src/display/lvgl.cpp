@@ -334,7 +334,7 @@ namespace Display
 
         std::string time = (timeInfo.hour < 10 ? "0" : "") + std::to_string(timeInfo.hour) + ":" + (timeInfo.minute < 10 ? "0" : "") + std::to_string(timeInfo.minute);
         std::string date = std::to_string(timeInfo.month) + "/" + std::to_string(timeInfo.day) + "/" + std::to_string(timeInfo.year);
-        lv_label_set_text(summaryDateTime, date + " " + time);
+        lv_label_set_text(summaryDateTime, (date + " " + time).c_str());
 
         /* Sys::WeatherInfo batteryInfo = state->Get_Battery(); */
         /* lv_label_set_text(summaryBattery, std::to_string(batteryInfo.percent) + "%"); */

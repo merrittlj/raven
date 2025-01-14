@@ -103,7 +103,7 @@ int main()
     /* HAL_TIM_PWM_Start(tim2, TIM_CHANNEL_1); */
 
     I2C_HandleTypeDef *i2c = sysCtrl.Config_I2C();
-    Sys::I2C_Controller i2cCtrl = Sys::I2C_Controller(i2c, 0x4A, &gpioCtrl);
+    Sys::I2C_Controller i2cCtrl = Sys::I2C_Controller(i2c, 0x4A << 1, &gpioCtrl);
     Haptic::Driver driver = Haptic::Driver(&i2cCtrl);
     Haptic::Controller hapticCtrl = Haptic::Controller(tim2, TIM_CHANNEL_1);
 
@@ -113,8 +113,8 @@ int main()
     driver.setOperationMode(Haptic::PWM_MODE);
 
     for (;;) {
-        driver.clearIrq(driver.getIrqEvent());
-        hapticCtrl.Vibrate_Pulse(10);
+        /* driver.clearIrq(driver.getIrqEvent()); */
+        /* hapticCtrl.Vibrate_Pulse(100); */
         Sys::Delay(5000);
     }
 

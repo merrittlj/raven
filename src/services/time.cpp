@@ -64,7 +64,7 @@ SVCCTL_EvtAckStatus_t BLE::TimeService::Event_Handler(void *Event)
                         uint8_t *data;
                         data = attribute_modified->Attr_Data;
                         if (attribute_modified->Attr_Handle == (currentTime.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Set_Time(Sys::TimeInfo{data[2], data[3], data[4], data[5], data[6]});
+                            sysState->Set_Time(Sys::TimeInfo{data[1], data[2], data[3], data[4], data[5], data[6]});
                             sysState->Display_Time();
                         }
                         break;
