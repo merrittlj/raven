@@ -339,8 +339,8 @@ namespace Display
         /* Sys::WeatherInfo batteryInfo = state->Get_Battery(); */
         /* lv_label_set_text(summaryBattery, std::to_string(batteryInfo.percent) + "%"); */
 
-        /* Sys::WeatherInfo weatherInfo = state->Get_Weather(); */
-        /* lv_label_set_text(summaryWeather, std::to_string(weatherInfo.fahrenheit) + "F"); */
+        Sys::WeatherInfo weatherInfo = state->Get_Weather();
+        lv_label_set_text(summaryWeather, weatherInfo.weather.c_str());
 
         /* Recent alerts */
         std::vector<Sys::AlertInfo> *stateAlerts = state->Get_Alerts();

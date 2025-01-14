@@ -54,6 +54,16 @@ namespace Sys
         Display::Controller::Instance()->Time(Get_Time());
     }
 
+    WeatherInfo State::Get_Weather()
+    {
+        return weather;
+    }
+
+    void State::Set_Weather(WeatherInfo value)
+    {
+        weather = value;
+    }
+
     void State::Screen_Activate(Screen s)
     {
         screens.at((size_t)s) = 1;
@@ -204,11 +214,11 @@ namespace Sys
         if (available >= length) {
             memcpy(&(Music_Builder.albumArt[chunkOffset]), arr, length);
             chunkOffset += length;
-        /* Partial chunk can fit */
+            /* Partial chunk can fit */
         } else if (available > 0) {
             memcpy(&(Music_Builder.albumArt[chunkOffset]), arr, available);
             chunkOffset += available;
-        /* No space left */
+            /* No space left */
         } else return;
     }
 

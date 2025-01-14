@@ -30,7 +30,7 @@ namespace Sys
 
     bool I2C_Controller::writeRegister(uint8_t reg, uint8_t data[])
     {
-        HAL_I2C_IsDeviceReady(i2c, addr, 1, 1000);
+        if (HAL_I2C_IsDeviceReady(i2c, addr, 1, 1000) != HAL_OK) Sys::Error_Handler();
         if (HAL_I2C_Mem_Write(i2c, addr, reg, 1, data, 1, 1000) != HAL_OK) return false;
         else return true;
     }
@@ -39,10 +39,9 @@ namespace Sys
     // address as its' parameter.
     uint8_t I2C_Controller::readRegister(uint8_t reg)
     {
-        HAL_I2C_IsDeviceReady(i2c, addr, 1, 1000);
-        uint8_t data;
-        ret = HAL_I2C_Mem_Read(i2c, addr, reg, 1, &data, 1, 1000);
-        if (ret != HAL_OK) Sys::Error_Handler();
+        uint8_t data = 0;
+        if (HAL_I2C_IsDeviceReady(i2c, addr, 1, 1000) != HAL_OK) Sys::Error_Handler();
+        if (HAL_I2C_Mem_Read(i2c, addr, reg, 1, &data, 1, 1000) != HAL_OK) Sys::Error_Handler();
         return data;
     }
 

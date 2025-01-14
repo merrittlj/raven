@@ -40,6 +40,11 @@ namespace Sys
         uint8_t second;
     };
 
+    struct WeatherInfo {
+        /* Just a single weather string with full data, splitting is unnecessary */
+        std::string weather;
+    };
+
     struct AlertInfo {
         std::string source;
         std::string title;
@@ -90,6 +95,8 @@ namespace Sys
             std::array<uint8_t, (size_t)Screen::Enum_Length> screens = {};
 
             Preferences pref;
+
+            WeatherInfo weather;
 
             std::vector<AlertInfo> alerts;
             AlertInfo Alert_Builder;
@@ -149,6 +156,9 @@ namespace Sys
             TimeInfo Get_Time();
             void Set_Time(TimeInfo value);
             void Display_Time();
+
+            WeatherInfo Get_Weather();
+            void Set_Weather(WeatherInfo value);
 
             void Screen_Activate(Screen s);
             void Screen_Deactivate(Screen s);
