@@ -388,6 +388,7 @@ namespace Display
 
         lv_scr_load(alertScreen);
         state->Screen_Activate(Sys::Screen::ALERTS_LIST);  /* Until dismissal, activate unread alerts */
+        hapticCtrl->Vibrate_Cons(100, 2, 50);
     }
 
     void LVGL::Event(Sys::EventInfo info)

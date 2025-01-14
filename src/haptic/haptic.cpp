@@ -80,8 +80,8 @@ namespace Haptic
     {
         /* For VG0832009L */
         sparkSettings.motorType = LRA_TYPE;
-        sparkSettings.nomVolt = 1.8;  // volts
-        sparkSettings.absVolt = 1.8;   // volts
+        sparkSettings.nomVolt = 0;  // volts - ignored as acceleration is disabled
+        sparkSettings.absVolt = 1.4976;   // volts
         sparkSettings.currMax = 80;  // milliamps
         sparkSettings.impedance = 22.5; // ohms, resistance in datasheet
         sparkSettings.lraFreq = 235;    // hertz
