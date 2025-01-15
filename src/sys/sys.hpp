@@ -11,7 +11,8 @@
 
 #define I2C_ARR_MAX (136170 - 1)
 #define VIBRATION_SENS (50)
-#define I2C_ARR_IDEAL ((I2C_ARR_MAX) * (VIBRATION_SENS / 100))
+/* This can easily break if 100.0 is not a double */
+#define I2C_ARR_IDEAL ((I2C_ARR_MAX) * (VIBRATION_SENS / 100.0))
 
 extern RTC_HandleTypeDef *ghrtc;
 

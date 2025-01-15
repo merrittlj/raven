@@ -99,7 +99,7 @@ int main()
     Sys::SPI_Controller spiCtrl = Sys::SPI_Controller(spi, &gpioCtrl, Sys::SPI_Manager{busy,rst,dc,cs,pwr});
 
     TIM_HandleTypeDef *tim2 = sysCtrl.Config_TIM2();
-    __HAL_TIM_SetCompare(tim2, TIM_CHANNEL_1, I2C_ARR_IDEAL);
+    __HAL_TIM_SetCompare(tim2, TIM_CHANNEL_1, (uint16_t)I2C_ARR_IDEAL);
 
     I2C_HandleTypeDef *i2c = sysCtrl.Config_I2C();
     Sys::I2C_Controller i2cCtrl = Sys::I2C_Controller(i2c, 0x4A << 1, &gpioCtrl);
