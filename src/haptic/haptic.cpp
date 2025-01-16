@@ -82,8 +82,8 @@ namespace Haptic
         sparkSettings.motorType = LRA_TYPE;
         sparkSettings.nomVolt = 0;  // volts - ignored as acceleration is disabled
         sparkSettings.absVolt = 1.4976;   // volts
-        sparkSettings.currMax = 80;  // milliamps
-        sparkSettings.impedance = 22.5; // ohms, resistance in datasheet
+        sparkSettings.currMax = 86.2;  // milliamps
+        sparkSettings.impedance = 7.8765; // ohms, resistance in datasheet
         sparkSettings.lraFreq = 235;    // hertz
 
         if (setActuatorType(sparkSettings.motorType) && setActuatorABSVolt(sparkSettings.absVolt) &&
@@ -652,17 +652,16 @@ namespace Haptic
             return false;
     }
 
-    Controller::Controller(TIM_HandleTypeDef *timHandle, uint32_t timChannel)
+    Controller::Controller(Driver *haptics)
     {
-        tim = timHandle;
-        channel = timChannel;
+        driver = haptics;
     }
 
     void Controller::Vibrate_Pulse(size_t length)
     {
-        HAL_TIM_PWM_Start(tim, channel);
+        driver->setOperationMode(Haptic::PWM_MODE);
         Sys::Delay(length);
-        HAL_TIM_PWM_Stop(tim, channel);
+        driver->setOperationMode(Haptic::INACTIVE);
     }
 
     void Controller::Vibrate_Cons(size_t length, size_t pulses, size_t delay)

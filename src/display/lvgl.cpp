@@ -354,6 +354,7 @@ namespace Display
 
     void LVGL::Time(Sys::TimeInfo value)
     {
+        if (lv_screen_active() == tagScreen) hapticCtrl->Vibrate_Pulse(500);
         std::string time = (value.hour < 10 ? "0" : "") + std::to_string(value.hour) + ":" + (value.minute < 10 ? "0" : "") + std::to_string(value.minute);
         if (curFace == Face::BIG_TICK_ENERGY) {
             lv_label_set_text(bigTime, time.c_str());
@@ -382,13 +383,14 @@ namespace Display
 
     void LVGL::Alert(Sys::AlertInfo info)
     {
+        hapticCtrl->Vibrate_Cons(100, 2, 50);  /* Better UX to have before load rather than after */
+
         lv_label_set_text(source, info.source.c_str());
         lv_label_set_text(title, info.title.c_str());
         lv_label_set_text(body, info.body.c_str());
 
         lv_scr_load(alertScreen);
         state->Screen_Activate(Sys::Screen::ALERTS_LIST);  /* Until dismissal, activate unread alerts */
-        hapticCtrl->Vibrate_Cons(100, 2, 50);
     }
 
     void LVGL::Event(Sys::EventInfo info)

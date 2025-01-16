@@ -99,23 +99,19 @@ int main()
     Sys::SPI_Controller spiCtrl = Sys::SPI_Controller(spi, &gpioCtrl, Sys::SPI_Manager{busy,rst,dc,cs,pwr});
 
     TIM_HandleTypeDef *tim2 = sysCtrl.Config_TIM2();
-    __HAL_TIM_SetCompare(tim2, TIM_CHANNEL_1, (uint16_t)I2C_ARR_IDEAL);
+    __HAL_TIM_SetCompare(tim2, TIM_CHANNEL_1, (uint64_t)I2C_ARR_IDEAL);
+    HAL_TIM_PWM_Start(tim2, TIM_CHANNEL_1);
 
     I2C_HandleTypeDef *i2c = sysCtrl.Config_I2C();
     Sys::I2C_Controller i2cCtrl = Sys::I2C_Controller(i2c, 0x4A << 1, &gpioCtrl);
     Haptic::Driver driver = Haptic::Driver(&i2cCtrl);
-    Haptic::Controller hapticCtrl = Haptic::Controller(tim2, TIM_CHANNEL_1);
+    Haptic::Controller hapticCtrl = Haptic::Controller(&driver);
 
     if (!driver.begin()) Sys::Error_Handler();
     if (!driver.defaultMotor()) Sys::Error_Handler();
     driver.enableFreqTrack(false);
-    driver.setOperationMode(Haptic::PWM_MODE);
-
-    for (;;) {
-        /* driver.clearIrq(driver.getIrqEvent()); */
-        /* hapticCtrl.Vibrate_Pulse(100); */
-        Sys::Delay(5000);
-    }
+    driver.setOperationMode(Haptic::INACTIVE);
+    driver.clearIrq(driver.getIrqEvent());  /* I hate this */
 
     /* Set the red LED On to indicate that the CPU2 is initializing */
     gpioCtrl.Write_Component(sysState.Fetch_LED_Red(), SET);

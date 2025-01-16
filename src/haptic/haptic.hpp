@@ -231,11 +231,10 @@ namespace Haptic
     class Controller
     {
         private:
-            TIM_HandleTypeDef *tim;
-            uint32_t channel;
+            Driver *driver;
 
         public:
-            Controller(TIM_HandleTypeDef *timHandle, uint32_t timChannel);
+            Controller(Driver *haptics);
 
             void Vibrate_Pulse(size_t length);
             void Vibrate_Cons(size_t length, size_t pulses, size_t delay);
