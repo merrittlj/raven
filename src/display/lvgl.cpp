@@ -41,6 +41,79 @@ LV_IMAGE_DECLARE(flag);
 
 namespace Display
 {
+    Big_Face::Big_Face()
+    {
+        static lv_style_t texts;
+        lv_style_init(&texts);
+        lv_style_set_text_color(&texts, lv_color_hex(0x000000));
+        lv_style_set_text_font(&texts, &gloock_time);
+
+        screen = lv_obj_create(NULL);
+
+        time = lv_label_create(screen);
+        lv_obj_add_style(time, &texts, 0);
+        lv_label_set_text(time, "00:00");
+        lv_obj_align(time, LV_ALIGN_CENTER, 0, -10);
+
+        date = lv_label_create(screen);
+        lv_obj_add_style(date, &texts, 0);
+        lv_label_set_text(date, "Month Day Year");
+        lv_obj_set_style_text_font(date, &gloock_date, 0);
+        lv_obj_align(date, LV_ALIGN_CENTER, 0, 45);
+    }
+
+    void Big_Face::Load_Screen()
+    {
+        lv_scr_load(screen);
+    }
+
+    void Big_Face::Draw(TimeInfo info)
+    {
+        std::string timeValue = (info.hour < 10 ? "0" : "") + std::to_string(info.hour) + ":" + (info.minute < 10 ? "0" : "") + std::to_string(info.minute);
+
+        const std::string months[12] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
+        std::string day = std::to_string(info.day);
+        if (info.day % 10 == 1 && info.day != 11) day += "st";
+        else if (info.day % 10 == 2 && info.day != 12) day += "nd";
+        else if (info.day % 10 == 3 && info.day != 13) day += "rd";
+        else day += "th";
+
+        lv_label_set_text(time, timeValue.c_str());
+        lv_label_set_text(date, (months[info.month - 1] + " " + day).c_str());
+
+        Load_Screen();
+    }
+
+    void Digital_Face::Digital_Face()
+    {
+        static lv_style_t texts;
+        lv_style_init(&texts);
+        lv_style_set_text_color(&texts, lv_color_hex(0x000000));
+        lv_style_set_text_font(&texts, &gloock_time);
+
+        screen = lv_obj_create(NULL);
+
+        time = lv_label_create(screen);
+        lv_obj_add_style(time, &texts, 0);
+        lv_label_set_text(time, "00:00");
+        lv_obj_set_style_text_font(time, &seg, 0);
+        lv_obj_align(time, LV_ALIGN_CENTER, 0, 0);
+    }
+
+    void Digital_Face::Load_Screen()
+    {
+        lv_scr_load(screen);
+    }
+
+    void Digital_Face::Draw(TimeInfo info)
+    {
+        std::string timeValue = (info.hour < 10 ? "0" : "") + std::to_string(info.hour) + ":" + (info.minute < 10 ? "0" : "") + std::to_string(info.minute);
+
+        lv_label_set_text(time, timeValue.c_str());
+
+        Load_Screen();
+    }
+
     LVGL::LVGL()
     {
 
@@ -87,30 +160,6 @@ namespace Display
         lv_label_set_text(tagText, "Raven");
         lv_obj_set_style_text_font(tagText, &tag, 0);
         lv_obj_align(tagText, LV_ALIGN_CENTER, 0, 0);
-
-
-        bigTickEnergy = lv_obj_create(NULL);
-
-        bigTime = lv_label_create(bigTickEnergy);
-        lv_obj_add_style(bigTime, &texts, 0);
-        lv_label_set_text(bigTime, "00:00");
-        lv_obj_align(bigTime, LV_ALIGN_CENTER, 0, -10);
-
-        bigDate = lv_label_create(bigTickEnergy);
-        lv_obj_add_style(bigDate, &texts, 0);
-        lv_label_set_text(bigDate, "Month Day Year");
-        lv_obj_set_style_text_font(bigDate, &gloock_date, 0);
-        lv_obj_align(bigDate, LV_ALIGN_CENTER, 0, 45);
-
-
-        digital = lv_obj_create(NULL);
-
-        digitalTime = lv_label_create(digital);
-        lv_obj_add_style(digitalTime, &texts, 0);
-        lv_label_set_text(digitalTime, "00:00");
-        lv_obj_set_style_text_font(digitalTime, &seg, 0);
-        lv_obj_align(digitalTime, LV_ALIGN_CENTER, 0, 0);
-
 
         alertScreen = lv_obj_create(NULL);
         static lv_style_t box;
@@ -318,9 +367,9 @@ namespace Display
         lv_obj_invalidate(lv_screen_active());
     }
 
-    void LVGL::Set_Face(Face face)
+    void LVGL::Set_Face(Face *value)
     {
-        curFace = face;
+        face = value;
     }
 
     void LVGL::Tag()
@@ -355,326 +404,304 @@ namespace Display
     void LVGL::Time(Sys::TimeInfo value)
     {
         if (lv_screen_active() == tagScreen) hapticCtrl->Vibrate_Pulse(500);
-        std::string time = (value.hour < 10 ? "0" : "") + std::to_string(value.hour) + ":" + (value.minute < 10 ? "0" : "") + std::to_string(value.minute);
-        if (curFace == Face::BIG_TICK_ENERGY) {
-            lv_label_set_text(bigTime, time.c_str());
+        face->Draw(value);
+    }
+}
 
-            const std::string months[12] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
-            std::string day = std::to_string(value.day);
-            if (value.day % 10 == 1 && value.day != 11) day += "st";
-            else if (value.day % 10 == 2 && value.day != 12) day += "nd";
-            else if (value.day % 10 == 3 && value.day != 13) day += "rd";
-            else day += "th";
-            lv_label_set_text(bigDate, (months[value.month - 1] + " " + day).c_str());
+void LVGL::Alert(Sys::AlertInfo info)
+{
+    hapticCtrl->Vibrate_Cons(100, 2, 50);  /* Better UX to have before load rather than after */
 
-            lv_scr_load(bigTickEnergy);
-        } else if (curFace == Face::DIGITAL) {
-            lv_label_set_text(digitalTime, time.c_str());
+    lv_label_set_text(source, info.source.c_str());
+    lv_label_set_text(title, info.title.c_str());
+    lv_label_set_text(body, info.body.c_str());
 
-            lv_scr_load(digital);
-        }
+    lv_scr_load(alertScreen);
+    state->Screen_Activate(Sys::Screen::ALERTS_LIST);  /* Until dismissal, activate unread alerts */
+}
+
+void LVGL::Event(Sys::EventInfo info)
+{
+    /* set event texts */
+
+    lv_scr_load(eventScreen);
+    state->Screen_Activate(Sys::Screen::EVENTS_LIST);
+}
+
+void LVGL::Nav(Sys::NavInfo info)
+{
+    lv_label_set_text(navInstruction, info.instruction.c_str());
+    lv_label_set_text(navDistance, info.distance.c_str());
+    lv_label_set_text(navETA, info.eta.c_str());
+
+    if (info.action == "continue") lv_image_set_src(navAction, &cont);
+    if (info.action == "continue-left") lv_image_set_src(navAction, &cont_left);
+    if (info.action == "continue-right") lv_image_set_src(navAction, &cont_right);
+    if (info.action == "turn-left") lv_image_set_src(navAction, &turn_left);
+    if (info.action == "turn-slight-left") lv_image_set_src(navAction, &turn_slight_left);
+    if (info.action == "turn-sharp-left") lv_image_set_src(navAction, &turn_sharp_left);
+    if (info.action == "turn-right") lv_image_set_src(navAction, &turn_right);
+    if (info.action == "turn-slight-right") lv_image_set_src(navAction, &turn_slight_right);
+    if (info.action == "turn-sharp-right") lv_image_set_src(navAction, &turn_sharp_right);
+    if (info.action == "roundabout-left") lv_image_set_src(navAction, &roundabout_left);
+    if (info.action == "roundabout-right") lv_image_set_src(navAction, &roundabout_right);
+    if (info.action == "uturn") lv_image_set_src(navAction, &uturn);
+    if (info.action == "close") lv_image_set_src(navAction, &close);
+    if (info.action == "flag") lv_image_set_src(navAction, &flag);
+
+    if (!state->Is_Screen_Active(Sys::Screen::NAVIGATION)) {
+        lv_scr_load(navScreen);
+        state->Screen_Activate(Sys::Screen::NAVIGATION);
+    }
+}
+
+std::string LVGL::Truncate_Text(std::string text, uint32_t limit)
+{
+    /* Note: assumes axel_text font! */
+    lv_point_t p;
+    std::string newText = text;
+    lv_text_get_size(&p, newText.c_str(), &axel_text, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_EXPAND);
+    if ((uint32_t)p.x > limit) {
+        lv_point_t p2;
+        lv_text_get_size(&p2, ">", &axel_text, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_EXPAND);
+        do {
+            newText.pop_back();
+            lv_text_get_size(&p, newText.c_str(), &axel_text, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_EXPAND);
+        } while ((uint32_t)(p.x + p2.x) > limit);
+        newText += ">";
     }
 
-    void LVGL::Load_Face_Screen()
-    {
-        if (curFace == Face::BIG_TICK_ENERGY) lv_scr_load(bigTickEnergy);
-        else if (curFace == Face::DIGITAL) lv_scr_load(digital);
+    return newText;
+}
+
+void LVGL::Music(Sys::MusicInfo info)
+{
+    lv_label_set_text(musicTrack, Truncate_Text(info.track, 200).c_str());
+    lv_label_set_text(musicArtist, Truncate_Text(info.artist, 200).c_str());
+    lv_label_set_text(musicAlbum, info.album.c_str());
+
+    static lv_image_dsc_t albumArt;
+
+    /* The first 8 bytes of the data should be a palette */
+    const size_t dataSize = 5000 + 8;
+    albumArt.header.magic = LV_IMAGE_HEADER_MAGIC;
+    albumArt.header.flags = 0;
+    albumArt.header.w = 200;
+    albumArt.header.h = 200;
+    albumArt.header.stride = 25;
+    albumArt.header.cf = LV_COLOR_FORMAT_I1;
+    albumArt.data_size = dataSize;
+
+    static uint8_t builder[dataSize];
+    /* Apparently data is stored w/ a palette, 1st 4 bytes are black, 2nd 4 bytes are white */
+    uint8_t palette[8] = {0x00,0x00,0x00,0xff,   0xff,0xff,0xff,0xff};
+    memcpy(builder, palette, 8);
+    memcpy(&builder[8], info.albumArt, dataSize - 8);
+
+    /* Checkerboard */
+    /* for (uint32_t i = 8; i < dataSize; ++i) { */
+    /*     // Alternate between 0x55 and 0xAA to create a checkerboard pattern */
+    /*     if ((i / albumArt.header.stride) % 2 == 0) { */
+    /*         cb[i] = 0x55;  // 01010101 (checkerboard-like pattern) */
+    /*     } else { */
+    /*         cb[i] = 0xAA;  // 10101010 (opposite pattern) */
+    /*     } */
+    /* } */
+
+    albumArt.data = builder;
+
+    lv_image_set_src(musicBG, &albumArt);
+
+    if (!state->Is_Screen_Active(Sys::Screen::MUSIC)) {
+        lv_scr_load(musicScreen);
+        state->Screen_Activate(Sys::Screen::MUSIC);
+    }
+}
+
+void LVGL::Active_Screen()
+{
+    std::array<uint8_t, (size_t)Sys::Screen::Enum_Length> screens = state->Get_Active_Screens();
+    for (size_t i = 0; i < screens.size(); ++i) {
+        uint8_t s = screens.at(i);
+        if (!s) continue;
+        if ((Sys::Screen)i == Sys::Screen::TAG) continue; /* Accessible through startup/shutdown */
+        if ((Sys::Screen)i == Sys::Screen::FACE) lv_list_add_button(activeList, NULL, "Watch Face");
+        if ((Sys::Screen)i == Sys::Screen::SUMMARY) lv_list_add_button(activeList, NULL, "Summary");  /* Only accessed through shortcut */
+        if ((Sys::Screen)i == Sys::Screen::ALERT) continue;  /* Alert is inaccessible directly, but it shouldn't be active anyways */
+        if ((Sys::Screen)i == Sys::Screen::ACTIVE) continue;  /* Shouldn't be set active, text is redundant */
+        if ((Sys::Screen)i == Sys::Screen::ALERTS_LIST) lv_list_add_button(activeList, NULL, "Unread Alerts");
+        if ((Sys::Screen)i == Sys::Screen::EVENTS_LIST) lv_list_add_button(activeList, NULL, "Upcoming Events");
+        if ((Sys::Screen)i == Sys::Screen::NAVIGATION) lv_list_add_button(activeList, NULL, "Navigation");
+        if ((Sys::Screen)i == Sys::Screen::MUSIC) lv_list_add_button(activeList, NULL, "Music");
+    }
+    lv_scr_load(activeScreen);
+}
+
+void LVGL::Alerts_List_Screen()
+{
+    std::vector<Sys::AlertInfo> *stateAlerts = state->Get_Alerts();
+    alertsList = Create_List(alertsListScreen, "Alerts");
+    for (Sys::AlertInfo alert : *stateAlerts) {
+        lv_list_add_button(alertsList, NULL, (alert.source).c_str());
+    }
+    lv_scr_load(alertsListScreen);
+}
+
+void LVGL::Events_List_Screen()
+{
+    std::vector<Sys::EventInfo> stateEvents = state->Get_Events();
+    eventsList = Create_List(eventsListScreen, "Events");
+    for (Sys::EventInfo event : stateEvents) {
+        lv_list_add_button(eventsList, NULL, (event.title).c_str());
+    }
+    lv_scr_load(eventsListScreen);
+}
+
+uint16_t LVGL::List_Handler(uint8_t group, uint8_t item)
+{
+    return (group - 1) * 2 + (item - 1);
+}
+
+void LVGL::Button(uint8_t b)
+{
+    if (b == 1) {
+        /* All screens: load face */
+        face->Load_Screen();
     }
 
-    void LVGL::Alert(Sys::AlertInfo info)
-    {
-        hapticCtrl->Vibrate_Cons(100, 2, 50);  /* Better UX to have before load rather than after */
-
-        lv_label_set_text(source, info.source.c_str());
-        lv_label_set_text(title, info.title.c_str());
-        lv_label_set_text(body, info.body.c_str());
-
-        lv_scr_load(alertScreen);
-        state->Screen_Activate(Sys::Screen::ALERTS_LIST);  /* Until dismissal, activate unread alerts */
-    }
-
-    void LVGL::Event(Sys::EventInfo info)
-    {
-        /* set event texts */
-
-        lv_scr_load(eventScreen);
-        state->Screen_Activate(Sys::Screen::EVENTS_LIST);
-    }
-
-    void LVGL::Nav(Sys::NavInfo info)
-    {
-        lv_label_set_text(navInstruction, info.instruction.c_str());
-        lv_label_set_text(navDistance, info.distance.c_str());
-        lv_label_set_text(navETA, info.eta.c_str());
-
-        if (info.action == "continue") lv_image_set_src(navAction, &cont);
-        if (info.action == "continue-left") lv_image_set_src(navAction, &cont_left);
-        if (info.action == "continue-right") lv_image_set_src(navAction, &cont_right);
-        if (info.action == "turn-left") lv_image_set_src(navAction, &turn_left);
-        if (info.action == "turn-slight-left") lv_image_set_src(navAction, &turn_slight_left);
-        if (info.action == "turn-sharp-left") lv_image_set_src(navAction, &turn_sharp_left);
-        if (info.action == "turn-right") lv_image_set_src(navAction, &turn_right);
-        if (info.action == "turn-slight-right") lv_image_set_src(navAction, &turn_slight_right);
-        if (info.action == "turn-sharp-right") lv_image_set_src(navAction, &turn_sharp_right);
-        if (info.action == "roundabout-left") lv_image_set_src(navAction, &roundabout_left);
-        if (info.action == "roundabout-right") lv_image_set_src(navAction, &roundabout_right);
-        if (info.action == "uturn") lv_image_set_src(navAction, &uturn);
-        if (info.action == "close") lv_image_set_src(navAction, &close);
-        if (info.action == "flag") lv_image_set_src(navAction, &flag);
-
-        if (!state->Is_Screen_Active(Sys::Screen::NAVIGATION)) {
-            lv_scr_load(navScreen);
-            state->Screen_Activate(Sys::Screen::NAVIGATION);
-        }
-    }
-
-    std::string LVGL::Truncate_Text(std::string text, uint32_t limit)
-    {
-        /* Note: assumes axel_text font! */
-        lv_point_t p;
-        std::string newText = text;
-        lv_text_get_size(&p, newText.c_str(), &axel_text, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_EXPAND);
-        if ((uint32_t)p.x > limit) {
-            lv_point_t p2;
-            lv_text_get_size(&p2, ">", &axel_text, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_EXPAND);
-            do {
-                newText.pop_back();
-                lv_text_get_size(&p, newText.c_str(), &axel_text, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_EXPAND);
-            } while ((uint32_t)(p.x + p2.x) > limit);
-            newText += ">";
-        }
-
-        return newText;
-    }
-
-    void LVGL::Music(Sys::MusicInfo info)
-    {
-        lv_label_set_text(musicTrack, Truncate_Text(info.track, 200).c_str());
-        lv_label_set_text(musicArtist, Truncate_Text(info.artist, 200).c_str());
-        lv_label_set_text(musicAlbum, info.album.c_str());
-
-        static lv_image_dsc_t albumArt;
-
-        /* The first 8 bytes of the data should be a palette */
-        const size_t dataSize = 5000 + 8;
-        albumArt.header.magic = LV_IMAGE_HEADER_MAGIC;
-        albumArt.header.flags = 0;
-        albumArt.header.w = 200;
-        albumArt.header.h = 200;
-        albumArt.header.stride = 25;
-        albumArt.header.cf = LV_COLOR_FORMAT_I1;
-        albumArt.data_size = dataSize;
-
-        static uint8_t builder[dataSize];
-        /* Apparently data is stored w/ a palette, 1st 4 bytes are black, 2nd 4 bytes are white */
-        uint8_t palette[8] = {0x00,0x00,0x00,0xff,   0xff,0xff,0xff,0xff};
-        memcpy(builder, palette, 8);
-        memcpy(&builder[8], info.albumArt, dataSize - 8);
-
-        /* Checkerboard */
-        /* for (uint32_t i = 8; i < dataSize; ++i) { */
-        /*     // Alternate between 0x55 and 0xAA to create a checkerboard pattern */
-        /*     if ((i / albumArt.header.stride) % 2 == 0) { */
-        /*         cb[i] = 0x55;  // 01010101 (checkerboard-like pattern) */
-        /*     } else { */
-        /*         cb[i] = 0xAA;  // 10101010 (opposite pattern) */
-        /*     } */
-        /* } */
-
-        albumArt.data = builder;
-
-        lv_image_set_src(musicBG, &albumArt);
-
-        if (!state->Is_Screen_Active(Sys::Screen::MUSIC)) {
-            lv_scr_load(musicScreen);
-            state->Screen_Activate(Sys::Screen::MUSIC);
-        }
-    }
-
-    void LVGL::Active_Screen()
-    {
-        std::array<uint8_t, (size_t)Sys::Screen::Enum_Length> screens = state->Get_Active_Screens();
-        for (size_t i = 0; i < screens.size(); ++i) {
-            uint8_t s = screens.at(i);
-            if (!s) continue;
-            if ((Sys::Screen)i == Sys::Screen::TAG) continue; /* Accessible through startup/shutdown */
-            if ((Sys::Screen)i == Sys::Screen::FACE) lv_list_add_button(activeList, NULL, "Watch Face");
-            if ((Sys::Screen)i == Sys::Screen::SUMMARY) lv_list_add_button(activeList, NULL, "Summary");  /* Only accessed through shortcut */
-            if ((Sys::Screen)i == Sys::Screen::ALERT) continue;  /* Alert is inaccessible directly, but it shouldn't be active anyways */
-            if ((Sys::Screen)i == Sys::Screen::ACTIVE) continue;  /* Shouldn't be set active, text is redundant */
-            if ((Sys::Screen)i == Sys::Screen::ALERTS_LIST) lv_list_add_button(activeList, NULL, "Unread Alerts");
-            if ((Sys::Screen)i == Sys::Screen::EVENTS_LIST) lv_list_add_button(activeList, NULL, "Upcoming Events");
-            if ((Sys::Screen)i == Sys::Screen::NAVIGATION) lv_list_add_button(activeList, NULL, "Navigation");
-            if ((Sys::Screen)i == Sys::Screen::MUSIC) lv_list_add_button(activeList, NULL, "Music");
-        }
+    if (b == 2) {
+        /* All screens: load active screen */
         lv_scr_load(activeScreen);
     }
 
-    void LVGL::Alerts_List_Screen()
-    {
-        std::vector<Sys::AlertInfo> *stateAlerts = state->Get_Alerts();
-        alertsList = Create_List(alertsListScreen, "Alerts");
-        for (Sys::AlertInfo alert : *stateAlerts) {
-            lv_list_add_button(alertsList, NULL, (alert.source).c_str());
+    if (b == 3) {
+        /* Alert screen: dismiss alert */
+        if (lv_screen_active() == alertScreen) {
+            state->Alert_Dismiss(alertIndex);
+            /* Deactivate on empty, safe doing here as all dismissals are routed here */
+            if (state->Get_Alerts()->size() == 0)
+                state->Screen_Deactivate(Sys::Screen::ALERTS_LIST);
+            face->Load_Screen();
         }
-        lv_scr_load(alertsListScreen);
-    }
-
-    void LVGL::Events_List_Screen()
-    {
-        std::vector<Sys::EventInfo> stateEvents = state->Get_Events();
-        eventsList = Create_List(eventsListScreen, "Events");
-        for (Sys::EventInfo event : stateEvents) {
-            lv_list_add_button(eventsList, NULL, (event.title).c_str());
+        else if (lv_screen_active() == eventScreen) {
+            state->Event_Dismiss(eventIndex);
+            /* Deactivate on empty, safe doing here as all dismissals are routed here */
+            if (state->Get_Events().size() == 0)
+                state->Screen_Deactivate(Sys::Screen::EVENTS_LIST);
+            face->Load_Screen();
         }
-        lv_scr_load(eventsListScreen);
-    }
-
-    uint16_t LVGL::List_Handler(uint8_t group, uint8_t item)
-    {
-        return (group - 1) * 2 + (item - 1);
-    }
-
-    void LVGL::Button(uint8_t b)
-    {
-        if (b == 1) {
-            /* All screens: load face */
-            Load_Face_Screen();
+        /* Active screen: selector */
+        else if (lv_screen_active() == activeScreen) {
+            /* Implement alerts/events list selectors */
         }
-
-        if (b == 2) {
-            /* All screens: load active screen */
-            lv_scr_load(activeScreen);
-        }
-
-        if (b == 3) {
-            /* Alert screen: dismiss alert */
-            if (lv_screen_active() == alertScreen) {
-                state->Alert_Dismiss(alertIndex);
-                /* Deactivate on empty, safe doing here as all dismissals are routed here */
-                if (state->Get_Alerts()->size() == 0)
-                    state->Screen_Deactivate(Sys::Screen::ALERTS_LIST);
-                Load_Face_Screen();
-            }
-            else if (lv_screen_active() == eventScreen) {
-                state->Event_Dismiss(eventIndex);
-                /* Deactivate on empty, safe doing here as all dismissals are routed here */
-                if (state->Get_Events().size() == 0)
-                    state->Screen_Deactivate(Sys::Screen::EVENTS_LIST);
-                Load_Face_Screen();
-            }
-            /* Active screen: selector */
-            else if (lv_screen_active() == activeScreen) {
-                /* Implement alerts/events list selectors */
-            }
-            /* Alerts list: selector */
-            else if (lv_screen_active() == alertsListScreen) {
-                /* If the group has been selected */
-                if (prevButton > 0) {
-                    uint16_t index = List_Handler(prevButton, 1);
-                    prevButton = 0;
-                    std::vector<Sys::AlertInfo> *stateAlerts = state->Get_Alerts();
-                    if (index < stateAlerts->size()) {
-                        alertIndex = index;
-                        Alert(stateAlerts->at(alertIndex));
-                    }
+        /* Alerts list: selector */
+        else if (lv_screen_active() == alertsListScreen) {
+            /* If the group has been selected */
+            if (prevButton > 0) {
+                uint16_t index = List_Handler(prevButton, 1);
+                prevButton = 0;
+                std::vector<Sys::AlertInfo> *stateAlerts = state->Get_Alerts();
+                if (index < stateAlerts->size()) {
+                    alertIndex = index;
+                    Alert(stateAlerts->at(alertIndex));
                 }
-                else prevButton = 1;
             }
-            /* Events list: selector */
-            else if (lv_screen_active() == eventsListScreen) {
-                /* If the group has been selected */
-                if (prevButton > 0) {
-                    uint16_t index = List_Handler(prevButton, 1);
-                    prevButton = 0;
-                    std::vector<Sys::EventInfo> stateEvents = state->Get_Events();
-                    if (index < stateEvents.size()) {
-                        eventIndex = index;
-                        Event(stateEvents.at(eventIndex));
-                    }
-                }
-                else prevButton = 1;
-            }
-            /* Music screen: playpause notify */
-            else if (lv_screen_active() == musicScreen) {
-                uint8_t musicData[1] = {1};
-                if (infoServ->Update_Char_Value(BLE::UUID::ExtractUUID16FromLE(infoServ->musicButton.Get_UUID()),
-                            infoServ->musicButton.Get_Value_Length(),
-                            musicData) != BLE_STATUS_SUCCESS)
-                    Sys::Error_Handler();
-            }
+            else prevButton = 1;
         }
-
-        if (b == 4) {
-            /* Alert screen: shortcut to alert list */
-            if (lv_screen_active() == alertScreen) {
-                Alerts_List_Screen();
-            }
-            /* Event screen: shortcut to event list */
-            else if (lv_screen_active() == eventScreen) {
-                Events_List_Screen();
-            }
-            /* Active screen: selector */
-            else if (lv_screen_active() == activeScreen) {
-            }
-            /* Alerts list screen: selector */
-            else if (lv_screen_active() == alertsListScreen) {
-                /* If the group has been selected */
-                if (prevButton > 0) {
-                    uint16_t index = List_Handler(prevButton, 2);
-                    prevButton = 0;
-                    std::vector<Sys::AlertInfo> *stateAlerts = state->Get_Alerts();
-                    if (index < stateAlerts->size())
-                        Alert(stateAlerts->at(index));
+        /* Events list: selector */
+        else if (lv_screen_active() == eventsListScreen) {
+            /* If the group has been selected */
+            if (prevButton > 0) {
+                uint16_t index = List_Handler(prevButton, 1);
+                prevButton = 0;
+                std::vector<Sys::EventInfo> stateEvents = state->Get_Events();
+                if (index < stateEvents.size()) {
+                    eventIndex = index;
+                    Event(stateEvents.at(eventIndex));
                 }
-                else prevButton = 2;
             }
-            /* Events list: selector */
-            else if (lv_screen_active() == eventsListScreen) {
-                /* If the group has been selected */
-                if (prevButton > 0) {
-                    uint16_t index = List_Handler(prevButton, 2);
-                    prevButton = 0;
-                    std::vector<Sys::EventInfo> stateEvents = state->Get_Events();
-                    if (index < stateEvents.size())
-                        Event(stateEvents.at(index));
-                }
-                else prevButton = 2;
-            }
-            /* Music screen: next notify */
-            else if (lv_screen_active() == musicScreen) {
-                uint8_t musicData[1] = {2};
-                if (infoServ->Update_Char_Value(BLE::UUID::ExtractUUID16FromLE(infoServ->musicButton.Get_UUID()),
-                            infoServ->musicButton.Get_Value_Length(),
-                            musicData) != BLE_STATUS_SUCCESS)
-                    Sys::Error_Handler();
-            }
+            else prevButton = 1;
+        }
+        /* Music screen: playpause notify */
+        else if (lv_screen_active() == musicScreen) {
+            uint8_t musicData[1] = {1};
+            if (infoServ->Update_Char_Value(BLE::UUID::ExtractUUID16FromLE(infoServ->musicButton.Get_UUID()),
+                        infoServ->musicButton.Get_Value_Length(),
+                        musicData) != BLE_STATUS_SUCCESS)
+                Sys::Error_Handler();
         }
     }
 
-    void LVGL::Button_Double(uint8_t b1, uint8_t b2)
-    {
-        /* Button 1 & 2 double press */
-        /* Button 3 & 4 double press */
-        if ((b1 == 1 && b2 == 2) || (b1 == 2 && b2 == 1)) {
-            /* Global summary screen */
-            Summary();
+    if (b == 4) {
+        /* Alert screen: shortcut to alert list */
+        if (lv_screen_active() == alertScreen) {
+            Alerts_List_Screen();
         }
-        if ((b1 == 3 && b2 == 4) || (b1 == 4 && b2 == 3)) {
-            /* Alerts list screen: selector */
-            if (lv_screen_active() == alertsListScreen) {
-                /* We only have two items so double selector only applies for groups */
-                if (prevButton == 0)
-                    prevButton = 3;  /* TODO: prev button defines */
+        /* Event screen: shortcut to event list */
+        else if (lv_screen_active() == eventScreen) {
+            Events_List_Screen();
+        }
+        /* Active screen: selector */
+        else if (lv_screen_active() == activeScreen) {
+        }
+        /* Alerts list screen: selector */
+        else if (lv_screen_active() == alertsListScreen) {
+            /* If the group has been selected */
+            if (prevButton > 0) {
+                uint16_t index = List_Handler(prevButton, 2);
+                prevButton = 0;
+                std::vector<Sys::AlertInfo> *stateAlerts = state->Get_Alerts();
+                if (index < stateAlerts->size())
+                    Alert(stateAlerts->at(index));
             }
-            /* Music screen: previous notify */
-            else if (lv_screen_active() == musicScreen) {
-                uint8_t musicData[1] = {3};
-                if (infoServ->Update_Char_Value(BLE::UUID::ExtractUUID16FromLE(infoServ->musicButton.Get_UUID()),
-                            infoServ->musicButton.Get_Value_Length(),
-                            musicData) != BLE_STATUS_SUCCESS)
-                    Sys::Error_Handler();
+            else prevButton = 2;
+        }
+        /* Events list: selector */
+        else if (lv_screen_active() == eventsListScreen) {
+            /* If the group has been selected */
+            if (prevButton > 0) {
+                uint16_t index = List_Handler(prevButton, 2);
+                prevButton = 0;
+                std::vector<Sys::EventInfo> stateEvents = state->Get_Events();
+                if (index < stateEvents.size())
+                    Event(stateEvents.at(index));
             }
+            else prevButton = 2;
+        }
+        /* Music screen: next notify */
+        else if (lv_screen_active() == musicScreen) {
+            uint8_t musicData[1] = {2};
+            if (infoServ->Update_Char_Value(BLE::UUID::ExtractUUID16FromLE(infoServ->musicButton.Get_UUID()),
+                        infoServ->musicButton.Get_Value_Length(),
+                        musicData) != BLE_STATUS_SUCCESS)
+                Sys::Error_Handler();
         }
     }
+}
+
+void LVGL::Button_Double(uint8_t b1, uint8_t b2)
+{
+    /* Button 1 & 2 double press */
+    /* Button 3 & 4 double press */
+    if ((b1 == 1 && b2 == 2) || (b1 == 2 && b2 == 1)) {
+        /* Global summary screen */
+        Summary();
+    }
+    if ((b1 == 3 && b2 == 4) || (b1 == 4 && b2 == 3)) {
+        /* Alerts list screen: selector */
+        if (lv_screen_active() == alertsListScreen) {
+            /* We only have two items so double selector only applies for groups */
+            if (prevButton == 0)
+                prevButton = 3;  /* TODO: prev button defines */
+        }
+        /* Music screen: previous notify */
+        else if (lv_screen_active() == musicScreen) {
+            uint8_t musicData[1] = {3};
+            if (infoServ->Update_Char_Value(BLE::UUID::ExtractUUID16FromLE(infoServ->musicButton.Get_UUID()),
+                        infoServ->musicButton.Get_Value_Length(),
+                        musicData) != BLE_STATUS_SUCCESS)
+                Sys::Error_Handler();
+        }
+    }
+}
 }

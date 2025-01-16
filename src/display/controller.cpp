@@ -28,8 +28,8 @@ namespace Display
         manager.displayCallback = &display;
 
         lvgl = Display::LVGL(manager, sysState, userHaptic, infoService);
-        lvgl.Set_Face(Face::BIG_TICK_ENERGY);
-        /* lvgl.Set_Face(Face::DIGITAL); */
+        Face *face = new Digital_Face();
+        lvgl.Set_Face(face);
     }
 
     Controller::~Controller()

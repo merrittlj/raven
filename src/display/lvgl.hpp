@@ -15,9 +15,38 @@
 
 namespace Display
 {
-    enum class Face : uint8_t {
-        BIG_TICK_ENERGY,
-        DIGITAL,
+    class Face
+    {
+        public:
+            virtual void Load_Screen();
+            virtual void Draw(TimeInfo info);
+    };
+
+    class Big_Face : Face
+    {
+        private:
+            lv_obj_t *screen;
+            lv_obj_t *time;
+            lv_obj_t *date;
+
+        public:
+            Big_Face();
+
+            void Load_Screen();
+            void Draw(TimeInfo info);
+    };
+
+    class Digital_Face : Face
+    {
+        private:
+            lv_obj_t *screen;
+            lv_obj_t *time;
+
+        public:
+            Digital_Face();
+
+            void Load_Screen();
+            void Draw(TimeInfo info);
     };
 
     class LVGL
@@ -30,19 +59,14 @@ namespace Display
             Display::Manager manager;
             std::vector<uint8_t> buf1;
 
+            Face *face;
+
             uint8_t prevButton;
 
             uint8_t alertIndex;
             uint8_t eventIndex;
 
             lv_obj_t *tagScreen;
-
-            Face curFace;
-
-            /* This is the large time/small date face :) */
-            lv_obj_t *bigTickEnergy;
-            lv_obj_t *bigTime;
-            lv_obj_t *bigDate;
 
             lv_obj_t *digital;
             lv_obj_t *digitalTime;
@@ -103,7 +127,7 @@ namespace Display
             static void Flush(lv_display_t *display, const lv_area_t *area, uint8_t *px_map);
             void Refresh();
 
-            void Set_Face(Face face);
+            void Set_Face(Face *value);
             void Load_Face_Screen();
             void Tag();
             void Summary();
