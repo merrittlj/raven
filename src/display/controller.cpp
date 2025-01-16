@@ -85,8 +85,12 @@ namespace Display
     void Controller::Update_Face()
     {
         std::string pref = state->Get_Pref()->face;
-        if (pref == "big") lvgl.Set_Face(Face::BIG_TICK_ENERGY);
-        else if (pref == "digital") lvgl.Set_Face(Face::DIGITAL);
+
+        Face *face = new Digital_Face();
+        if (pref == "big") face = new Big_Face();
+        else if (pref == "digital") face = new Digital_Face();
+        lvgl.Set_Face(face);
+
         Time(Get_RTC());
     }
 

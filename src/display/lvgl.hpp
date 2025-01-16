@@ -18,11 +18,11 @@ namespace Display
     class Face
     {
         public:
-            virtual void Load_Screen();
-            virtual void Draw(TimeInfo info);
+            virtual void Load_Screen() = 0;
+            virtual void Draw(Sys::TimeInfo info) = 0;
     };
 
-    class Big_Face : Face
+    class Big_Face : public Face
     {
         private:
             lv_obj_t *screen;
@@ -33,10 +33,10 @@ namespace Display
             Big_Face();
 
             void Load_Screen();
-            void Draw(TimeInfo info);
+            void Draw(Sys::TimeInfo info);
     };
 
-    class Digital_Face : Face
+    class Digital_Face : public Face
     {
         private:
             lv_obj_t *screen;
@@ -46,7 +46,26 @@ namespace Display
             Digital_Face();
 
             void Load_Screen();
-            void Draw(TimeInfo info);
+            void Draw(Sys::TimeInfo info);
+    };
+
+    class Arcs_Face : public Face
+    {
+        private:
+            lv_obj_t *screen;
+
+            void Arc_Ticks(float startAngle, float endAngle, uint32_t radius, uint32_t width, lv_color_t color, uint32_t step);
+
+            void Draw_Minute(uint8_t minute);
+            void Draw_Hour(uint8_t hour);
+            void Draw_Day(uint8_t day);
+            void Draw_Month(uint8_t month);
+
+        public:
+            Arcs_Face();
+
+            void Load_Screen();
+            void Draw(Sys::TimeInfo info);
     };
 
     class LVGL
