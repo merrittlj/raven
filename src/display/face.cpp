@@ -252,14 +252,70 @@ LV_FONT_DECLARE(axel_ui)  /* 22 bold */
     void Analog_Face::Draw_Numbers()
     {
         uint8_t hourStep = (uint8_t)(360 / 12);
+        const uint8_t radius = 98;
+
+        static lv_style_t arcs;
+        lv_style_init(&arcs);
+        lv_style_set_arc_width(&arcs, 13);
+
+        lv_obj_t *arc = lv_arc_create(screen);
+        lv_obj_add_style(arc, &arcs, 0);
+        lv_arc_set_bg_angles(arc, 0, 360);
+        lv_obj_remove_style(arc, NULL, LV_PART_KNOB);  /* Remove knob */
+        lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE);
+        lv_obj_set_size(arc, radius*2, radius*2);
+        lv_arc_set_rotation(arc, 270);  /* Start from top */
+        lv_arc_set_range(arc, 0, 360);
+        lv_arc_set_value(arc, 0);
+
+        static lv_style_t texts;
+        lv_style_init(&texts);
+        lv_style_set_text_color(&texts, lv_color_hex(0x000000));
+
         for (uint8_t i = 1; i < 13; ++i) {
-            /* TODO: */
+            lv_obj_t *num = lv_label_create(screen);
+            lv_obj_add_style(num, &texts, 0);
+            lv_label_set_text(num, std::to_string(i).c_str());
+            lv_obj_set_style_text_font(num, &axel_ui, 0);
+
+            uint8_t angle = hourStep * i;
+            lv_arc_set_value(arc, angle);
+            lv_arc_align_obj_to_angle(arc, num, 0);
         }
     }
 
     void Analog_Face::Draw_Hands(uint8_t hour, uint8_t minute)
     {
-        float hourAngle = 360.0 * (hour / 60.0);
+        float hourAngle = 360.0 * (hour / 12.0);
         float minuteAngle = 360.0 * (minute / 60.0);
+        const uint8_t radius = 98;
+
+        Draw_Hand(hourAngle, radius - 30);
+        Draw_Hand(minuteAngle, radius - 10);
+    }
+
+    void Analog_Face::Draw_Hand(uint8_t angle, uint8_t length)
+    {
+        uint8_t center_x = 100;
+        uint8_t center_y = 100;
+
+        float endX = center_x + length * cos((angle - 90) * (float)DEG2RAD);
+        float endY = center_y + length * sin((angle - 90) * (float)DEG2RAD);
+
+        lv_point_precise_t *linePoints = new lv_point_precise_t[2] {
+            {(lv_value_precise_t)center_x, (lv_value_precise_t)center_y}, 
+                {(lv_value_precise_t)endX, (lv_value_precise_t)endY}};
+
+        static lv_style_t styleLine;
+        lv_style_init(&styleLine);
+        lv_style_set_line_width(&styleLine, 5);
+        lv_style_set_line_color(&styleLine, lv_color_hex(0x000000));
+        lv_style_set_line_rounded(&styleLine, false);
+
+        lv_obj_t *line;
+        line = lv_line_create(screen);
+        lv_line_set_points(line, linePoints, 2);
+        lv_obj_add_style(line, &styleLine, 0);
+        lv_obj_align(line, LV_ALIGN_TOP_LEFT, 0, 0);
     }
 }

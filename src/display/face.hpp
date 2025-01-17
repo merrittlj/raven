@@ -77,6 +77,7 @@ namespace Display
             lv_obj_t *screen;
 
             void Draw_Numbers();
+            void Draw_Hand(uint8_t angle, uint8_t length);
             void Draw_Hands(uint8_t hour, uint8_t minute);
 
         public:
