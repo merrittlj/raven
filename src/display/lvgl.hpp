@@ -3,6 +3,7 @@
 
 
 #include "display/display.hpp"
+#include "display/face.hpp"
 #include "sys/state.hpp"
 #include "haptic/haptic.hpp"
 #include "services/info.hpp"
@@ -15,59 +16,6 @@
 
 namespace Display
 {
-    class Face
-    {
-        public:
-            virtual void Load_Screen() = 0;
-            virtual void Draw(Sys::TimeInfo info) = 0;
-    };
-
-    class Big_Face : public Face
-    {
-        private:
-            lv_obj_t *screen;
-            lv_obj_t *time;
-            lv_obj_t *date;
-
-        public:
-            Big_Face();
-
-            void Load_Screen();
-            void Draw(Sys::TimeInfo info);
-    };
-
-    class Digital_Face : public Face
-    {
-        private:
-            lv_obj_t *screen;
-            lv_obj_t *time;
-
-        public:
-            Digital_Face();
-
-            void Load_Screen();
-            void Draw(Sys::TimeInfo info);
-    };
-
-    class Arcs_Face : public Face
-    {
-        private:
-            lv_obj_t *screen;
-
-            void Arc_Ticks(float startAngle, float endAngle, uint32_t radius, uint32_t width, lv_color_t color, uint32_t step);
-
-            void Draw_Minute(uint8_t minute);
-            void Draw_Hour(uint8_t hour);
-            void Draw_Day(uint8_t day);
-            void Draw_Month(uint8_t month);
-
-        public:
-            Arcs_Face();
-
-            void Load_Screen();
-            void Draw(Sys::TimeInfo info);
-    };
-
     class LVGL
     {
         private:

@@ -74,6 +74,7 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCE_DIR}/display/display.cpp
     ${PROJECT_SOURCE_DIR}/display/controller.cpp
     ${PROJECT_SOURCE_DIR}/display/lvgl.cpp
+    ${PROJECT_SOURCE_DIR}/display/face.cpp
     ${PROJECT_SOURCE_DIR}/display/eink.cpp
 
     ${PROJECT_SOURCE_DIR}/display/fonts/gloock_date.c

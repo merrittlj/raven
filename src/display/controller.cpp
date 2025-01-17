@@ -1,4 +1,5 @@
 #include "display/controller.hpp"
+#include "display/face.hpp"
 #include "sys/sys.hpp"
 #include "ble/uuid.hpp"
 #include "services/info.hpp"
@@ -28,8 +29,7 @@ namespace Display
         manager.displayCallback = &display;
 
         lvgl = Display::LVGL(manager, sysState, userHaptic, infoService);
-        Face *face = new Digital_Face();
-        lvgl.Set_Face(face);
+        /* Be careful not to use LVGL here, not init'd yet */
     }
 
     Controller::~Controller()
@@ -60,8 +60,9 @@ namespace Display
         lvgl.Init();
         lvgl.Create();
 
+        Face *face = new Digital_Face();
+        lvgl.Set_Face(face);
         state->Screen_Activate(Sys::Screen::FACE);
-        /* Alerts list shouldn't be default, just as there is no reason to with no unreads */
     }
 
     void Controller::Process()
@@ -89,6 +90,8 @@ namespace Display
         Face *face = new Digital_Face();
         if (pref == "big") face = new Big_Face();
         else if (pref == "digital") face = new Digital_Face();
+        else if (pref == "arcs") face = new Arcs_Face();
+        else if (pref == "analog") face = new Analog_Face();
         lvgl.Set_Face(face);
 
         Time(Get_RTC());

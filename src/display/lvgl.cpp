@@ -8,18 +8,7 @@
 #include "lvgl.h"
 #include "src/misc/lv_timer_private.h"
 
-#include <array>
-#include <vector>
-#include <string>
 
-
-#ifndef LV_ATTRIBUTE_MEM_ALIGN
-#define LV_ATTRIBUTE_MEM_ALIGN
-#endif
-
-    LV_FONT_DECLARE(gloock_time)  /* 70 regular */
-    LV_FONT_DECLARE(gloock_date)  /* 18 regular */
-    LV_FONT_DECLARE(seg)  /* 55 bold */
     LV_FONT_DECLARE(axel_ui)  /* 22 bold */
     LV_FONT_DECLARE(axel_text)  /* 20 regular */
 LV_FONT_DECLARE(tag)  /* 110 regular */
@@ -41,180 +30,6 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
 
     namespace Display
 {
-    Big_Face::Big_Face()
-    {
-        static lv_style_t texts;
-        lv_style_init(&texts);
-        lv_style_set_text_color(&texts, lv_color_hex(0x000000));
-        lv_style_set_text_font(&texts, &gloock_time);
-
-        screen = lv_obj_create(NULL);
-
-        time = lv_label_create(screen);
-        lv_obj_add_style(time, &texts, 0);
-        lv_label_set_text(time, "00:00");
-        lv_obj_align(time, LV_ALIGN_CENTER, 0, -10);
-
-        date = lv_label_create(screen);
-        lv_obj_add_style(date, &texts, 0);
-        lv_label_set_text(date, "Month Day Year");
-        lv_obj_set_style_text_font(date, &gloock_date, 0);
-        lv_obj_align(date, LV_ALIGN_CENTER, 0, 45);
-    }
-
-    void Big_Face::Load_Screen()
-    {
-        lv_scr_load(screen);
-    }
-
-    void Big_Face::Draw(Sys::TimeInfo info)
-    {
-        std::string timeValue = (info.hour < 10 ? "0" : "") + std::to_string(info.hour) + ":" + (info.minute < 10 ? "0" : "") + std::to_string(info.minute);
-
-        const std::string months[12] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
-        std::string day = std::to_string(info.day);
-        if (info.day % 10 == 1 && info.day != 11) day += "st";
-        else if (info.day % 10 == 2 && info.day != 12) day += "nd";
-        else if (info.day % 10 == 3 && info.day != 13) day += "rd";
-        else day += "th";
-
-        lv_label_set_text(time, timeValue.c_str());
-        lv_label_set_text(date, (months[info.month - 1] + " " + day).c_str());
-
-        Load_Screen();
-    }
-
-    Digital_Face::Digital_Face()
-    {
-        static lv_style_t texts;
-        lv_style_init(&texts);
-        lv_style_set_text_color(&texts, lv_color_hex(0x000000));
-        lv_style_set_text_font(&texts, &gloock_time);
-
-        screen = lv_obj_create(NULL);
-
-        time = lv_label_create(screen);
-        lv_obj_add_style(time, &texts, 0);
-        lv_label_set_text(time, "00:00");
-        lv_obj_set_style_text_font(time, &seg, 0);
-        lv_obj_align(time, LV_ALIGN_CENTER, 0, 0);
-    }
-
-    void Digital_Face::Load_Screen()
-    {
-        lv_scr_load(screen);
-    }
-
-    void Digital_Face::Draw(Sys::TimeInfo info)
-    {
-        std::string timeValue = (info.hour < 10 ? "0" : "") + std::to_string(info.hour) + ":" + (info.minute < 10 ? "0" : "") + std::to_string(info.minute);
-
-        lv_label_set_text(time, timeValue.c_str());
-
-        Load_Screen();
-    }
-
-    Arcs_Face::Arcs_Face()
-    {
-        static lv_style_t texts;
-        lv_style_init(&texts);
-        lv_style_set_text_color(&texts, lv_color_hex(0x000000));
-        lv_style_set_text_font(&texts, &gloock_time);
-
-        screen = lv_obj_create(NULL);
-
-        lv_obj_t *tmp = lv_label_create(screen);
-        lv_obj_add_style(tmp, &texts, 0);
-        lv_label_set_text(tmp, "Arcs Face");
-        lv_obj_set_style_text_font(tmp, &axel_ui, 0);
-        lv_obj_align(tmp, LV_ALIGN_CENTER, 0, 0);
-    }
-
-    void Arcs_Face::Load_Screen()
-    {
-        lv_scr_load(screen);
-    }
-
-    void Arcs_Face::Draw(Sys::TimeInfo info)
-    {
-        Draw_Minute(info.minute);
-        Draw_Hour(info.hour);
-        Draw_Day(info.day);
-        Draw_Month(info.month);
-
-        Load_Screen();
-    }
-
-    void Arcs_Face::Draw_Minute(uint8_t minute)
-    {
-        float minuteAngle = 360.0 * (minute / 60.0);
-        uint8_t tick = (uint8_t)(360 / 60);
-
-        static lv_style_t arcs;
-        lv_style_init(&arcs);
-        lv_style_set_arc_color(&arcs, lv_color_hex(0x000000));
-        lv_style_set_arc_rotation(&arcs, 270);  /* Start from top */
-        lv_style_set_arc_width(&arcs, 13);
-        lv_style_set_arc_rounded(&arcs, false);
-        /* TODO: 88px radius */
-
-        lv_obj_t *arc = lv_arc_create(screen);
-        lv_obj_add_style(arc, &arcs, 0);
-        lv_arc_set_bg_angles(arc, 0, minuteAngle);
-        lv_obj_remove_style(arc, NULL, LV_PART_KNOB);  /* Remove knob */
-        lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE);
-        lv_arc_set_value(arc, 100);
-        lv_obj_set_size(arc, 88*2, 88*2);
-
-        /* Existing ticks */
-        /* Arc_Ticks(tick, minuteAngle - tick, 88, 13, lv_color_hex(0xffffff), tick); */
-        /* Future ticks */
-        /* Arc_Ticks(minuteAngle + tick, 360 - tick, 85, 7, lv_color_hex(0x000000), tick); */
-    }
-
-    void Arcs_Face::Draw_Hour(uint8_t hour)
-    {
-
-    }
-
-    void Arcs_Face::Draw_Day(uint8_t day)
-    {
-
-    }
-
-    void Arcs_Face::Draw_Month(uint8_t month)
-    {
-
-    }
-
-    void Arcs_Face::Arc_Ticks(float startAngle, float endAngle, uint32_t radius, uint32_t width, lv_color_t color, uint32_t step)
-    {
-        uint8_t center_x = 100;
-        uint8_t center_y = 100;
-
-        // Draw colour blocks every inc degrees
-        for (float i = start_angle; i <= end_angle; i += step) {
-            float cx1 = center_x + (radius - width / 2) * cos((i - 90) * DEG2RAD);
-            float cy1 = center_y + (radius - width / 2) * sin((i - 90) * DEG2RAD);
-            float cx2 = center_x + (radius + width / 2) * cos((i - 90) * DEG2RAD);
-            float cy2 = center_y + (radius + width / 2) * sin((i - 90) * DEG2RAD);
-
-            lv_point_precise_t linePoints[4] = {{cx1, cy1}, {cx2, cy2}};
-
-            /*Create style*/
-            static lv_style_t styleLine;
-            lv_style_init(&styleLine);
-            lv_style_set_line_width(&styleLine, 2);
-            lv_style_set_line_color(&styleLine, color);
-            lv_style_set_line_rounded(&styleLine, false);
-
-            lv_obj_t *line;
-            line = lv_line_create(screen);
-            lv_line_set_points(line, linePoints, 2);
-            lv_obj_add_style(line, &styleLine, 0);
-        }
-    }
-
     LVGL::LVGL()
     {}
 
@@ -251,7 +66,7 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         static lv_style_t texts;
         lv_style_init(&texts);
         lv_style_set_text_color(&texts, lv_color_hex(0x000000));
-        lv_style_set_text_font(&texts, &gloock_time);
+        lv_style_set_text_font(&texts, &axel_text);
 
         tagScreen = lv_screen_active();
         lv_obj_t *tagText = lv_label_create(tagScreen);
@@ -469,6 +284,7 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
     void LVGL::Set_Face(Face *value)
     {
         face = value;
+        face->Create();
     }
 
     void LVGL::Tag()
@@ -508,7 +324,10 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
 
     void LVGL::Alert(Sys::AlertInfo info)
     {
-        hapticCtrl->Vibrate_Cons(100, 2, 50);  /* Better UX to have before load rather than after */
+        /* Better UX to have before load rather than after */
+        hapticCtrl->Vibrate_Pulse(100);
+        Sys::Delay(30);
+        hapticCtrl->Vibrate_Pulse(50);
 
         lv_label_set_text(source, info.source.c_str());
         lv_label_set_text(title, info.title.c_str());
@@ -662,6 +481,7 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
 
     void LVGL::Button(uint8_t b)
     {
+        hapticCtrl->Vibrate_Pulse(50);
         if (b == 1) {
             /* All screens: load face */
             face->Load_Screen();
@@ -779,6 +599,7 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
 
     void LVGL::Button_Double(uint8_t b1, uint8_t b2)
     {
+        hapticCtrl->Vibrate_Pulse(50);
         /* Button 1 & 2 double press */
         /* Button 3 & 4 double press */
         if ((b1 == 1 && b2 == 2) || (b1 == 2 && b2 == 1)) {
