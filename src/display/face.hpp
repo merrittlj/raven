@@ -88,6 +88,20 @@ namespace Display
             void Load_Screen();
             void Draw(Sys::TimeInfo info);
     };
+
+    class Speed_Face : public Face
+    {
+        private:
+            lv_obj_t *screen;
+
+        public:
+            Speed_Face();
+            ~Speed_Face();
+            
+            void Create();
+            void Load_Screen();
+            void Draw(Sys::TimeInfo info);
+    };
 }
 
 

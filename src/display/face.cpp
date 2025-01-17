@@ -318,4 +318,44 @@ LV_FONT_DECLARE(axel_ui)  /* 22 bold */
         lv_obj_add_style(line, &styleLine, 0);
         lv_obj_align(line, LV_ALIGN_TOP_LEFT, 0, 0);
     }
+
+    Speed_Face::Speed_Face()
+    {}
+
+    Speed_Face::~Speed_Face()
+    {
+        lv_obj_clean(screen);
+    }
+
+    void Speed_Face::Create()
+    {
+        static lv_style_t texts;
+        lv_style_init(&texts);
+        lv_style_set_text_color(&texts, lv_color_hex(0x000000));
+
+        screen = lv_obj_create(NULL);
+
+        lv_obj_t *tmp = lv_label_create(screen);
+        lv_obj_add_style(tmp, &texts, 0);
+        lv_label_set_text(tmp, "Speed Face");
+        lv_obj_set_style_text_font(tmp, &axel_ui, 0);
+        lv_obj_align(tmp, LV_ALIGN_CENTER, 0, 0);
+    }
+
+    void Speed_Face::Load_Screen()
+    {
+        lv_scr_load(screen);
+    }
+
+    void Speed_Face::Draw(Sys::TimeInfo info)
+    {
+        /* Draw circle */
+        /* Draw small(subsecond) ticks */
+        /* Draw second ticks */
+        /* Draw hour ticks */
+        /* Draw circles */
+        /* Draw hands */
+
+        Load_Screen();
+    }
 }
