@@ -158,11 +158,12 @@ LV_FONT_DECLARE(axel_ui)  /* 22 bold */
         lv_obj_set_size(arc, faceRadius*2, faceRadius*2);
         lv_arc_set_rotation(arc, 270);  /* Start from top */
         lv_obj_center(arc);
+        lv_obj_move_background(arc);
 
         /* Existing ticks */
-        /* Arc_Ticks(tick, minuteAngle - tick, faceRadius, 13, lv_color_hex(0xffffff), tick); */
+        Arc_Ticks(tick, minuteAngle - tick, faceRadius - 13/2, 15, lv_color_hex(0xffffff), tick);
         /* Future ticks */
-        Arc_Ticks(minuteAngle + tick, 360 - tick, faceRadius - 3, 7, lv_color_hex(0x000000), tick);
+        Arc_Ticks(minuteAngle + tick, 360 - tick, faceRadius - 13/2, 7, lv_color_hex(0x000000), tick);
     }
 
     void Arcs_Face::Draw_Hour(uint8_t hour)
@@ -185,6 +186,12 @@ LV_FONT_DECLARE(axel_ui)  /* 22 bold */
         uint8_t center_x = 100;
         uint8_t center_y = 100;
 
+        lv_style_t *styleLine = new lv_style_t;
+        lv_style_init(styleLine);
+        lv_style_set_line_width(styleLine, 3);
+        lv_style_set_line_rounded(styleLine, true);
+        lv_style_set_line_color(styleLine, color);
+
         // Draw colour blocks every inc degrees
         for (float i = startAngle; i <= endAngle; i += step) {
             float cx1 = center_x + (radius - width / 2) * cos((i - 90) * (float)DEG2RAD);
@@ -194,16 +201,10 @@ LV_FONT_DECLARE(axel_ui)  /* 22 bold */
 
             lv_point_precise_t *linePoints = new lv_point_precise_t[2] {{(lv_value_precise_t)cx1, (lv_value_precise_t)cy1}, {(lv_value_precise_t)cx2, (lv_value_precise_t)cy2}};
 
-            static lv_style_t styleLine;
-            lv_style_init(&styleLine);
-            lv_style_set_line_width(&styleLine, 2);
-            lv_style_set_line_color(&styleLine, color);
-            lv_style_set_line_rounded(&styleLine, false);
-
             lv_obj_t *line;
             line = lv_line_create(screen);
             lv_line_set_points(line, linePoints, 2);
-            lv_obj_add_style(line, &styleLine, 0);
+            lv_obj_add_style(line, styleLine, 0);
             lv_obj_align(line, LV_ALIGN_TOP_LEFT, 0, 0);
         }
     }

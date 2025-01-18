@@ -55,7 +55,7 @@ namespace Display
         private:
             lv_obj_t *screen;
 
-            const uint8_t faceRadius = 95;
+            const uint8_t faceRadius = 88;
             const uint8_t centerX = 100;
             const uint8_t centerY = 100;
 
