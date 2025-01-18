@@ -121,12 +121,6 @@ LV_FONT_DECLARE(axel_ui)  /* 22 bold */
         lv_style_set_text_font(&texts, &gloock_time);
 
         screen = lv_obj_create(NULL);
-
-        lv_obj_t *tmp = lv_label_create(screen);
-        lv_obj_add_style(tmp, &texts, 0);
-        lv_label_set_text(tmp, "Arcs Face");
-        lv_obj_set_style_text_font(tmp, &axel_ui, 0);
-        lv_obj_align(tmp, LV_ALIGN_CENTER, 0, 0);
     }
 
     void Arcs_Face::Load_Screen()
@@ -161,13 +155,14 @@ LV_FONT_DECLARE(axel_ui)  /* 22 bold */
         lv_obj_remove_style(arc, NULL, LV_PART_KNOB);  /* Remove knob */
         lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE);
         lv_arc_set_value(arc, 100);
-        lv_obj_set_size(arc, 98*2, 98*2);
+        lv_obj_set_size(arc, faceRadius*2, faceRadius*2);
         lv_arc_set_rotation(arc, 270);  /* Start from top */
+        lv_obj_center(arc);
 
         /* Existing ticks */
-        Arc_Ticks(tick, minuteAngle - tick, 98, 13, lv_color_hex(0xffffff), tick);
+        /* Arc_Ticks(tick, minuteAngle - tick, faceRadius, 13, lv_color_hex(0xffffff), tick); */
         /* Future ticks */
-        Arc_Ticks(minuteAngle + tick, 360 - tick, 95, 7, lv_color_hex(0x000000), tick);
+        Arc_Ticks(minuteAngle + tick, 360 - tick, faceRadius - 3, 7, lv_color_hex(0x000000), tick);
     }
 
     void Arcs_Face::Draw_Hour(uint8_t hour)
@@ -229,11 +224,41 @@ LV_FONT_DECLARE(axel_ui)  /* 22 bold */
 
         screen = lv_obj_create(NULL);
 
-        lv_obj_t *tmp = lv_label_create(screen);
-        lv_obj_add_style(tmp, &texts, 0);
-        lv_label_set_text(tmp, "Analog Face");
-        lv_obj_set_style_text_font(tmp, &axel_ui, 0);
-        lv_obj_align(tmp, LV_ALIGN_CENTER, 0, 0);
+        Draw_Numbers();
+
+        /* Two styles for different line widths, but I like them essentially the same */
+        static lv_style_t hourStyle;
+        lv_style_init(&hourStyle);
+        lv_style_set_line_width(&hourStyle, 5);
+        lv_style_set_line_color(&hourStyle, lv_color_hex(0x000000));
+        lv_style_set_line_rounded(&hourStyle, false);
+
+        static lv_style_t minuteStyle;
+        lv_style_init(&minuteStyle);
+        lv_style_set_line_width(&minuteStyle, 5);
+        lv_style_set_line_color(&minuteStyle, lv_color_hex(0x000000));
+        lv_style_set_line_rounded(&minuteStyle, false);
+
+
+        hourPoints = new lv_point_precise_t[2] {
+            {0,0},
+                {0,0}
+        };
+
+        minutePoints = new lv_point_precise_t[2] {
+            {0,0},
+                {0,0}
+        };
+
+        hourHand = lv_line_create(screen);
+        lv_line_set_points(hourHand, hourPoints, 2);
+        lv_obj_add_style(hourHand, &hourStyle, 0);
+        lv_obj_align(hourHand, LV_ALIGN_TOP_LEFT, 0, 0);
+
+        minuteHand = lv_line_create(screen);
+        lv_line_set_points(minuteHand, minutePoints, 2);
+        lv_obj_add_style(minuteHand, &minuteStyle, 0);
+        lv_obj_align(minuteHand, LV_ALIGN_TOP_LEFT, 0, 0);
     }
 
     void Analog_Face::Load_Screen()
@@ -243,7 +268,6 @@ LV_FONT_DECLARE(axel_ui)  /* 22 bold */
 
     void Analog_Face::Draw(Sys::TimeInfo info)
     {
-        Draw_Numbers();
         Draw_Hands(info.hour, info.minute);
 
         Load_Screen();
@@ -252,7 +276,6 @@ LV_FONT_DECLARE(axel_ui)  /* 22 bold */
     void Analog_Face::Draw_Numbers()
     {
         uint8_t hourStep = (uint8_t)(360 / 12);
-        const uint8_t radius = 98;
 
         static lv_style_t arcs;
         lv_style_init(&arcs);
@@ -265,8 +288,10 @@ LV_FONT_DECLARE(axel_ui)  /* 22 bold */
         lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE);
         lv_obj_set_size(arc, radius*2, radius*2);
         lv_arc_set_rotation(arc, 270);  /* Start from top */
-        lv_arc_set_range(arc, 0, 360);
+        /* lv_arc_set_range(arc, 0, 360); */
         lv_arc_set_value(arc, 0);
+        lv_obj_center(arc);
+        lv_obj_add_flag(arc, LV_OBJ_FLAG_HIDDEN);
 
         static lv_style_t texts;
         lv_style_init(&texts);
@@ -278,45 +303,32 @@ LV_FONT_DECLARE(axel_ui)  /* 22 bold */
             lv_label_set_text(num, std::to_string(i).c_str());
             lv_obj_set_style_text_font(num, &axel_ui, 0);
 
-            uint8_t angle = hourStep * i;
-            lv_arc_set_value(arc, angle);
+            uint8_t value = (uint8_t)((hourStep * i) / 3.6);
+            lv_arc_set_value(arc, value);
             lv_arc_align_obj_to_angle(arc, num, 0);
         }
     }
 
     void Analog_Face::Draw_Hands(uint8_t hour, uint8_t minute)
     {
-        float hourAngle = 360.0 * (hour / 12.0);
+        float hourAngle = (360.0 * (hour / 12.0)) + (30.0 * (minute / 60.0));
         float minuteAngle = 360.0 * (minute / 60.0);
-        const uint8_t radius = 98;
+        const uint8_t hLength = radius - 50;
+        const uint8_t mLength = radius - 20;
+        const uint8_t bwLength = 10;
 
-        Draw_Hand(hourAngle, radius - 30);
-        Draw_Hand(minuteAngle, radius - 10);
-    }
+        hourPoints[0].x = (lv_value_precise_t)(100 + -(bwLength) * cos((hourAngle - 90) * (float)DEG2RAD));;
+        hourPoints[0].y = (lv_value_precise_t)(100 + -(bwLength) * sin((hourAngle - 90) * (float)DEG2RAD));;
+        hourPoints[1].x = (lv_value_precise_t)(100 + hLength * cos((hourAngle - 90) * (float)DEG2RAD));
+        hourPoints[1].y = (lv_value_precise_t)(100 + hLength * sin((hourAngle - 90) * (float)DEG2RAD));
 
-    void Analog_Face::Draw_Hand(uint8_t angle, uint8_t length)
-    {
-        uint8_t center_x = 100;
-        uint8_t center_y = 100;
+        minutePoints[0].x = (lv_value_precise_t)(100 + -(bwLength) * cos((minuteAngle - 90) * (float)DEG2RAD));;
+        minutePoints[0].y = (lv_value_precise_t)(100 + -(bwLength) * sin((minuteAngle - 90) * (float)DEG2RAD));;
+        minutePoints[1].x = (lv_value_precise_t)(100 + mLength * cos((minuteAngle - 90) * (float)DEG2RAD));
+        minutePoints[1].y = (lv_value_precise_t)(100 + mLength * sin((minuteAngle - 90) * (float)DEG2RAD));
 
-        float endX = center_x + length * cos((angle - 90) * (float)DEG2RAD);
-        float endY = center_y + length * sin((angle - 90) * (float)DEG2RAD);
-
-        lv_point_precise_t *linePoints = new lv_point_precise_t[2] {
-            {(lv_value_precise_t)center_x, (lv_value_precise_t)center_y}, 
-                {(lv_value_precise_t)endX, (lv_value_precise_t)endY}};
-
-        static lv_style_t styleLine;
-        lv_style_init(&styleLine);
-        lv_style_set_line_width(&styleLine, 5);
-        lv_style_set_line_color(&styleLine, lv_color_hex(0x000000));
-        lv_style_set_line_rounded(&styleLine, false);
-
-        lv_obj_t *line;
-        line = lv_line_create(screen);
-        lv_line_set_points(line, linePoints, 2);
-        lv_obj_add_style(line, &styleLine, 0);
-        lv_obj_align(line, LV_ALIGN_TOP_LEFT, 0, 0);
+        lv_line_set_points(hourHand, hourPoints, 2);
+        lv_line_set_points(minuteHand, minutePoints, 2);
     }
 
     Speed_Face::Speed_Face()
