@@ -106,6 +106,10 @@ namespace Display
         private:
             lv_obj_t *screen;
 
+            const uint8_t radius = 95;
+
+            void Draw_Border();
+
         public:
             Speed_Face();
             ~Speed_Face();

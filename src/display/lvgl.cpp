@@ -47,6 +47,7 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         lv_tick_set_cb(HAL_GetTick);
 
         lv_display_t *eInk = lv_display_create(manager.width, manager.height);
+        lv_display_set_antialiasing(eInk, false);
         buf1 = std::vector<uint8_t>(manager.Buffer_Size() + 8);
         lv_display_set_buffers(eInk, &buf1[0], NULL, buf1.size(), LV_DISPLAY_RENDER_MODE_DIRECT);  /* TODO: dual buffers & diff render mode */
         lv_display_set_flush_cb(eInk, Flush);

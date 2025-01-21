@@ -188,7 +188,7 @@ LV_FONT_DECLARE(axel_ui)  /* 22 bold */
 
         lv_style_t *styleLine = new lv_style_t;
         lv_style_init(styleLine);
-        lv_style_set_line_width(styleLine, 3);
+        lv_style_set_line_width(styleLine, 1);
         lv_style_set_line_rounded(styleLine, true);
         lv_style_set_line_color(styleLine, color);
 
@@ -363,6 +363,7 @@ LV_FONT_DECLARE(axel_ui)  /* 22 bold */
     void Speed_Face::Draw(Sys::TimeInfo info)
     {
         /* Draw circle */
+        Draw_Border();
         /* Draw small(subsecond) ticks */
         /* Draw second ticks */
         /* Draw hour ticks */
@@ -370,5 +371,24 @@ LV_FONT_DECLARE(axel_ui)  /* 22 bold */
         /* Draw hands */
 
         Load_Screen();
+    }
+
+    void Speed_Face::Draw_Border()
+    {
+        static lv_style_t arcs;
+        lv_style_init(&arcs);
+        lv_style_set_arc_color(&arcs, lv_color_hex(0x000000));
+        lv_style_set_arc_width(&arcs, 1);
+
+        lv_obj_t *arc = lv_arc_create(screen);
+        lv_obj_add_style(arc, &arcs, 0);
+        lv_arc_set_bg_angles(arc, 0, 360);
+        lv_obj_remove_style(arc, NULL, LV_PART_KNOB);  /* Remove knob */
+        lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE);
+        lv_arc_set_value(arc, 100);
+        lv_obj_set_size(arc, radius*2, radius*2);
+        lv_arc_set_rotation(arc, 270);  /* Start from top */
+        lv_obj_center(arc);
+        lv_obj_move_background(arc);
     }
 }
