@@ -46,13 +46,10 @@ namespace Display
             lv_obj_t *eventScreen;
 
             lv_obj_t *activeScreen;
-            lv_obj_t *activeList;
 
             lv_obj_t *alertsListScreen;
-            lv_obj_t *alertsList;
 
             lv_obj_t *eventsListScreen;
-            lv_obj_t *eventsList;
 
             lv_obj_t *navScreen;
             lv_obj_t *navInstruction;
@@ -74,6 +71,7 @@ namespace Display
             lv_obj_t *summaryUpcoming;
 
             lv_obj_t *Create_List(lv_obj_t *screen, std::string text);
+            void Create_Selectors(lv_obj_t *screen, std::vector<std::string> items);
             void Active_Screen();
             void Alerts_List_Screen();
             void Events_List_Screen();

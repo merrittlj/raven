@@ -53,13 +53,62 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         lv_display_set_flush_cb(eInk, Flush);
     }
 
-    lv_obj_t *LVGL::Create_List(lv_obj_t *screen, std::string text)
+    void LVGL::Create_Selectors(lv_obj_t *screen, std::vector<std::string> items)
     {
-        lv_obj_t *list = lv_list_create(screen);
-        lv_obj_set_size(list, 200, 200);
-        lv_obj_align(list, LV_ALIGN_TOP_LEFT, 0, 0);
-        lv_list_add_text(list, text.c_str());
-        return list;
+        static lv_style_t styleLine;
+        lv_style_init(&styleLine);
+        lv_style_set_line_width(&styleLine, 2);
+        lv_style_set_line_rounded(&styleLine, true);
+        lv_style_set_line_color(&styleLine, lv_color_hex(0x000000));
+
+        static lv_style_t texts;
+        lv_style_init(&texts);
+        lv_style_set_text_color(&texts, lv_color_hex(0x000000));
+        lv_style_set_text_font(&texts, &axel_text);
+
+        lv_point_precise_t *vertPoints = new lv_point_precise_t[2] {{(lv_value_precise_t)30, (lv_value_precise_t)0}, {(lv_value_precise_t)30, (lv_value_precise_t)200}};
+
+        lv_obj_t *vertLine;
+        vertLine = lv_line_create(screen);
+        lv_line_set_points(vertLine, vertPoints, 2);
+        lv_obj_add_style(vertLine, &styleLine, 0);
+        lv_obj_align(vertLine, LV_ALIGN_TOP_LEFT, 0, 0);
+
+        const uint8_t lineHeight = 25;
+        uint8_t curRow = 0;
+        for (uint8_t i = 1; i < 4; ++i) {
+            for (uint8_t j = 1; j < 3; ++j) {
+                uint8_t curHeight = curRow * lineHeight;
+
+                if (curRow < items.size()) {
+                    /* Draw x.x text */
+                    lv_obj_t *selectorText = lv_label_create(screen);
+                    lv_obj_add_style(selectorText, &texts, 0);
+                    lv_label_set_text(selectorText, (std::to_string(i) + "." + std::to_string(j)).c_str());
+                    lv_obj_set_style_text_font(selectorText, &axel_ui, 0);
+                    lv_obj_set_x(selectorText, 5);
+                    lv_obj_set_y(selectorText, curHeight - 5);
+
+                    lv_obj_t *itemText = lv_label_create(screen);
+                    lv_obj_add_style(itemText, &texts, 0);
+                    lv_label_set_text(itemText, items.at(curRow).c_str());
+                    lv_obj_set_style_text_font(itemText, &axel_text, 0);
+                    lv_obj_set_x(itemText, 35);
+                    lv_obj_set_y(itemText, curHeight - 5);
+                }
+
+                /* Draw horizontal line */
+                lv_point_precise_t *horizPoints = new lv_point_precise_t[2] {{(lv_value_precise_t)0, (lv_value_precise_t)curHeight}, {(lv_value_precise_t)200, (lv_value_precise_t)curHeight}};
+
+                lv_obj_t *horizLine;
+                horizLine = lv_line_create(screen);
+                lv_line_set_points(horizLine, horizPoints, 2);
+                lv_obj_add_style(horizLine, &styleLine, 0);
+                lv_obj_align(horizLine, LV_ALIGN_TOP_LEFT, 0, 0);
+
+                ++curRow;
+            }
+        }
     }
 
     void LVGL::Create()
@@ -139,21 +188,12 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
 
 
         activeScreen = lv_obj_create(NULL);
-        lv_obj_t *activeTitle = lv_label_create(activeScreen);
-        lv_obj_add_style(activeTitle, &texts, 0);
-        lv_label_set_text(activeTitle, "Active Screens");
-        lv_obj_set_style_text_font(activeTitle, &axel_ui, 0);
-        lv_obj_align(activeTitle, LV_ALIGN_CENTER, 0, 0);
-
-        activeList = Create_List(activeScreen, "Screens");
 
 
         alertsListScreen = lv_obj_create(NULL);
-        alertsList = Create_List(alertsListScreen, "Alerts");
 
 
         eventsListScreen = lv_obj_create(NULL);
-        eventsList = Create_List(eventsListScreen, "Events");
 
 
         navScreen = lv_obj_create(NULL);
@@ -243,10 +283,6 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         lv_obj_set_style_text_font(summaryWeather, &axel_text, 0);
         lv_obj_align(summaryWeather, LV_ALIGN_TOP_RIGHT, 0, 0);
 
-        /* summaryRecent = Create_List(summaryScreen, "Recent"); */
-        /* summaryUpcoming = Create_List(summaryScreen, "Upcoming"); */
-
-
         lv_timer_t *checkUpdate = lv_timer_create(LVGL::Timer_Check_Update, 500, this);
         lv_timer_set_repeat_count(checkUpdate, -1);
         lv_timer_enable(checkUpdate);
@@ -295,6 +331,8 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
 
     void LVGL::Summary()
     {
+        lv_obj_clean(summaryScreen);
+
         Sys::TimeInfo timeInfo = state->Get_Time();
 
         std::string time = (timeInfo.hour < 10 ? "0" : "") + std::to_string(timeInfo.hour) + ":" + (timeInfo.minute < 10 ? "0" : "") + std::to_string(timeInfo.minute);
@@ -309,10 +347,11 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
 
         /* Recent alerts */
         std::vector<Sys::AlertInfo> *stateAlerts = state->Get_Alerts();
-        alertsList = Create_List(alertsListScreen, "Alerts");
+        std::vector<std::string> stateSources;
         for (Sys::AlertInfo alert : *stateAlerts) {
-            lv_list_add_button(alertsList, NULL, (alert.source).c_str());
+            stateSources.push_back(alert.source);
         }
+        Create_Selectors(summaryScreen, stateSources);
 
         lv_scr_load(summaryScreen);
     }
@@ -438,40 +477,52 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
 
     void LVGL::Active_Screen()
     {
-        std::array<uint8_t, (size_t)Sys::Screen::Enum_Length> screens = state->Get_Active_Screens();
-        for (size_t i = 0; i < screens.size(); ++i) {
-            uint8_t s = screens.at(i);
-            if (!s) continue;
-            if ((Sys::Screen)i == Sys::Screen::TAG) continue; /* Accessible through startup/shutdown */
-            if ((Sys::Screen)i == Sys::Screen::FACE) lv_list_add_button(activeList, NULL, "Watch Face");
-            if ((Sys::Screen)i == Sys::Screen::SUMMARY) lv_list_add_button(activeList, NULL, "Summary");  /* Only accessed through shortcut */
-            if ((Sys::Screen)i == Sys::Screen::ALERT) continue;  /* Alert is inaccessible directly, but it shouldn't be active anyways */
-            if ((Sys::Screen)i == Sys::Screen::ACTIVE) continue;  /* Shouldn't be set active, text is redundant */
-            if ((Sys::Screen)i == Sys::Screen::ALERTS_LIST) lv_list_add_button(activeList, NULL, "Unread Alerts");
-            if ((Sys::Screen)i == Sys::Screen::EVENTS_LIST) lv_list_add_button(activeList, NULL, "Upcoming Events");
-            if ((Sys::Screen)i == Sys::Screen::NAVIGATION) lv_list_add_button(activeList, NULL, "Navigation");
-            if ((Sys::Screen)i == Sys::Screen::MUSIC) lv_list_add_button(activeList, NULL, "Music");
+        lv_obj_clean(activeScreen);
+
+        std::vector<uint8_t> screens = state->Get_Screens();
+        std::vector<std::string> items;
+        for (uint8_t i = 0; i < screens.size(); ++i) {
+            if (!i) continue;
+            if ((Sys::Screen)i == Sys::Screen::TAG) continue;
+            if ((Sys::Screen)i == Sys::Screen::FACE) items.push_back("Watch Face");
+            if ((Sys::Screen)i == Sys::Screen::SUMMARY) items.push_back("Summary");
+            if ((Sys::Screen)i == Sys::Screen::ALERT) continue;
+            if ((Sys::Screen)i == Sys::Screen::ACTIVE) continue;
+            if ((Sys::Screen)i == Sys::Screen::ALERTS_LIST) items.push_back("Unread Alerts");
+            if ((Sys::Screen)i == Sys::Screen::EVENTS_LIST) items.push_back("Upcoming Events");
+            if ((Sys::Screen)i == Sys::Screen::NAVIGATION) items.push_back("Navigation");
+            if ((Sys::Screen)i == Sys::Screen::MUSIC) items.push_back("Music");
         }
+        Create_Selectors(alertsListScreen, items);
+
         lv_scr_load(activeScreen);
     }
 
     void LVGL::Alerts_List_Screen()
     {
+        lv_obj_clean(alertsListScreen);
+
         std::vector<Sys::AlertInfo> *stateAlerts = state->Get_Alerts();
-        alertsList = Create_List(alertsListScreen, "Alerts");
+        std::vector<std::string> stateSources;
         for (Sys::AlertInfo alert : *stateAlerts) {
-            lv_list_add_button(alertsList, NULL, (alert.source).c_str());
+            stateSources.push_back(alert.source);
         }
+        Create_Selectors(alertsListScreen, stateSources);
+
         lv_scr_load(alertsListScreen);
     }
 
     void LVGL::Events_List_Screen()
     {
+        lv_obj_clean(eventsListScreen);
+
         std::vector<Sys::EventInfo> stateEvents = state->Get_Events();
-        eventsList = Create_List(eventsListScreen, "Events");
+        std::vector<std::string> stateTitles;
         for (Sys::EventInfo event : stateEvents) {
-            lv_list_add_button(eventsList, NULL, (event.title).c_str());
+            stateTitles.push_back(event.title);
         }
+        Create_Selectors(eventsListScreen, stateTitles);
+
         lv_scr_load(eventsListScreen);
     }
 
