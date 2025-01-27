@@ -47,6 +47,7 @@ namespace Display
             lv_obj_t *body;
 
             lv_obj_t *eventScreen;
+            lv_obj_t *eventType;
             lv_obj_t *eventTitle;
             lv_obj_t *eventDesc;
             lv_obj_t *eventTime;
@@ -78,6 +79,8 @@ namespace Display
             lv_obj_t *summaryRecent;
             lv_obj_t *summaryUpcoming;
 
+            std::vector<std::string> activeItems;
+
             lv_obj_t *Create_List(lv_obj_t *screen, std::string text);
             void Create_Selectors(lv_obj_t *screen, std::vector<std::string> items);
             void Active_Screen();
@@ -88,6 +91,8 @@ namespace Display
 
             /* Handles lists with groups(first button press) and items(second button press) */
             uint16_t List_Handler(uint8_t group, uint8_t item);
+
+            void Load_Screen_By_Name(std::string name);
 
             std::string Truncate_Text(std::string text, uint32_t limit);
 

@@ -62,27 +62,29 @@ SVCCTL_EvtAckStatus_t BLE::EventService::Event_Handler(void *Event)
                     case ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE:
                         attribute_modified = (aci_gatt_attribute_modified_event_rp0*)blecore_evt->data;
                         uint8_t *data;
+                        size_t length;
                         data = attribute_modified->Attr_Data;
+                        length = (size_t)(attribute_modified->Attr_Data_Length);
                         if (attribute_modified->Attr_Handle == (type.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            /* Set type */
+                            sysState->Event_Build_Type(data[0]);
                         }
                         if (attribute_modified->Attr_Handle == (id.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            /* Set id */
+                            sysState->Event_Build_Id(data[0]);
                         }
                         if (attribute_modified->Attr_Handle == (title.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            /* Set title */
+                            sysState->Event_Build_Title(std::string((const char *)data, length));
                         }
                         if (attribute_modified->Attr_Handle == (desc.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            /* Set desc */
+                            sysState->Event_Build_Desc(std::string((const char *)data, length));
                         }
                         if (attribute_modified->Attr_Handle == (timestamp.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            /* Set timestamp */
+                            sysState->Event_Build_Timestamp(((uint16_t)data[0] << 8) | data[1]);
                         }
                         if (attribute_modified->Attr_Handle == (repDur.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            /* Set repDur */
+                            sysState->Event_Build_RepDur(data[0]);
                         }
                         if (attribute_modified->Attr_Handle == (trigger.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            /* Set trigger */
+                            sysState->Event_Trigger();
                         }
                         break;
 
