@@ -479,7 +479,7 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
     {
         lv_obj_clean(activeScreen);
 
-        std::vector<uint8_t> screens = state->Get_Screens();
+        std::array<uint8_t, (size_t)Sys::Screen::Enum_Length> screens = state->Get_Screens();
         std::vector<std::string> items;
         for (uint8_t i = 0; i < screens.size(); ++i) {
             if (!i) continue;
@@ -534,17 +534,17 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
     void LVGL::Button(uint8_t b)
     {
         hapticCtrl->Vibrate_Pulse(50);
-        if (b == 1) {
+        if (b == 0) {
             /* All screens: load face */
             face->Load_Screen();
         }
 
-        if (b == 2) {
+        if (b == 1) {
             /* All screens: load active screen */
             lv_scr_load(activeScreen);
         }
 
-        if (b == 3) {
+        if (b == 2) {
             /* Alert screen: dismiss alert */
             if (lv_screen_active() == alertScreen) {
                 state->Alert_Dismiss(alertIndex);
@@ -602,7 +602,7 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
             }
         }
 
-        if (b == 4) {
+        if (b == 3) {
             /* Alert screen: shortcut to alert list */
             if (lv_screen_active() == alertScreen) {
                 Alerts_List_Screen();
@@ -654,11 +654,11 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         hapticCtrl->Vibrate_Pulse(50);
         /* Button 1 & 2 double press */
         /* Button 3 & 4 double press */
-        if ((b1 == 1 && b2 == 2) || (b1 == 2 && b2 == 1)) {
+        if ((b1 == 0 && b2 == 1) || (b1 == 1 && b2 == 0)) {
             /* Global summary screen */
             Summary();
         }
-        if ((b1 == 3 && b2 == 4) || (b1 == 4 && b2 == 3)) {
+        if ((b1 == 2 && b2 == 3) || (b1 == 3 && b2 == 2)) {
             /* Alerts list screen: selector */
             if (lv_screen_active() == alertsListScreen) {
                 /* We only have two items so double selector only applies for groups */

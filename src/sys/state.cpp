@@ -79,7 +79,7 @@ namespace Sys
         return screens.at((size_t)s);
     }
 
-    std::vector<uint8_t> State::Get_Screens()
+    std::array<uint8_t, (size_t)Screen::Enum_Length> State::Get_Screens()
     {
         return screens;
     }

@@ -165,16 +165,17 @@ int main()
     xTaskCreate(RTOS::Startup_Task, "Startup", configMINIMAL_STACK_SIZE, (void *)startupParams, tskIDLE_PRIORITY, (TaskHandle_t *)NULL);
 
     uint32_t buttonState = 0;
-    RTOS::Button_Params *buttonParams = new RTOS::Button_Params;
-    buttonParams->btnPort = &btnPort;
-    buttonParams->gpioCtrl = &gpioCtrl;
-    buttonParams->displayCtrl = &displayCtrl;
-    buttonParams->sysState = &sysState;
-    buttonParams->buttonState = &buttonState;
     for (uint8_t i = 0; i < 4; ++i) {
+        RTOS::Button_Params *buttonParams = new RTOS::Button_Params;
+        buttonParams->btnPort = &btnPort;
+        buttonParams->gpioCtrl = &gpioCtrl;
+        buttonParams->displayCtrl = &displayCtrl;
+        buttonParams->sysState = &sysState;
+        buttonParams->buttonState = &buttonState;
+
         buttonParams->button = i;
         buttonParams->buttonIndex = btns.at(i);
-        xTaskCreate(RTOS::Button_Task, "ButtonX", configMINIMAL_STACK_SIZE, (void *)buttonParams, tskIDLE_PRIORITY + 2, (TaskHandle_t *)NULL);
+        xTaskCreate(RTOS::Button_Task, ("Button" + std::to_string(i)).c_str(), configMINIMAL_STACK_SIZE, (void *)buttonParams, tskIDLE_PRIORITY + 2, (TaskHandle_t *)NULL);
     }
 
     vTaskStartScheduler();

@@ -54,15 +54,9 @@ namespace RTOS
     {
         Button_Params *p = (Button_Params *)params;
         for (;;) {
-            p->btnPort->ButtonProcess(p->gpioCtrl->Read_Component(p->buttonIndex));
-            if (p->btnPort->ButtonPressed(1 << (p->button - 1))) {
-                BITNSET(p->buttonState, p->button - 1, 1);
-                /* Ignore, button 1 & 2 now have about screen functionality */
-                /* /1* Button 1 & 2 do not have double press functionality *1/ */
-                /* if (p->button == 1 || p->button == 2) { */
-                /*     p->displayCtrl->Button(p->button); */
-                /*     continue; */
-                /* } */
+            p->btnPort->ButtonProcess(p->gpioCtrl->Read_Component(p->buttonIndex) << p->button);  /* WE ARE NOT SHIFTING!!!! BUG!!! */
+            if (p->btnPort->ButtonPressed(1 << p->button)) {  /* Check this */
+                BITNSET(p->buttonState, p->button, 1);
 
                 uint8_t db = 0;
                 for(uint8_t i = 0; i < DOUBLE_PRESS_TIMEOUT; ++i) {
@@ -79,7 +73,7 @@ namespace RTOS
                     vTaskDelay(1);
                 }
                 if (!db) p->displayCtrl->Button(p->button);
-            } else BITNSET(p->buttonState, p->button - 1, 0);
+            } else BITNSET(p->buttonState, p->button, 0);
 
             vTaskDelay(1);
         }

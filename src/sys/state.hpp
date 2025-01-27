@@ -92,7 +92,7 @@ namespace Sys
 
             /* Stores 0 or 1 values for if a screen is active */
             /* Not used to track current state, but rather track what stays open */
-            std::vector<uint8_t> screens = {};
+            std::array<uint8_t, (size_t)Screen::Enum_Length> screens;
 
             Preferences pref;
 
@@ -164,7 +164,7 @@ namespace Sys
             void Screen_Deactivate(Screen s);
             /* 0 or 1 depending on if a screen is active(ran) */
             uint8_t Is_Screen_Active(Screen s);
-            std::vector<uint8_t> Get_Screens();
+            std::array<uint8_t, (size_t)Screen::Enum_Length> Get_Screens();
 
             void Alert_Build_Source(std::string str);
             void Alert_Build_Title(std::string str);
