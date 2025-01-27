@@ -26,9 +26,12 @@ namespace Display
             Display::Manager manager;
             std::vector<uint8_t> buf1;
 
-            Face *face;
+            lv_display_t *eInk;
+            static inline bool displayReady = true;
 
-            uint8_t prevButton;
+            Face *face = nullptr;
+
+            uint8_t prevButton = 0;
 
             uint8_t alertIndex;
             uint8_t eventIndex;
@@ -86,6 +89,8 @@ namespace Display
         public:
             LVGL();
             LVGL(Display::Manager man, Sys::State *sysState, Haptic::Controller *ctrl, BLE::InfoService *infoService);
+
+            static void Safe_Screen_Load(lv_obj_t *screen);
 
             void Init();
             void Create();

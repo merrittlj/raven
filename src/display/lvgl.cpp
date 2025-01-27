@@ -41,12 +41,17 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         infoServ = infoService;
     }
 
+    void LVGL::Safe_Screen_Load(lv_obj_t *screen)
+    {
+        if (displayReady) lv_scr_load(screen);
+    }
+
     void LVGL::Init()
     {
         lv_init();
         lv_tick_set_cb(HAL_GetTick);
 
-        lv_display_t *eInk = lv_display_create(manager.width, manager.height);
+        eInk = lv_display_create(manager.width, manager.height);
         lv_display_set_antialiasing(eInk, false);
         buf1 = std::vector<uint8_t>(manager.Buffer_Size() + 8);
         lv_display_set_buffers(eInk, &buf1[0], NULL, buf1.size(), LV_DISPLAY_RENDER_MODE_DIRECT);  /* TODO: dual buffers & diff render mode */
@@ -74,10 +79,10 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         lv_obj_add_style(vertLine, &styleLine, 0);
         lv_obj_align(vertLine, LV_ALIGN_TOP_LEFT, 0, 0);
 
-        const uint8_t lineHeight = 25;
+        const uint8_t lineHeight = (200 / 9);
         uint8_t curRow = 0;
         for (uint8_t i = 1; i < 4; ++i) {
-            for (uint8_t j = 1; j < 3; ++j) {
+            for (uint8_t j = 1; j < 4; ++j) {
                 uint8_t curHeight = curRow * lineHeight;
 
                 if (curRow < items.size()) {
@@ -86,25 +91,27 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
                     lv_obj_add_style(selectorText, &texts, 0);
                     lv_label_set_text(selectorText, (std::to_string(i) + "." + std::to_string(j)).c_str());
                     lv_obj_set_style_text_font(selectorText, &axel_ui, 0);
-                    lv_obj_set_x(selectorText, 5);
-                    lv_obj_set_y(selectorText, curHeight - 5);
+                    lv_obj_set_x(selectorText, 0);
+                    lv_obj_set_y(selectorText, curHeight + 2);
 
                     lv_obj_t *itemText = lv_label_create(screen);
                     lv_obj_add_style(itemText, &texts, 0);
-                    lv_label_set_text(itemText, items.at(curRow).c_str());
+                    lv_label_set_text(itemText, Truncate_Text(items.at(curRow), 200 - 35).c_str());
                     lv_obj_set_style_text_font(itemText, &axel_text, 0);
                     lv_obj_set_x(itemText, 35);
-                    lv_obj_set_y(itemText, curHeight - 5);
+                    lv_obj_set_y(itemText, curHeight + 2);
                 }
 
-                /* Draw horizontal line */
-                lv_point_precise_t *horizPoints = new lv_point_precise_t[2] {{(lv_value_precise_t)0, (lv_value_precise_t)curHeight}, {(lv_value_precise_t)200, (lv_value_precise_t)curHeight}};
+                if (curRow < 8) {
+                    /* Draw horizontal line */
+                    lv_point_precise_t *horizPoints = new lv_point_precise_t[2] {{(lv_value_precise_t)0, (lv_value_precise_t)curHeight + lineHeight}, {(lv_value_precise_t)200, (lv_value_precise_t)curHeight + lineHeight}};
 
-                lv_obj_t *horizLine;
-                horizLine = lv_line_create(screen);
-                lv_line_set_points(horizLine, horizPoints, 2);
-                lv_obj_add_style(horizLine, &styleLine, 0);
-                lv_obj_align(horizLine, LV_ALIGN_TOP_LEFT, 0, 0);
+                    lv_obj_t *horizLine;
+                    horizLine = lv_line_create(screen);
+                    lv_line_set_points(horizLine, horizPoints, 2);
+                    lv_obj_add_style(horizLine, &styleLine, 0);
+                    lv_obj_align(horizLine, LV_ALIGN_TOP_LEFT, 0, 0);
+                }
 
                 ++curRow;
             }
@@ -301,6 +308,8 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
 
     void LVGL::Flush(lv_display_t *display, const lv_area_t *area, uint8_t *px_map)
     {
+        displayReady = false;
+
         Manager man = Controller::Instance()->Get_Manager();
 
         uint8_t *screen_data = px_map + 8;
@@ -311,6 +320,8 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         man.displayCallback->Init();
         man.displayCallback->Display();
         lv_display_flush_ready(display);
+
+        displayReady = lv_disp_flush_is_last(display);
     }
 
     void LVGL::Refresh()
@@ -322,11 +333,12 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
     {
         face = value;
         face->Create();
+        face->Load_Screen();
     }
 
     void LVGL::Tag()
     {
-        lv_scr_load(tagScreen);
+        Safe_Screen_Load(tagScreen);
     }
 
     void LVGL::Summary()
@@ -353,13 +365,15 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         }
         Create_Selectors(summaryScreen, stateSources);
 
-        lv_scr_load(summaryScreen);
+        Safe_Screen_Load(summaryScreen);
     }
 
     void LVGL::Time(Sys::TimeInfo value)
     {
-        if (lv_screen_active() == tagScreen) hapticCtrl->Vibrate_Pulse(500);
-        face->Draw(value);
+        if (face != nullptr) {
+            if (lv_screen_active() == tagScreen) hapticCtrl->Vibrate_Pulse(500);
+            face->Draw(value);
+        }
     }
 
     void LVGL::Alert(Sys::AlertInfo info)
@@ -373,7 +387,7 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         lv_label_set_text(title, info.title.c_str());
         lv_label_set_text(body, info.body.c_str());
 
-        lv_scr_load(alertScreen);
+        Safe_Screen_Load(alertScreen);
         state->Screen_Activate(Sys::Screen::ALERTS_LIST);  /* Until dismissal, activate unread alerts */
     }
 
@@ -381,7 +395,7 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
     {
         /* set event texts */
 
-        lv_scr_load(eventScreen);
+        Safe_Screen_Load(eventScreen);
         state->Screen_Activate(Sys::Screen::EVENTS_LIST);
     }
 
@@ -407,7 +421,7 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         if (info.action == "flag") lv_image_set_src(navAction, &flag);
 
         if (!state->Is_Screen_Active(Sys::Screen::NAVIGATION)) {
-            lv_scr_load(navScreen);
+            Safe_Screen_Load(navScreen);
             state->Screen_Activate(Sys::Screen::NAVIGATION);
         }
     }
@@ -470,7 +484,7 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         lv_image_set_src(musicBG, &albumArt);
 
         if (!state->Is_Screen_Active(Sys::Screen::MUSIC)) {
-            lv_scr_load(musicScreen);
+            Safe_Screen_Load(musicScreen);
             state->Screen_Activate(Sys::Screen::MUSIC);
         }
     }
@@ -495,7 +509,7 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         }
         Create_Selectors(alertsListScreen, items);
 
-        lv_scr_load(activeScreen);
+        Safe_Screen_Load(activeScreen);
     }
 
     void LVGL::Alerts_List_Screen()
@@ -505,11 +519,12 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         std::vector<Sys::AlertInfo> *stateAlerts = state->Get_Alerts();
         std::vector<std::string> stateSources;
         for (Sys::AlertInfo alert : *stateAlerts) {
-            stateSources.push_back(alert.source);
+            std::string itemText = alert.source + " - " + alert.title;
+            stateSources.push_back(itemText);
         }
         Create_Selectors(alertsListScreen, stateSources);
 
-        lv_scr_load(alertsListScreen);
+        Safe_Screen_Load(alertsListScreen);
     }
 
     void LVGL::Events_List_Screen()
@@ -523,28 +538,28 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         }
         Create_Selectors(eventsListScreen, stateTitles);
 
-        lv_scr_load(eventsListScreen);
+        Safe_Screen_Load(eventsListScreen);
     }
 
     uint16_t LVGL::List_Handler(uint8_t group, uint8_t item)
     {
-        return (group - 1) * 2 + (item - 1);
+        return (group - 1) * 3 + (item - 1);
     }
 
     void LVGL::Button(uint8_t b)
     {
         hapticCtrl->Vibrate_Pulse(50);
-        if (b == 0) {
+        if (b == 1) {
             /* All screens: load face */
             face->Load_Screen();
         }
 
-        if (b == 1) {
+        if (b == 2) {
             /* All screens: load active screen */
-            lv_scr_load(activeScreen);
+            Safe_Screen_Load(activeScreen);
         }
 
-        if (b == 2) {
+        if (b == 3) {
             /* Alert screen: dismiss alert */
             if (lv_screen_active() == alertScreen) {
                 state->Alert_Dismiss(alertIndex);
@@ -602,7 +617,7 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
             }
         }
 
-        if (b == 3) {
+        if (b == 4) {
             /* Alert screen: shortcut to alert list */
             if (lv_screen_active() == alertScreen) {
                 Alerts_List_Screen();
@@ -651,19 +666,26 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
 
     void LVGL::Button_Double(uint8_t b1, uint8_t b2)
     {
-        hapticCtrl->Vibrate_Pulse(50);
+        /* Why does this crash ?? */
+        /* hapticCtrl->Vibrate_Pulse(50); */
         /* Button 1 & 2 double press */
-        /* Button 3 & 4 double press */
-        if ((b1 == 0 && b2 == 1) || (b1 == 1 && b2 == 0)) {
+        if ((b1 == 1 && b2 == 2) || (b1 == 2 && b2 == 1)) {
             /* Global summary screen */
             Summary();
         }
-        if ((b1 == 2 && b2 == 3) || (b1 == 3 && b2 == 2)) {
+        /* Button 3 & 4 double press */
+        if ((b1 == 3 && b2 == 4) || (b1 == 4 && b2 == 3)) {
             /* Alerts list screen: selector */
             if (lv_screen_active() == alertsListScreen) {
-                /* We only have two items so double selector only applies for groups */
-                if (prevButton == 0)
-                    prevButton = 3;  /* TODO: prev button defines */
+                /* If the group has been selected */
+                if (prevButton > 0) {
+                    uint16_t index = List_Handler(prevButton, 3);
+                    prevButton = 0;
+                    std::vector<Sys::AlertInfo> *stateAlerts = state->Get_Alerts();
+                    if (index < stateAlerts->size())
+                        Alert(stateAlerts->at(index));
+                }
+                else prevButton = 3;
             }
             /* Music screen: previous notify */
             else if (lv_screen_active() == musicScreen) {

@@ -165,7 +165,7 @@ int main()
     xTaskCreate(RTOS::Startup_Task, "Startup", configMINIMAL_STACK_SIZE, (void *)startupParams, tskIDLE_PRIORITY, (TaskHandle_t *)NULL);
 
     uint32_t buttonState = 0;
-    for (uint8_t i = 0; i < 4; ++i) {
+    for (uint8_t i = 1; i < 5; ++i) {
         RTOS::Button_Params *buttonParams = new RTOS::Button_Params;
         buttonParams->btnPort = &btnPort;
         buttonParams->gpioCtrl = &gpioCtrl;
@@ -174,7 +174,7 @@ int main()
         buttonParams->buttonState = &buttonState;
 
         buttonParams->button = i;
-        buttonParams->buttonIndex = btns.at(i);
+        buttonParams->buttonIndex = btns.at(i - 1);
         xTaskCreate(RTOS::Button_Task, ("Button" + std::to_string(i)).c_str(), configMINIMAL_STACK_SIZE, (void *)buttonParams, tskIDLE_PRIORITY + 2, (TaskHandle_t *)NULL);
     }
 

@@ -59,10 +59,6 @@ namespace Display
         display.Clear();
         lvgl.Init();
         lvgl.Create();
-
-        Face *face = new Digital_Face();
-        lvgl.Set_Face(face);
-        state->Screen_Activate(Sys::Screen::FACE);
     }
 
     void Controller::Process()

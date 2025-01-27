@@ -54,26 +54,27 @@ namespace RTOS
     {
         Button_Params *p = (Button_Params *)params;
         for (;;) {
-            p->btnPort->ButtonProcess(p->gpioCtrl->Read_Component(p->buttonIndex) << p->button);  /* WE ARE NOT SHIFTING!!!! BUG!!! */
-            if (p->btnPort->ButtonPressed(1 << p->button)) {  /* Check this */
-                BITNSET(p->buttonState, p->button, 1);
+            p->btnPort->ButtonProcess(p->gpioCtrl->Read_Component(p->buttonIndex) << (p->button - 1));
+            if (p->btnPort->ButtonPressed(1 << (p->button - 1))) {
+                SET_BIT(*p->buttonState, p->button - 1);
 
                 uint8_t db = 0;
                 for(uint8_t i = 0; i < DOUBLE_PRESS_TIMEOUT; ++i) {
-                    if ((p->button == 1 && BITN(p->buttonState, (2 - 1))) || (p->button == 2 && BITN(p->buttonState, (1 - 1)))) {
+                    if ((p->button == 1 && READ_BIT(*p->buttonState, (2 - 1))) || (p->button == 2 && READ_BIT(*p->buttonState, (1 - 1)))) {
                         p->displayCtrl->Button_Double(1, 2);
                         db = 1;
                         break;
                     }
-                    if ((p->button == 3 && BITN(p->buttonState, (4 - 1))) || (p->button == 4 && BITN(p->buttonState, (3 - 1)))) {
+                    if ((p->button == 3 && READ_BIT(*p->buttonState, (4 - 1))) || (p->button == 4 && READ_BIT(*p->buttonState, (3 - 1)))) {
                         p->displayCtrl->Button_Double(3, 4);
                         db = 1;
                         break;
                     }
+                    p->btnPort->ButtonProcess(p->gpioCtrl->Read_Component(p->buttonIndex) << (p->button - 1));
                     vTaskDelay(1);
                 }
                 if (!db) p->displayCtrl->Button(p->button);
-            } else BITNSET(p->buttonState, p->button, 0);
+            } else CLEAR_BIT(*p->buttonState, p->button - 1);
 
             vTaskDelay(1);
         }

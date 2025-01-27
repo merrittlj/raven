@@ -1,4 +1,5 @@
 #include "display/face.hpp"
+#include "display/lvgl.hpp"
 #include "sys/state.hpp"
 
 #include "lvgl.h"
@@ -48,7 +49,7 @@ LV_FONT_DECLARE(axel_ui)  /* 22 bold */
 
     void Big_Face::Load_Screen()
     {
-        lv_scr_load(screen);
+        LVGL::Safe_Screen_Load(screen);
     }
 
     void Big_Face::Draw(Sys::TimeInfo info)
@@ -64,8 +65,6 @@ LV_FONT_DECLARE(axel_ui)  /* 22 bold */
 
         lv_label_set_text(time, timeValue.c_str());
         lv_label_set_text(date, (months[info.month - 1] + " " + day).c_str());
-
-        Load_Screen();
     }
 
     Digital_Face::Digital_Face()
@@ -93,7 +92,7 @@ LV_FONT_DECLARE(axel_ui)  /* 22 bold */
 
     void Digital_Face::Load_Screen()
     {
-        lv_scr_load(screen);
+        LVGL::Safe_Screen_Load(screen);
     }
 
     void Digital_Face::Draw(Sys::TimeInfo info)
@@ -101,8 +100,6 @@ LV_FONT_DECLARE(axel_ui)  /* 22 bold */
         std::string timeValue = (info.hour < 10 ? "0" : "") + std::to_string(info.hour) + ":" + (info.minute < 10 ? "0" : "") + std::to_string(info.minute);
 
         lv_label_set_text(time, timeValue.c_str());
-
-        Load_Screen();
     }
 
     Arcs_Face::Arcs_Face()
@@ -125,7 +122,7 @@ LV_FONT_DECLARE(axel_ui)  /* 22 bold */
 
     void Arcs_Face::Load_Screen()
     {
-        lv_scr_load(screen);
+        LVGL::Safe_Screen_Load(screen);
     }
 
     void Arcs_Face::Draw(Sys::TimeInfo info)
@@ -134,8 +131,6 @@ LV_FONT_DECLARE(axel_ui)  /* 22 bold */
         Draw_Hour(info.hour);
         Draw_Day(info.day);
         Draw_Month(info.month);
-
-        Load_Screen();
     }
 
     void Arcs_Face::Draw_Minute(uint8_t minute)
@@ -264,14 +259,12 @@ LV_FONT_DECLARE(axel_ui)  /* 22 bold */
 
     void Analog_Face::Load_Screen()
     {
-        lv_scr_load(screen);
+        LVGL::Safe_Screen_Load(screen);
     }
 
     void Analog_Face::Draw(Sys::TimeInfo info)
     {
         Draw_Hands(info.hour, info.minute);
-
-        Load_Screen();
     }
 
     void Analog_Face::Draw_Numbers()
@@ -357,7 +350,7 @@ LV_FONT_DECLARE(axel_ui)  /* 22 bold */
 
     void Speed_Face::Load_Screen()
     {
-        lv_scr_load(screen);
+        LVGL::Safe_Screen_Load(screen);
     }
 
     void Speed_Face::Draw(Sys::TimeInfo info)
@@ -369,8 +362,6 @@ LV_FONT_DECLARE(axel_ui)  /* 22 bold */
         /* Draw hour ticks */
         /* Draw circles */
         /* Draw hands */
-
-        Load_Screen();
     }
 
     void Speed_Face::Draw_Border()

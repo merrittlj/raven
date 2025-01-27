@@ -69,6 +69,10 @@
 
 #define BITNSET(w, n, b)   M_BEGIN (w)[(n)/32] |= ((U32)(b))<<((n)%32); M_END
 
+#define READ_BIT(var, pos) (((var) >> (pos)) & 1U)
+#define SET_BIT(var, pos) ((var) |= (1U << (pos)))
+#define CLEAR_BIT(var, pos) ((var) &= ~(1U << (pos)))
+
 #define VariableBit_Reset_BB(VariableAddress, BitNumber) \
     (*(volatile uint32_t *) (RAM_BB_BASE | ((VariableAddress - RAM_BASE) << 5) | ((BitNumber) << 2)) = 0)
 #define VariableBit_Set_BB(VariableAddress, BitNumber) \

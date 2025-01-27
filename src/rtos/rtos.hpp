@@ -10,8 +10,7 @@
 #include "button_debounce.h"
 
 
-/* #define DOUBLE_PRESS_TIMEOUT 500 */
-#define DOUBLE_PRESS_TIMEOUT 0
+#define DOUBLE_PRESS_TIMEOUT 50
 
 namespace RTOS
 {
