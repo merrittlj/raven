@@ -148,6 +148,8 @@ namespace Sys
 
     void State::Event_Trigger()
     {
+        /* If trigger is used, this is in alert mode */
+        Event_Builder.mode = 0;
         events.push_back(Event_Builder);
         Display::Controller::Instance()->Event_Send(events.back());
         /* Event_Builder = {0, 0, "", "", 0, 0}; */

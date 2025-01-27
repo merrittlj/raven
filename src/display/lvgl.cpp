@@ -187,7 +187,37 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
 
         eventScreen = lv_obj_create(NULL);
 
-        lv_obj_t *eventBorder = lv_obj_create(eventScreen);
+        eventType = lv_label_create(eventScreen);
+        lv_obj_add_style(eventType, &texts, 0);
+        lv_label_set_text(eventType, "Event Type");
+        lv_obj_set_style_text_font(eventType, &axel_text, 0);
+        lv_obj_align(eventType, LV_ALIGN_TOP_MID, 0, 0);
+
+        eventTitle = lv_label_create(eventScreen);
+        lv_obj_add_style(eventTitle, &texts, 0);
+        lv_label_set_text(eventTitle, "Event Title");
+        lv_obj_set_style_text_font(eventTitle, &axel_text, 0);
+        lv_obj_align(eventTitle, LV_ALIGN_TOP_MID, 0, -20);
+
+        eventDesc = lv_label_create(eventScreen);
+        lv_obj_add_style(eventDesc, &texts, 0);
+        lv_label_set_text(eventDesc, "Event Description");
+        lv_obj_set_style_text_font(eventDesc, &axel_text, 0);
+        lv_obj_align(eventDesc, LV_ALIGN_CENTER, 0, 0);
+
+        eventTime = lv_label_create(eventScreen);
+        lv_obj_add_style(eventTime, &texts, 0);
+        lv_label_set_text(eventTime, "Event Time");
+        lv_obj_set_style_text_font(eventTime, &axel_text, 0);
+        lv_obj_align(eventTime, LV_ALIGN_BOTTOM_LEFT, 0, 0);
+
+        eventRepdur = lv_label_create(eventScreen);
+        lv_obj_add_style(eventRepdur, &texts, 0);
+        lv_label_set_text(eventRepdur, "Event Repetition/Duration");
+        lv_obj_set_style_text_font(eventRepdur, &axel_text, 0);
+        lv_obj_align(eventRepdur, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
+
+        eventBorder = lv_obj_create(eventScreen);
         lv_obj_add_style(eventBorder, &box, 0);
         lv_obj_align(eventBorder, LV_ALIGN_CENTER, 0, 0);
         lv_obj_move_background(eventBorder);
@@ -359,11 +389,51 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
 
         /* Recent alerts */
         std::vector<Sys::AlertInfo> *stateAlerts = state->Get_Alerts();
-        std::vector<std::string> stateSources;
+        std::vector<std::string> items;
         for (Sys::AlertInfo alert : *stateAlerts) {
-            stateSources.push_back(alert.source);
+            items.push_back(alert.source);
         }
-        Create_Selectors(summaryScreen, stateSources);
+        static lv_style_t styleLine;
+        lv_style_init(&styleLine);
+        lv_style_set_line_width(&styleLine, 2);
+        lv_style_set_line_rounded(&styleLine, true);
+        lv_style_set_line_color(&styleLine, lv_color_hex(0x000000));
+
+        static lv_style_t texts;
+        lv_style_init(&texts);
+        lv_style_set_text_color(&texts, lv_color_hex(0x000000));
+        lv_style_set_text_font(&texts, &axel_text);
+
+        const uint8_t lineHeight = 25;
+        const uint8_t limit = 8;
+        uint8_t curRow = 1;
+        for (uint8_t i = 1; i < 4; ++i) {
+            for (uint8_t j = 1; j < 3; ++j) {
+                if (curRow >= limit) break;
+                uint8_t curHeight = (curRow * lineHeight);
+
+                if (curRow < items.size()) {
+                    lv_obj_t *itemText = lv_label_create(screen);
+                    lv_obj_add_style(itemText, &texts, 0);
+                    lv_label_set_text(itemText, items.at(curRow).c_str());
+                    lv_obj_set_style_text_font(itemText, &axel_text, 0);
+                    lv_obj_set_x(itemText, 5);
+                    lv_obj_set_y(itemText, curHeight - 5);
+                }
+
+                /* Draw horizontal line */
+                lv_point_precise_t *horizPoints = new lv_point_precise_t[2] {{(lv_value_precise_t)0, (lv_value_precise_t)curHeight}, {(lv_value_precise_t)200, (lv_value_precise_t)curHeight}};
+
+                lv_obj_t *horizLine;
+                horizLine = lv_line_create(screen);
+                lv_line_set_points(horizLine, horizPoints, 2);
+                lv_obj_add_style(horizLine, &styleLine, 0);
+                lv_obj_align(horizLine, LV_ALIGN_TOP_LEFT, 0, 0);
+
+                ++curRow;
+            }
+        }
+
 
         Safe_Screen_Load(summaryScreen);
     }
@@ -393,7 +463,18 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
 
     void LVGL::Event(Sys::EventInfo info)
     {
-        /* set event texts */
+        /* Display event type */
+        /* Display title */
+        /* Display description */
+        /* Display timestamp(probably now) */
+        /* Display repetition/duration */
+        /* Display w/wo border depending on type, view vs. alert modes */
+
+        lv_obj_t *eventTitle;
+        lv_obj_t *eventDesc;
+        lv_obj_t *eventTime;
+        lv_obj_t *eventRepdur;
+        lv_obj_t *eventBorder;
 
         Safe_Screen_Load(eventScreen);
         state->Screen_Activate(Sys::Screen::EVENTS_LIST);
@@ -602,7 +683,9 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
                     std::vector<Sys::EventInfo> stateEvents = state->Get_Events();
                     if (index < stateEvents.size()) {
                         eventIndex = index;
-                        Event(stateEvents.at(eventIndex));
+                        Sys::EventInfo passedEvent = stateEvents.at(eventIndex);
+                        passedEvent.mode = 1;  /* View */
+                        Event(passedEvent);
                     }
                 }
                 else prevButton = 1;

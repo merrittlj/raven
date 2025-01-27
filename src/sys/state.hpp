@@ -52,12 +52,14 @@ namespace Sys
     };
 
     struct EventInfo {
-        uint8_t type;
-        uint8_t id;
+        uint8_t mode;  /* whether to display as an alert(0) or view(1) */
+
+        uint8_t type;  /* alarm(0) or calendar(1) event */
+        uint8_t id;  /* ID for calendar events */
         std::string title;
         std::string desc;
-        uint16_t timestamp;
-        uint8_t repDur;
+        uint16_t timestamp;  /* Alarm or event time */
+        uint8_t repDur;  /* Either alarm repetition or event duration */
     };
 
     struct NavInfo {
