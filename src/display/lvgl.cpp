@@ -56,9 +56,13 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         buf1 = std::vector<uint8_t>(manager.Buffer_Size() + 8);
         lv_display_set_buffers(eInk, &buf1[0], NULL, buf1.size(), LV_DISPLAY_RENDER_MODE_DIRECT);  /* TODO: dual buffers & diff render mode */
         lv_display_set_flush_cb(eInk, Flush);
+
+
+        state->Screen_Deactivate(Sys::Screen::NAVIGATION);
+        state->Screen_Deactivate(Sys::Screen::MUSIC);
     }
 
-    void LVGL::Create_Selectors(lv_obj_t *screen, std::vector<std::string> items)
+    void LVGL::Create_Selectors(lv_obj_t *screen, bool isSummary, std::vector<std::string> items)
     {
         static lv_style_t styleLine;
         lv_style_init(&styleLine);
@@ -71,8 +75,6 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         lv_style_set_text_color(&texts, lv_color_hex(0x000000));
         lv_style_set_text_font(&texts, &axel_text);
 
-
-        bool isSummary = (lv_screen_active() == summaryScreen);
 
         const uint8_t lineHeight = (200 / 9);
         uint8_t curRow = 0;
@@ -404,7 +406,7 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
             items.push_back(itemText);
         }
 
-        Create_Selectors(summaryScreen, items);
+        Create_Selectors(summaryScreen, true, items);
 
         Safe_Screen_Load(summaryScreen);
     }
@@ -538,21 +540,23 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
     void LVGL::Active_Screen()
     {
         lv_obj_clean(activeScreen);
+        activeItems.clear();
 
         std::array<uint8_t, (size_t)Sys::Screen::Enum_Length> screens = state->Get_Screens();
         for (uint8_t i = 0; i < screens.size(); ++i) {
-            if (!i) continue;
-            if ((Sys::Screen)i == Sys::Screen::TAG) continue;
-            if ((Sys::Screen)i == Sys::Screen::FACE) activeItems.push_back("Watch Face");
-            if ((Sys::Screen)i == Sys::Screen::SUMMARY) activeItems.push_back("Summary");
-            if ((Sys::Screen)i == Sys::Screen::ALERT) continue;
-            if ((Sys::Screen)i == Sys::Screen::ACTIVE) continue;
-            if ((Sys::Screen)i == Sys::Screen::ALERTS_LIST) activeItems.push_back("Unread Alerts");
-            if ((Sys::Screen)i == Sys::Screen::EVENTS_LIST) activeItems.push_back("Upcoming Events");
-            if ((Sys::Screen)i == Sys::Screen::NAVIGATION) activeItems.push_back("Navigation");
-            if ((Sys::Screen)i == Sys::Screen::MUSIC) activeItems.push_back("Music");
+            volatile Sys::Screen s = (Sys::Screen)i;
+            if (!screens.at(i)) continue;
+            if (s == Sys::Screen::TAG) continue;
+            if (s == Sys::Screen::FACE) activeItems.push_back("Watch Face");
+            if (s == Sys::Screen::SUMMARY) activeItems.push_back("Summary");
+            if (s == Sys::Screen::ALERT) continue;
+            if (s == Sys::Screen::ACTIVE) continue;
+            if (s == Sys::Screen::ALERTS_LIST) activeItems.push_back("Unread Alerts");
+            if (s == Sys::Screen::EVENTS_LIST) activeItems.push_back("Upcoming Events");
+            if (s == Sys::Screen::NAVIGATION) activeItems.push_back("Navigation");
+            if (s == Sys::Screen::MUSIC) activeItems.push_back("Music");
         }
-        Create_Selectors(alertsListScreen, activeItems);
+        Create_Selectors(activeScreen, false, activeItems);
 
         Safe_Screen_Load(activeScreen);
     }
@@ -567,7 +571,7 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
             std::string itemText = alert.source + " - " + alert.title;
             stateSources.push_back(itemText);
         }
-        Create_Selectors(alertsListScreen, stateSources);
+        Create_Selectors(alertsListScreen, false, stateSources);
 
         Safe_Screen_Load(alertsListScreen);
     }
@@ -581,7 +585,7 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         for (Sys::EventInfo event : stateEvents) {
             stateTitles.push_back(event.title);
         }
-        Create_Selectors(eventsListScreen, stateTitles);
+        Create_Selectors(eventsListScreen, false, stateTitles);
 
         Safe_Screen_Load(eventsListScreen);
     }
@@ -594,9 +598,9 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
     void LVGL::Load_Screen_By_Name(std::string name)
     {
         if (name == "Watch Face") face->Load_Screen();
-        if (name == "Summary") Safe_Screen_Load(summaryScreen);
-        if (name == "Unread Alerts") Safe_Screen_Load(alertsListScreen);
-        if (name == "Upcoming Events") Safe_Screen_Load(eventsListScreen);
+        if (name == "Summary") Summary();
+        if (name == "Unread Alerts") Alerts_List_Screen();
+        if (name == "Upcoming Events") Events_List_Screen();
         if (name == "Navigation") Safe_Screen_Load(navScreen);
         if (name == "Music") Safe_Screen_Load(musicScreen);
     }

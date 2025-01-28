@@ -45,6 +45,7 @@ namespace RTOS
     /* Startup code, such as sending reset notify char */
     void Startup_Task(void *params);
 
+    uint8_t Is_Double(uint8_t button, uint32_t *state);
     /* Button processing task, runs every ms, with higher priority then process */
     void Button_Task(void *params);
 }

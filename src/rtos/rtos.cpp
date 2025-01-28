@@ -50,6 +50,13 @@ namespace RTOS
         }
     }
 
+    uint8_t Is_Double(uint8_t button, uint32_t *state)
+    {
+        if ((button == 1 && READ_BIT(*state, (2 - 1))) || (button == 2 && READ_BIT(*state, (1 - 1)))) return 1;
+        if ((button == 3 && READ_BIT(*state, (4 - 1))) || (button == 4 && READ_BIT(*state, (3 - 1)))) return 2;
+        return 0;
+    }
+
     void Button_Task(void *params)
     {
         Button_Params *p = (Button_Params *)params;
@@ -58,22 +65,38 @@ namespace RTOS
             if (p->btnPort->ButtonPressed(1 << (p->button - 1))) {
                 SET_BIT(*p->buttonState, p->button - 1);
 
-                uint8_t db = 0;
-                for(uint8_t i = 0; i < DOUBLE_PRESS_TIMEOUT; ++i) {
-                    if ((p->button == 1 && READ_BIT(*p->buttonState, (2 - 1))) || (p->button == 2 && READ_BIT(*p->buttonState, (1 - 1)))) {
-                        p->displayCtrl->Button_Double(1, 2);
-                        db = 1;
-                        break;
+                /* If now became double, means that the other button is proccesing the timeout */
+                uint8_t isDouble = Is_Double(p->button, p->buttonState);
+                if (isDouble == 0) {
+                    uint8_t db = 0;
+                    for(uint8_t i = 0; i < DOUBLE_PRESS_TIMEOUT; ++i) {
+                        if (isDouble == 1) {
+                            CLEAR_BIT(*p->buttonState, 1 - 1);
+                            CLEAR_BIT(*p->buttonState, 2 - 1);
+
+                            p->displayCtrl->Button_Double(1, 2);
+                            db = 1;
+                            break;
+                        }
+                        if (isDouble == 2) {
+                            CLEAR_BIT(*p->buttonState, 3 - 1);
+                            CLEAR_BIT(*p->buttonState, 4 - 1);
+
+                            p->displayCtrl->Button_Double(3, 4);
+                            db = 1;
+                            break;
+                        }
+                        vTaskDelay(1);
+
+                        p->btnPort->ButtonProcess(p->gpioCtrl->Read_Component(p->buttonIndex) << (p->button - 1));
+                        /* Keep checking for if double until timeout or actually is double */
+                        isDouble = Is_Double(p->button, p->buttonState);
                     }
-                    if ((p->button == 3 && READ_BIT(*p->buttonState, (4 - 1))) || (p->button == 4 && READ_BIT(*p->buttonState, (3 - 1)))) {
-                        p->displayCtrl->Button_Double(3, 4);
-                        db = 1;
-                        break;
+                    if (!db) {
+                        p->displayCtrl->Button(p->button);
+                        CLEAR_BIT(*p->buttonState, p->button - 1);
                     }
-                    p->btnPort->ButtonProcess(p->gpioCtrl->Read_Component(p->buttonIndex) << (p->button - 1));
-                    vTaskDelay(1);
                 }
-                if (!db) p->displayCtrl->Button(p->button);
             } else CLEAR_BIT(*p->buttonState, p->button - 1);
 
             vTaskDelay(1);
