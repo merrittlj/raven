@@ -62,6 +62,32 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         state->Screen_Deactivate(Sys::Screen::MUSIC);
     }
 
+    void LVGL::Recreate_Summary()
+    {
+        static lv_style_t texts;
+        lv_style_init(&texts);
+        lv_style_set_text_color(&texts, lv_color_hex(0x000000));
+        lv_style_set_text_font(&texts, &axel_text);
+
+        summaryDateTime = lv_label_create(summaryScreen);
+        lv_obj_add_style(summaryDateTime, &texts, 0);
+        lv_label_set_text(summaryDateTime, "x/x/x xx:xx");
+        lv_obj_set_style_text_font(summaryDateTime, &axel_text, 0);
+        lv_obj_align(summaryDateTime, LV_ALIGN_TOP_LEFT, 0, 0);
+
+        summaryBattery = lv_label_create(summaryScreen);
+        lv_obj_add_style(summaryBattery, &texts, 0);
+        lv_label_set_text(summaryBattery, "xx%");
+        lv_obj_set_style_text_font(summaryBattery, &axel_text, 0);
+        lv_obj_align(summaryBattery, LV_ALIGN_TOP_MID, 0, 0);
+
+        summaryWeather = lv_label_create(summaryScreen);
+        lv_obj_add_style(summaryWeather, &texts, 0);
+        lv_label_set_text(summaryWeather, "xxF");
+        lv_obj_set_style_text_font(summaryWeather, &axel_text, 0);
+        lv_obj_align(summaryWeather, LV_ALIGN_TOP_RIGHT, 0, 0);
+    }
+
     void LVGL::Create_Selectors(lv_obj_t *screen, bool isSummary, std::vector<std::string> items)
     {
         static lv_style_t styleLine;
@@ -312,24 +338,8 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
 
 
         summaryScreen = lv_obj_create(NULL);
+        Recreate_Summary();
 
-        summaryDateTime = lv_label_create(summaryScreen);
-        lv_obj_add_style(summaryDateTime, &texts, 0);
-        lv_label_set_text(summaryDateTime, "x/x/x xx:xx");
-        lv_obj_set_style_text_font(summaryDateTime, &axel_text, 0);
-        lv_obj_align(summaryDateTime, LV_ALIGN_TOP_LEFT, 0, 0);
-
-        summaryBattery = lv_label_create(summaryScreen);
-        lv_obj_add_style(summaryBattery, &texts, 0);
-        lv_label_set_text(summaryBattery, "xx%");
-        lv_obj_set_style_text_font(summaryBattery, &axel_text, 0);
-        lv_obj_align(summaryBattery, LV_ALIGN_TOP_MID, 0, 0);
-
-        summaryWeather = lv_label_create(summaryScreen);
-        lv_obj_add_style(summaryWeather, &texts, 0);
-        lv_label_set_text(summaryWeather, "xxF");
-        lv_obj_set_style_text_font(summaryWeather, &axel_text, 0);
-        lv_obj_align(summaryWeather, LV_ALIGN_TOP_RIGHT, 0, 0);
 
         lv_timer_t *checkUpdate = lv_timer_create(LVGL::Timer_Check_Update, 500, this);
         lv_timer_set_repeat_count(checkUpdate, -1);
@@ -385,6 +395,7 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
     void LVGL::Summary()
     {
         lv_obj_clean(summaryScreen);
+        Recreate_Summary();
 
         Sys::TimeInfo timeInfo = state->Get_Time();
 
@@ -392,7 +403,7 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         std::string date = std::to_string(timeInfo.month) + "/" + std::to_string(timeInfo.day) + "/" + std::to_string(timeInfo.year);
         lv_label_set_text(summaryDateTime, (date + " " + time).c_str());
 
-        /* Sys::WeatherInfo batteryInfo = state->Get_Battery(); */
+        /* Sys::BatteryInfo batteryInfo = state->Get_Battery(); */
         /* lv_label_set_text(summaryBattery, std::to_string(batteryInfo.percent) + "%"); */
 
         Sys::WeatherInfo weatherInfo = state->Get_Weather();
@@ -547,8 +558,8 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
             volatile Sys::Screen s = (Sys::Screen)i;
             if (!screens.at(i)) continue;
             if (s == Sys::Screen::TAG) continue;
-            if (s == Sys::Screen::FACE) activeItems.push_back("Watch Face");
-            if (s == Sys::Screen::SUMMARY) activeItems.push_back("Summary");
+            if (s == Sys::Screen::FACE) continue;
+            if (s == Sys::Screen::SUMMARY) continue;
             if (s == Sys::Screen::ALERT) continue;
             if (s == Sys::Screen::ACTIVE) continue;
             if (s == Sys::Screen::ALERTS_LIST) activeItems.push_back("Unread Alerts");
@@ -597,8 +608,6 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
 
     void LVGL::Load_Screen_By_Name(std::string name)
     {
-        if (name == "Watch Face") face->Load_Screen();
-        if (name == "Summary") Summary();
         if (name == "Unread Alerts") Alerts_List_Screen();
         if (name == "Upcoming Events") Events_List_Screen();
         if (name == "Navigation") Safe_Screen_Load(navScreen);
@@ -740,8 +749,7 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
 
     void LVGL::Button_Double(uint8_t b1, uint8_t b2)
     {
-        /* Why does this crash ?? */
-        /* hapticCtrl->Vibrate_Pulse(50); */
+        hapticCtrl->Vibrate_Pulse(50);
         /* Button 1 & 2 double press */
         if ((b1 == 1 && b2 == 2) || (b1 == 2 && b2 == 1)) {
             /* Global summary screen */

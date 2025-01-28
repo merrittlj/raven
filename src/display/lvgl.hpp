@@ -81,7 +81,7 @@ namespace Display
 
             std::vector<std::string> activeItems;
 
-            lv_obj_t *Create_List(lv_obj_t *screen, std::string text);
+            void Recreate_Summary();
             void Create_Selectors(lv_obj_t *screen, bool isSummary, std::vector<std::string> items);
             void Active_Screen();
             void Alerts_List_Screen();

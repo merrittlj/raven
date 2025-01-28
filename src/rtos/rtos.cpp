@@ -61,43 +61,64 @@ namespace RTOS
     {
         Button_Params *p = (Button_Params *)params;
         for (;;) {
-            p->btnPort->ButtonProcess(p->gpioCtrl->Read_Component(p->buttonIndex) << (p->button - 1));
-            if (p->btnPort->ButtonPressed(1 << (p->button - 1))) {
-                SET_BIT(*p->buttonState, p->button - 1);
+            p->btnPort->ButtonProcess(p->gpioCtrl->Read_Component(p->btn1) | (p->gpioCtrl->Read_Component(p->btn2) << 1) | (p->gpioCtrl->Read_Component(p->btn3) << 2) | (p->gpioCtrl->Read_Component(p->btn4) << 3));
 
-                /* If now became double, means that the other button is proccesing the timeout */
-                uint8_t isDouble = Is_Double(p->button, p->buttonState);
-                if (isDouble == 0) {
-                    uint8_t db = 0;
-                    for(uint8_t i = 0; i < DOUBLE_PRESS_TIMEOUT; ++i) {
-                        if (isDouble == 1) {
-                            CLEAR_BIT(*p->buttonState, 1 - 1);
-                            CLEAR_BIT(*p->buttonState, 2 - 1);
+            if (p->btnPort->ButtonPressed(BUTTON_PIN_0)) {
+                /* Button 1, wait for 2 double */
 
-                            p->displayCtrl->Button_Double(1, 2);
-                            db = 1;
-                            break;
-                        }
-                        if (isDouble == 2) {
-                            CLEAR_BIT(*p->buttonState, 3 - 1);
-                            CLEAR_BIT(*p->buttonState, 4 - 1);
-
-                            p->displayCtrl->Button_Double(3, 4);
-                            db = 1;
-                            break;
-                        }
-                        vTaskDelay(1);
-
-                        p->btnPort->ButtonProcess(p->gpioCtrl->Read_Component(p->buttonIndex) << (p->button - 1));
-                        /* Keep checking for if double until timeout or actually is double */
-                        isDouble = Is_Double(p->button, p->buttonState);
+                bool db = false;
+                for (uint8_t i = 0; i < DOUBLE_PRESS_TIMEOUT; ++i) {
+                    p->btnPort->ButtonProcess(p->gpioCtrl->Read_Component(p->btn1) | (p->gpioCtrl->Read_Component(p->btn2) << 1) | (p->gpioCtrl->Read_Component(p->btn3) << 2) | (p->gpioCtrl->Read_Component(p->btn4) << 3));
+                    if (p->btnPort->ButtonPressed(BUTTON_PIN_1)) {
+                        db = true;
+                        p->displayCtrl->Button_Double(1, 2);
                     }
-                    if (!db) {
-                        p->displayCtrl->Button(p->button);
-                        CLEAR_BIT(*p->buttonState, p->button - 1);
-                    }
+                    vTaskDelay(1);
                 }
-            } else CLEAR_BIT(*p->buttonState, p->button - 1);
+                if (!db) p->displayCtrl->Button(1);
+            }
+            else if (p->btnPort->ButtonPressed(BUTTON_PIN_1)) {
+                /* Button 2, wait for 1 double */
+
+                bool db = false;
+                for (uint8_t i = 0; i < DOUBLE_PRESS_TIMEOUT; ++i) {
+                    p->btnPort->ButtonProcess(p->gpioCtrl->Read_Component(p->btn1) | (p->gpioCtrl->Read_Component(p->btn2) << 1) | (p->gpioCtrl->Read_Component(p->btn3) << 2) | (p->gpioCtrl->Read_Component(p->btn4) << 3));
+                    if (p->btnPort->ButtonPressed(BUTTON_PIN_0)) {
+                        db = true;
+                        p->displayCtrl->Button_Double(2, 1);
+                    }
+                    vTaskDelay(1);
+                }
+                if (!db) p->displayCtrl->Button(2);
+            }
+            else if (p->btnPort->ButtonPressed(BUTTON_PIN_2)) {
+                /* Button 3, wait for 4 double */
+
+                bool db = false;
+                for (uint8_t i = 0; i < DOUBLE_PRESS_TIMEOUT; ++i) {
+                    p->btnPort->ButtonProcess(p->gpioCtrl->Read_Component(p->btn1) | (p->gpioCtrl->Read_Component(p->btn2) << 1) | (p->gpioCtrl->Read_Component(p->btn3) << 2) | (p->gpioCtrl->Read_Component(p->btn4) << 3));
+                    if (p->btnPort->ButtonPressed(BUTTON_PIN_3)) {
+                        db = true;
+                        p->displayCtrl->Button_Double(3, 4);
+                    }
+                    vTaskDelay(1);
+                }
+                if (!db) p->displayCtrl->Button(3);
+            }
+            else if (p->btnPort->ButtonPressed(BUTTON_PIN_3)) {
+                /* Button 4, wait for 3 double */
+
+                bool db = false;
+                for (uint8_t i = 0; i < DOUBLE_PRESS_TIMEOUT; ++i) {
+                    p->btnPort->ButtonProcess(p->gpioCtrl->Read_Component(p->btn1) | (p->gpioCtrl->Read_Component(p->btn2) << 1) | (p->gpioCtrl->Read_Component(p->btn3) << 2) | (p->gpioCtrl->Read_Component(p->btn4) << 3));
+                    if (p->btnPort->ButtonPressed(BUTTON_PIN_2)) {
+                        db = true;
+                        p->displayCtrl->Button_Double(4, 3);
+                    }
+                    vTaskDelay(1);
+                }
+                if (!db) p->displayCtrl->Button(4);
+            }
 
             vTaskDelay(1);
         }

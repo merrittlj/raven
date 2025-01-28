@@ -92,7 +92,7 @@ extern "C" {
 
             __HAL_RCC_GPIOA_CLK_ENABLE();
             /**SPI1 GPIO Configuration
-              PA1     ------> SPI1_SCK
+              PA5     ------> SPI1_SCK
               PA7     ------> SPI1_MOSI
               */
             GPIO_InitStruct.Pin = GPIO_PIN_5|GPIO_PIN_7;
