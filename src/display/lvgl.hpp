@@ -45,13 +45,14 @@ namespace Display
             lv_obj_t *source;
             lv_obj_t *title;
             lv_obj_t *body;
+            lv_obj_t *alertBorder;
 
             lv_obj_t *eventScreen;
             lv_obj_t *eventType;
             lv_obj_t *eventTitle;
             lv_obj_t *eventDesc;
             lv_obj_t *eventTime;
-            lv_obj_t *eventRepdur;
+            lv_obj_t *eventRepDur;
             lv_obj_t *eventBorder;
 
             lv_obj_t *activeScreen;

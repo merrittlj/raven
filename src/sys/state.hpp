@@ -46,6 +46,8 @@ namespace Sys
     };
 
     struct AlertInfo {
+        uint8_t mode;  /* whether to display as an alert(0) or view(1) */
+
         std::string source;
         std::string title;
         std::string body;

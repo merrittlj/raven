@@ -215,11 +215,12 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         lv_obj_set_style_max_width(body, 185, 0);
         lv_obj_align(body, LV_ALIGN_TOP_LEFT, 15, 85);
 
-        lv_obj_t *alertBorder = lv_obj_create(alertScreen);
+        alertBorder = lv_obj_create(alertScreen);
         lv_obj_add_style(alertBorder, &box, 0);
         lv_obj_align(alertBorder, LV_ALIGN_CENTER, 0, 0);
         lv_obj_move_background(alertBorder);
         lv_obj_set_size(alertBorder, 200, 200);
+        lv_obj_clear_flag(alertBorder, LV_OBJ_FLAG_HIDDEN);
 
 
         eventScreen = lv_obj_create(NULL);
@@ -248,17 +249,18 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         lv_obj_set_style_text_font(eventTime, &axel_text, 0);
         lv_obj_align(eventTime, LV_ALIGN_BOTTOM_LEFT, 0, 0);
 
-        eventRepdur = lv_label_create(eventScreen);
-        lv_obj_add_style(eventRepdur, &texts, 0);
-        lv_label_set_text(eventRepdur, "Event Repetition/Duration");
-        lv_obj_set_style_text_font(eventRepdur, &axel_text, 0);
-        lv_obj_align(eventRepdur, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
+        eventRepDur = lv_label_create(eventScreen);
+        lv_obj_add_style(eventRepDur, &texts, 0);
+        lv_label_set_text(eventRepDur, "Event Repetition/Duration");
+        lv_obj_set_style_text_font(eventRepDur, &axel_text, 0);
+        lv_obj_align(eventRepDur, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
 
         eventBorder = lv_obj_create(eventScreen);
         lv_obj_add_style(eventBorder, &box, 0);
         lv_obj_align(eventBorder, LV_ALIGN_CENTER, 0, 0);
         lv_obj_move_background(eventBorder);
         lv_obj_set_size(eventBorder, 200, 200);
+        lv_obj_clear_flag(eventBorder, LV_OBJ_FLAG_HIDDEN);
 
 
         activeScreen = lv_obj_create(NULL);
@@ -440,6 +442,9 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         lv_label_set_text(source, info.source.c_str());
         lv_label_set_text(title, info.title.c_str());
         lv_label_set_text(body, info.body.c_str());
+        /* 0: incoming alert, 1: view from list */
+        if (info.mode == 0) lv_obj_add_flag(alertBorder, LV_OBJ_FLAG_HIDDEN);
+        if (info.mode == 1) lv_obj_clear_flag(alertBorder, LV_OBJ_FLAG_HIDDEN);
 
         Safe_Screen_Load(alertScreen);
         state->Screen_Activate(Sys::Screen::ALERTS_LIST);  /* Until dismissal, activate unread alerts */
@@ -447,12 +452,25 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
 
     void LVGL::Event(Sys::EventInfo info)
     {
+        bool isView = info.mode == 1;
+
         /* Display event type */
-        /* Display title */
-        /* Display description */
-        /* Display timestamp(probably now) */
+        /* THIS IS TEMP */
+        lv_label_set_text(eventType, std::to_string(info.type).c_str());
+
+        lv_label_set_text(eventTitle, info.title.c_str());
+        lv_label_set_text(eventDesc, info.desc.c_str());
+
+        if (!isView) lv_label_set_text(eventTime, "Now");
+        if (isView) lv_label_set_text(eventTime, std::to_string(info.timestamp).c_str());
+
         /* Display repetition/duration */
-        /* Display w/wo border depending on type, view vs. alert modes */
+        /* THIS IS TEMP */
+        lv_label_set_text(eventRepDur, std::to_string(info.repDur).c_str());
+
+        /* 0: incoming alert, 1: view from list */
+        if (!isView) lv_obj_add_flag(eventBorder, LV_OBJ_FLAG_HIDDEN);
+        if (isView) lv_obj_clear_flag(eventBorder, LV_OBJ_FLAG_HIDDEN);
 
         Safe_Screen_Load(eventScreen);
         state->Screen_Activate(Sys::Screen::EVENTS_LIST);
