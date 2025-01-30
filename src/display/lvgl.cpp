@@ -543,8 +543,9 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
 
     void LVGL::Music(Sys::MusicInfo info)
     {
-        lv_label_set_text(musicTrack, Truncate_Text(info.track, 200).c_str());
-        lv_label_set_text(musicArtist, Truncate_Text(info.artist, 200).c_str());
+        /* subtract 2 border width */
+        lv_label_set_text(musicTrack, Truncate_Text(info.track, 200 - 2).c_str());
+        lv_label_set_text(musicArtist, Truncate_Text(info.artist, 200 - 2).c_str());
         lv_label_set_text(musicAlbum, info.album.c_str());
 
         static lv_image_dsc_t albumArt;
