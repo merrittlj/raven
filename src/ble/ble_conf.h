@@ -53,7 +53,7 @@
  * WHY IS THIS NECESSARY WITH CFG_BLE_NUM_GATT_SERVICES???
  * !!!!!!!!!!!!!!!!!!!!!!!!!!!!
  */
-#define BLE_CFG_SVC_MAX_NBR_CB                                                 7
+#define BLE_CFG_SVC_MAX_NBR_CB                                                 8
 
 #define BLE_CFG_CLT_MAX_NBR_CB                                                 0
 

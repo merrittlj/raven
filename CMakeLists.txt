@@ -70,6 +70,7 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCE_DIR}/services/music.cpp
     ${PROJECT_SOURCE_DIR}/services/event.cpp
     ${PROJECT_SOURCE_DIR}/services/info.cpp
+    ${PROJECT_SOURCE_DIR}/services/data.cpp
 
     ${PROJECT_SOURCE_DIR}/display/display.cpp
     ${PROJECT_SOURCE_DIR}/display/controller.cpp

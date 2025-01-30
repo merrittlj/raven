@@ -168,7 +168,7 @@ Sys::TimeInfo Sys::Controller::Get_RTC()
 
     Sys::TimeInfo info;
 
-    info.year = (date.Year & 3);
+    info.year = date.Year + 2000;
     info.month = date.Month;
     info.day = date.Date;
 
@@ -191,10 +191,10 @@ void Sys::Controller::Set_RTC(Sys::TimeInfo info)
         Sys::Error_Handler();
 
     RTC_DateTypeDef date = {0};
-    date.WeekDay = 1;  /* TODO */
+    date.WeekDay = RTC_WEEKDAY_MONDAY;
     date.Month = info.month;
     date.Date = info.day;
-    date.Year = 99;  /* TODO */
+    date.Year = info.year - 2000;
     if (HAL_RTC_SetDate(&hrtc, &date, RTC_FORMAT_BIN) != HAL_OK)
         Sys::Error_Handler();
 

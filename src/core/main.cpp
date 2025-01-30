@@ -20,6 +20,7 @@
 #include "services/music.hpp"
 #include "services/event.hpp"
 #include "services/info.hpp"
+#include "services/data.hpp"
 #include "display/controller.hpp"
 #include "rtos/rtos.hpp"
 #include "haptic/haptic.hpp"
@@ -66,6 +67,7 @@ int main()
     BLE::MusicService musicService = BLE::MusicService(&gpioCtrl, &sysState);
     BLE::EventService eventService = BLE::EventService(&gpioCtrl, &sysState);
     BLE::InfoService infoService = BLE::InfoService(&gpioCtrl, &sysState);
+    BLE::DataService dataService = BLE::DataService(&gpioCtrl, &sysState);
     BLE::App bleApp = BLE::App(&gpioCtrl, &sysState);
 
     /* Configure the debug support if needed */
@@ -138,6 +140,7 @@ int main()
     prefService.Init();
     navService.Init();
     infoService.Init();
+    dataService.Init();
     musicService.Init();
     eventService.Init();
 

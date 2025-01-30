@@ -86,6 +86,8 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         lv_label_set_text(summaryWeather, "xxF");
         lv_obj_set_style_text_font(summaryWeather, &axel_text, 0);
         lv_obj_align(summaryWeather, LV_ALIGN_TOP_RIGHT, 0, 0);
+
+        lv_obj_add_flag(summaryBattery, LV_OBJ_FLAG_HIDDEN);
     }
 
     void LVGL::Create_Selectors(lv_obj_t *screen, bool isSummary, std::vector<std::string> items)
@@ -402,8 +404,9 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         Sys::TimeInfo timeInfo = state->Get_Time();
 
         std::string time = (timeInfo.hour < 10 ? "0" : "") + std::to_string(timeInfo.hour) + ":" + (timeInfo.minute < 10 ? "0" : "") + std::to_string(timeInfo.minute);
-        std::string date = std::to_string(timeInfo.month) + "/" + std::to_string(timeInfo.day) + "/" + std::to_string(timeInfo.year);
-        lv_label_set_text(summaryDateTime, (date + " " + time).c_str());
+        std::string date = (timeInfo.month < 10 ? "0" : "") + std::to_string(timeInfo.month) + "/" + (timeInfo.day < 10 ? "0" : "") + std::to_string(timeInfo.day) + "/" + (timeInfo.year < 10 ? "0" : "") + std::to_string(timeInfo.year).substr(2);
+
+        lv_label_set_text(summaryDateTime, (date + "  " + time).c_str());
 
         /* Sys::BatteryInfo batteryInfo = state->Get_Battery(); */
         /* lv_label_set_text(summaryBattery, std::to_string(batteryInfo.percent) + "%"); */
