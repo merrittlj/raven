@@ -90,7 +90,7 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         lv_obj_add_flag(summaryBattery, LV_OBJ_FLAG_HIDDEN);
     }
 
-    void LVGL::Create_Selectors(lv_obj_t *screen, bool isSummary, std::vector<std::string> items)
+    void LVGL::Create_Selectors(lv_obj_t *screen, bool isSummary, std::vector<std::string> items, std::vector<std::string> items2)
     {
         static lv_style_t styleLine;
         lv_style_init(&styleLine);
@@ -133,12 +133,25 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
                     }
 
                     const uint8_t offset = (isSummary ? 0 : 35);
+                    const uint8_t limit = (isSummary ? 100 : 200 - offset);
+
                     lv_obj_t *itemText = lv_label_create(screen);
                     lv_obj_add_style(itemText, &texts, 0);
-                    lv_label_set_text(itemText, Truncate_Text(items.at(curRow), 200 - offset).c_str());
+                    lv_label_set_text(itemText, Truncate_Text(items.at(curRow), limit).c_str());
                     lv_obj_set_style_text_font(itemText, &axel_text, 0);
                     lv_obj_set_x(itemText, offset);
-                    lv_obj_set_y(itemText, curHeight + 2);
+                    if (isSummary) lv_obj_set_y(itemText, lineHeight + curHeight + 2);
+                    if (!isSummary) lv_obj_set_y(itemText, curHeight + 2);
+
+                    if (isSummary && items2.size() > 0) {
+                        lv_obj_t *item2Text = lv_label_create(screen);
+                        lv_obj_add_style(item2Text, &texts, 0);
+                        lv_label_set_text(item2Text, Truncate_Text(items2.at(curRow), limit).c_str());
+                        lv_obj_set_style_text_font(item2Text, &axel_text, 0);
+
+                        lv_obj_set_x(item2Text, 100 + offset + 2);
+                        lv_obj_set_y(item2Text, lineHeight + curHeight + 2);
+                    }
                 }
 
                 if (curRow < 8) {
@@ -422,7 +435,10 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
             items.push_back(itemText);
         }
 
-        Create_Selectors(summaryScreen, true, items);
+        /* Upcoming events */
+        /* TODO after event screen */
+
+        Create_Selectors(summaryScreen, true, items, {});
 
         Safe_Screen_Load(summaryScreen);
     }
@@ -549,16 +565,6 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         memcpy(builder, palette, 8);
         memcpy(&builder[8], info.albumArt, dataSize - 8);
 
-        /* Checkerboard */
-        /* for (uint32_t i = 8; i < dataSize; ++i) { */
-        /*     // Alternate between 0x55 and 0xAA to create a checkerboard pattern */
-        /*     if ((i / albumArt.header.stride) % 2 == 0) { */
-        /*         cb[i] = 0x55;  // 01010101 (checkerboard-like pattern) */
-        /*     } else { */
-        /*         cb[i] = 0xAA;  // 10101010 (opposite pattern) */
-        /*     } */
-        /* } */
-
         albumArt.data = builder;
 
         lv_image_set_src(musicBG, &albumArt);
@@ -674,6 +680,10 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
                 }
                 else prevButton = 1;
             }
+            /* Summary screen: shortcut to respective lists */
+            else if (lv_screen_active() == summaryScreen) {
+                Alerts_List_Screen();
+            }
             /* Alerts list: selector */
             else if (lv_screen_active() == alertsListScreen) {
                 /* If the group has been selected */
@@ -732,6 +742,10 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
                     Load_Screen_By_Name(activeItems.at(index));
                 }
                 else prevButton = 2;
+            }
+            /* Summary screen: shortcut to respective lists */
+            else if (lv_screen_active() == summaryScreen) {
+                Events_List_Screen();
             }
             /* Alerts list screen: selector */
             else if (lv_screen_active() == alertsListScreen) {
