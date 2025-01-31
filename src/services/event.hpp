@@ -39,7 +39,7 @@ namespace BLE
             BLE::Char id;
             BLE::Char title;
             BLE::Char desc;
-            BLE::Char timestamp;
+            BLE::Char time;
             BLE::Char repDur;
             BLE::Char trigger;
 

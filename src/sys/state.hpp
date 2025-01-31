@@ -57,11 +57,11 @@ namespace Sys
         uint8_t mode;  /* whether to display as an alert(0) or view(1) */
 
         uint8_t type;  /* alarm(0) or calendar(1) event */
-        uint8_t id;  /* ID for calendar events */
+        uint64_t id;  /* ID for calendar events */
         std::string title;
         std::string desc;
-        uint16_t timestamp;  /* Alarm or event time */
-        uint8_t repDur;  /* Either alarm repetition or event duration */
+        std::string time;  /* Alarm or event time */
+        std::string repDur;  /* Either alarm repetition or event duration */
     };
 
     struct NavInfo {
@@ -181,8 +181,8 @@ namespace Sys
             void Event_Build_Id(uint8_t value);
             void Event_Build_Title(std::string str);
             void Event_Build_Desc(std::string str);
-            void Event_Build_Timestamp(uint16_t value);
-            void Event_Build_RepDur(uint8_t value);
+            void Event_Build_Time(std::string value);
+            void Event_Build_RepDur(std::string value);
             void Event_Trigger();
             void Event_Dismiss(size_t index);
             std::vector<EventInfo> Get_Events();

@@ -69,7 +69,9 @@ SVCCTL_EvtAckStatus_t BLE::EventService::Event_Handler(void *Event)
                             sysState->Event_Build_Type(data[0]);
                         }
                         if (attribute_modified->Attr_Handle == (id.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Event_Build_Id(data[0]);
+                            uint64_t res;
+                            memcpy(&res, data, sizeof(uint64_t));
+                            sysState->Event_Build_Id(res);
                         }
                         if (attribute_modified->Attr_Handle == (title.Get_Handle() + CHAR_VALUE_OFFSET)) {
                             sysState->Event_Build_Title(std::string((const char *)data, length));
@@ -77,11 +79,11 @@ SVCCTL_EvtAckStatus_t BLE::EventService::Event_Handler(void *Event)
                         if (attribute_modified->Attr_Handle == (desc.Get_Handle() + CHAR_VALUE_OFFSET)) {
                             sysState->Event_Build_Desc(std::string((const char *)data, length));
                         }
-                        if (attribute_modified->Attr_Handle == (timestamp.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Event_Build_Timestamp(((uint16_t)data[0] << 8) | data[1]);
+                        if (attribute_modified->Attr_Handle == (time.Get_Handle() + CHAR_VALUE_OFFSET)) {
+                            sysState->Event_Build_Time(std::string((const char *)data, length));
                         }
                         if (attribute_modified->Attr_Handle == (repDur.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Event_Build_RepDur(data[0]);
+                            sysState->Event_Build_RepDur(std::string((const char *)data, length));
                         }
                         if (attribute_modified->Attr_Handle == (trigger.Get_Handle() + CHAR_VALUE_OFFSET)) {
                             sysState->Event_Trigger();
@@ -138,7 +140,7 @@ void BLE::EventService::Init()
 
     Char_UUID_t idUUID = BLE::UUID::CreateCharUUID({0x00,0xa9,0x70,0xd2,0xc0,0xdb,0x11,0xef,0xa8,0xfa,0x08,0x00,0x20,0x0c,0x9a,0x66});
     id = BLE::Char(UUID_TYPE_128, &idUUID,
-            1,
+            8,
             CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
@@ -149,7 +151,7 @@ void BLE::EventService::Init()
 
     Char_UUID_t titleUUID = BLE::UUID::CreateCharUUID({0x00,0xa9,0x70,0xd3,0xc0,0xdb,0x11,0xef,0xa8,0xfa,0x08,0x00,0x20,0x0c,0x9a,0x66});
     title = BLE::Char(UUID_TYPE_128, &titleUUID,
-            1,  /* TODO: we need to truncate on GB & need UI parity */
+            30,
             CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
@@ -160,7 +162,7 @@ void BLE::EventService::Init()
 
     Char_UUID_t descUUID = BLE::UUID::CreateCharUUID({0x00,0xa9,0x70,0xd4,0xc0,0xdb,0x11,0xef,0xa8,0xfa,0x08,0x00,0x20,0x0c,0x9a,0x66});
     desc = BLE::Char(UUID_TYPE_128, &descUUID,
-            1,  /* TODO: see prev */
+            30,
             CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
@@ -169,20 +171,20 @@ void BLE::EventService::Init()
     if (desc.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
         Sys::Error_Handler(); /* UNEXPECTED */
 
-    Char_UUID_t timestampUUID = BLE::UUID::CreateCharUUID({0x00,0xa9,0x70,0xd5,0xc0,0xdb,0x11,0xef,0xa8,0xfa,0x08,0x00,0x20,0x0c,0x9a,0x66});
-    timestamp = BLE::Char(UUID_TYPE_128, &timestampUUID,
-            1,
+    Char_UUID_t timeUUID = BLE::UUID::CreateCharUUID({0x00,0xa9,0x70,0xd5,0xc0,0xdb,0x11,0xef,0xa8,0xfa,0x08,0x00,0x20,0x0c,0x9a,0x66});
+    time = BLE::Char(UUID_TYPE_128, &timeUUID,
+            20,
             CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
             10,
             (uint8_t)VALUE_VARIABLE_LENGTH);
-    if (timestamp.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
+    if (time.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
         Sys::Error_Handler(); /* UNEXPECTED */
 
     Char_UUID_t repDurUUID = BLE::UUID::CreateCharUUID({0x00,0xa9,0x70,0xd6,0xc0,0xdb,0x11,0xef,0xa8,0xfa,0x08,0x00,0x20,0x0c,0x9a,0x66});
     repDur = BLE::Char(UUID_TYPE_128, &repDurUUID,
-            1,
+            20,
             CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,

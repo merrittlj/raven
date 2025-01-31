@@ -136,12 +136,12 @@ namespace Sys
         Event_Builder.desc = str;
     }
 
-    void State::Event_Build_Timestamp(uint16_t value)
+    void State::Event_Build_Time(std::string value)
     {
-        Event_Builder.timestamp = value;
+        Event_Builder.time = value;
     }
 
-    void State::Event_Build_RepDur(uint8_t value)
+    void State::Event_Build_RepDur(std::string value)
     {
         Event_Builder.repDur = value;
     }

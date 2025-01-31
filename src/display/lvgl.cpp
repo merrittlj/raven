@@ -462,8 +462,8 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         lv_label_set_text(title, info.title.c_str());
         lv_label_set_text(body, info.body.c_str());
         /* 0: incoming alert, 1: view from list */
-        if (info.mode == 0) lv_obj_add_flag(alertBorder, LV_OBJ_FLAG_HIDDEN);
-        if (info.mode == 1) lv_obj_clear_flag(alertBorder, LV_OBJ_FLAG_HIDDEN);
+        if (info.mode == 0) lv_obj_clear_flag(alertBorder, LV_OBJ_FLAG_HIDDEN);
+        if (info.mode == 1) lv_obj_add_flag(alertBorder, LV_OBJ_FLAG_HIDDEN);
 
         Safe_Screen_Load(alertScreen);
         state->Screen_Activate(Sys::Screen::ALERTS_LIST);  /* Until dismissal, activate unread alerts */
@@ -474,22 +474,21 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         bool isView = info.mode == 1;
 
         /* Display event type */
-        /* THIS IS TEMP */
-        lv_label_set_text(eventType, std::to_string(info.type).c_str());
+        if (info.type == 0) lv_label_set_text(eventType, "Alarm");
+        if (info.type == 1) lv_label_set_text(eventType, "Calendar");
 
         lv_label_set_text(eventTitle, info.title.c_str());
         lv_label_set_text(eventDesc, info.desc.c_str());
 
         if (!isView) lv_label_set_text(eventTime, "Now");
-        if (isView) lv_label_set_text(eventTime, std::to_string(info.timestamp).c_str());
+        if (isView) lv_label_set_text(eventTime, info.time.c_str());
 
         /* Display repetition/duration */
-        /* THIS IS TEMP */
-        lv_label_set_text(eventRepDur, std::to_string(info.repDur).c_str());
+        lv_label_set_text(eventRepDur, info.repDur.c_str());
 
         /* 0: incoming alert, 1: view from list */
-        if (!isView) lv_obj_add_flag(eventBorder, LV_OBJ_FLAG_HIDDEN);
-        if (isView) lv_obj_clear_flag(eventBorder, LV_OBJ_FLAG_HIDDEN);
+        if (!isView) lv_obj_clear_flag(eventBorder, LV_OBJ_FLAG_HIDDEN);
+        if (isView) lv_obj_add_flag(eventBorder, LV_OBJ_FLAG_HIDDEN);
 
         Safe_Screen_Load(eventScreen);
         state->Screen_Activate(Sys::Screen::EVENTS_LIST);
