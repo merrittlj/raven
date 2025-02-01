@@ -121,7 +121,7 @@ namespace Sys
         Event_Builder.type = value;
     }
 
-    void State::Event_Build_Id(uint8_t value)
+    void State::Event_Build_Id(uint64_t value)
     {
         Event_Builder.id = value;
     }

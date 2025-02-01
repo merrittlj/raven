@@ -177,6 +177,12 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         lv_style_set_text_color(&texts, lv_color_hex(0x000000));
         lv_style_set_text_font(&texts, &axel_text);
 
+        static lv_style_t styleLine;
+        lv_style_init(&styleLine);
+        lv_style_set_line_width(&styleLine, 2);
+        lv_style_set_line_rounded(&styleLine, true);
+        lv_style_set_line_color(&styleLine, lv_color_hex(0x000000));
+
         tagScreen = lv_screen_active();
         lv_obj_t *tagText = lv_label_create(tagScreen);
         lv_obj_add_style(tagText, &texts, 0);
@@ -243,32 +249,32 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         eventType = lv_label_create(eventScreen);
         lv_obj_add_style(eventType, &texts, 0);
         lv_label_set_text(eventType, "Event Type");
-        lv_obj_set_style_text_font(eventType, &axel_text, 0);
-        lv_obj_align(eventType, LV_ALIGN_TOP_MID, 0, 0);
+        lv_obj_set_style_text_font(eventType, &axel_ui, 0);
+        lv_obj_align(eventType, LV_ALIGN_TOP_MID, 0, 5);
 
         eventTitle = lv_label_create(eventScreen);
         lv_obj_add_style(eventTitle, &texts, 0);
         lv_label_set_text(eventTitle, "Event Title");
-        lv_obj_set_style_text_font(eventTitle, &axel_text, 0);
-        lv_obj_align(eventTitle, LV_ALIGN_TOP_MID, 0, -20);
+        lv_obj_set_style_text_font(eventTitle, &axel_ui, 0);
+        lv_obj_align(eventTitle, LV_ALIGN_TOP_MID, 0, 35);
 
         eventDesc = lv_label_create(eventScreen);
         lv_obj_add_style(eventDesc, &texts, 0);
         lv_label_set_text(eventDesc, "Event Description");
         lv_obj_set_style_text_font(eventDesc, &axel_text, 0);
-        lv_obj_align(eventDesc, LV_ALIGN_CENTER, 0, 0);
+        lv_obj_align(eventDesc, LV_ALIGN_TOP_MID, 0, 65);
 
         eventTime = lv_label_create(eventScreen);
         lv_obj_add_style(eventTime, &texts, 0);
         lv_label_set_text(eventTime, "Event Time");
         lv_obj_set_style_text_font(eventTime, &axel_text, 0);
-        lv_obj_align(eventTime, LV_ALIGN_BOTTOM_LEFT, 0, 0);
+        lv_obj_align(eventTime, LV_ALIGN_BOTTOM_LEFT, 5, -25);
 
         eventRepDur = lv_label_create(eventScreen);
         lv_obj_add_style(eventRepDur, &texts, 0);
         lv_label_set_text(eventRepDur, "Event Repetition/Duration");
         lv_obj_set_style_text_font(eventRepDur, &axel_text, 0);
-        lv_obj_align(eventRepDur, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
+        lv_obj_align(eventRepDur, LV_ALIGN_BOTTOM_LEFT, 5, -2);
 
         eventBorder = lv_obj_create(eventScreen);
         lv_obj_add_style(eventBorder, &box, 0);
@@ -276,6 +282,22 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         lv_obj_move_background(eventBorder);
         lv_obj_set_size(eventBorder, 200, 200);
         lv_obj_clear_flag(eventBorder, LV_OBJ_FLAG_HIDDEN);
+
+        lv_point_precise_t *typePoints = new lv_point_precise_t[2] {{(lv_value_precise_t)0, (lv_value_precise_t)17}, {(lv_value_precise_t)200, (lv_value_precise_t)17}};
+
+        lv_obj_t *underType;
+        underType = lv_line_create(eventScreen);
+        lv_line_set_points(underType, typePoints, 2);
+        lv_obj_add_style(underType, &styleLine, 0);
+        lv_obj_align(underType, LV_ALIGN_TOP_MID, 0, 10);
+
+        lv_point_precise_t *descPoints = new lv_point_precise_t[2] {{(lv_value_precise_t)0, (lv_value_precise_t)130}, {(lv_value_precise_t)200, (lv_value_precise_t)130}};
+
+        lv_obj_t *underDesc;
+        underDesc = lv_line_create(eventScreen);
+        lv_line_set_points(underDesc, descPoints, 2);
+        lv_obj_add_style(underDesc, &styleLine, 0);
+        lv_obj_align(underDesc, LV_ALIGN_TOP_MID, 0, 20);
 
 
         activeScreen = lv_obj_create(NULL);
@@ -471,6 +493,7 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
 
     void LVGL::Event(Sys::EventInfo info)
     {
+
         bool isView = info.mode == 1;
 
         /* Display event type */
@@ -480,8 +503,7 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         lv_label_set_text(eventTitle, info.title.c_str());
         lv_label_set_text(eventDesc, info.desc.c_str());
 
-        if (!isView) lv_label_set_text(eventTime, "Now");
-        if (isView) lv_label_set_text(eventTime, info.time.c_str());
+        lv_label_set_text(eventTime, info.time.c_str());
 
         /* Display repetition/duration */
         lv_label_set_text(eventRepDur, info.repDur.c_str());

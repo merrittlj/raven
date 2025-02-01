@@ -69,8 +69,10 @@ SVCCTL_EvtAckStatus_t BLE::EventService::Event_Handler(void *Event)
                             sysState->Event_Build_Type(data[0]);
                         }
                         if (attribute_modified->Attr_Handle == (id.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            uint64_t res;
-                            memcpy(&res, data, sizeof(uint64_t));
+                            volatile uint64_t res = 0;
+                            for (int i = 0; i < 8; i++) {
+                                res |= (uint64_t)data[i] << ((i - 7) * 8);
+                            }
                             sysState->Event_Build_Id(res);
                         }
                         if (attribute_modified->Attr_Handle == (title.Get_Handle() + CHAR_VALUE_OFFSET)) {

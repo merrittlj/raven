@@ -178,7 +178,7 @@ namespace Sys
             std::vector<AlertInfo> *Get_Alerts();
 
             void Event_Build_Type(uint8_t value);
-            void Event_Build_Id(uint8_t value);
+            void Event_Build_Id(uint64_t value);
             void Event_Build_Title(std::string str);
             void Event_Build_Desc(std::string str);
             void Event_Build_Time(std::string value);
