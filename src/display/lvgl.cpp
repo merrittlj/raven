@@ -449,18 +449,24 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         Sys::WeatherInfo weatherInfo = state->Get_Weather();
         lv_label_set_text(summaryWeather, weatherInfo.weather.c_str());
 
+
         /* Recent alerts */
         std::vector<Sys::AlertInfo> *stateAlerts = state->Get_Alerts();
-        std::vector<std::string> items;
+        std::vector<std::string> alertItems;
         for (Sys::AlertInfo alert : *stateAlerts) {
             std::string itemText = alert.source + " - " + alert.title;
-            items.push_back(itemText);
+            alertItems.push_back(itemText);
         }
 
         /* Upcoming events */
-        /* TODO after event screen */
+        std::vector<Sys::EventInfo> stateEvents = state->Get_Events();
+        std::vector<std::string> eventItems;
+        for (Sys::EventInfo event : stateEvents) {
+            std::string itemText = event.time + " - " + event.title;
+            eventItems.push_back(itemText);
+        }
 
-        Create_Selectors(summaryScreen, true, items, {});
+        Create_Selectors(summaryScreen, true, alertItems, eventItems);
 
         Safe_Screen_Load(summaryScreen);
     }
@@ -641,11 +647,12 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         lv_obj_clean(eventsListScreen);
 
         std::vector<Sys::EventInfo> stateEvents = state->Get_Events();
-        std::vector<std::string> stateTitles;
+        std::vector<std::string> eventItems;
         for (Sys::EventInfo event : stateEvents) {
-            stateTitles.push_back(event.title);
+            std::string itemText = event.time + " - " + event.title;
+            eventItems.push_back(itemText);
         }
-        Create_Selectors(eventsListScreen, false, stateTitles);
+        Create_Selectors(eventsListScreen, false, eventItems);
 
         Safe_Screen_Load(eventsListScreen);
     }
