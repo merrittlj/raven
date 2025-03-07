@@ -6,6 +6,7 @@
 #include "lvgl.h"
 
 #include <cstddef>
+#include <bitset>
 
 
 namespace Sys
@@ -208,27 +209,32 @@ namespace Sys
 
     void State::Music_Build_Album_Art(uint8_t *arr, size_t length)
     {
-        if (!arr || length <= 0 || length > capacity) return;  /* Invalid inputs */
+        if (!arr) return;
+
+        /* Chunks are 1-byte index + rest bytes data */
+        size_t dataSize = length - 1;
+        /* 511, not 512, only 511 bytes of data are written */
+        size_t chunkOffset = 511 * arr[0];  /* Where the first byte of the chunk is */
+
+        if (length <= 1 || dataSize > capacity || arr[0] > chunks - 1 || chunkOffset + dataSize > capacity) return;  /* Invalid inputs */
 
         size_t available = capacity - chunkOffset;
 
         /* Full chunk can fit */
-        if (available >= length) {
-            memcpy(&(Music_Builder.albumArt[chunkOffset]), arr, length);
-            chunkOffset += length;
+        if (available >= dataSize) {
+            memcpy(&(Music_Builder.albumArt[chunkOffset]), &arr[1], dataSize);
+            chunkWrites.set(arr[0]);
+        } else if (available > 0 && arr[0] == chunks - 1) {
             /* Partial chunk can fit */
-        } else if (available > 0) {
-            memcpy(&(Music_Builder.albumArt[chunkOffset]), arr, available);
-            chunkOffset += available;
-            /* No space left */
+            /* Should only happen on the last chunk */
+            memcpy(&(Music_Builder.albumArt[chunkOffset]), &arr[1], available);
+            chunkWrites.set(arr[0]);
         } else return;
-    }
 
-    void State::Music_Trigger()
-    {
-        Display::Controller::Instance()->Music_Send(Music_Builder);
-        chunkOffset = 0;
-        /* Music_Builder = {"", "", "", NULL}; */
+        if (chunkWrites.all()) {
+            Display::Controller::Instance()->Music_Send(Music_Builder);
+            chunkWrites.reset();
+        }
     }
 
     void State::Register_LED_Red(uint32_t pIndex)

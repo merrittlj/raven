@@ -39,7 +39,6 @@ namespace BLE
             BLE::Char track;
             BLE::Char album;
             BLE::Char albumArt;
-            BLE::Char trigger;
 
             MusicService(GPIO::Controller *pGpioCtrl, Sys::State *pSysState);
             ~MusicService();

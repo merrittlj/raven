@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 #include <array>
+#include <bitset>
 
 
 #define EVENT_POOL_SIZE                    (CFG_TLBLE_EVT_QUEUE_LENGTH*4U*DIVC(( sizeof(TL_PacketHeader_t) + TL_BLE_EVENT_FRAME_SIZE ), 4U))
@@ -109,8 +110,10 @@ namespace Sys
             EventInfo Event_Builder;
 
             MusicInfo Music_Builder;
-            const size_t capacity = 5000;
-            size_t chunkOffset = 0;
+            static constexpr size_t capacity = 5000;
+            /* (5000 / 511) + 1 */
+            static constexpr size_t chunks = 10;
+            std::bitset<chunks> chunkWrites;
 
             NavInfo Nav_Builder;
 
@@ -197,7 +200,7 @@ namespace Sys
             void Music_Build_Track(std::string str);
             void Music_Build_Album(std::string str);
             void Music_Build_Album_Art(uint8_t *arr, size_t length);
-            void Music_Trigger();
+            /* Triggered via last album art chunk */
 
             void Register_LED_Red(uint32_t pIndex);
             uint32_t Fetch_LED_Red();

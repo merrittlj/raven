@@ -76,9 +76,6 @@ SVCCTL_EvtAckStatus_t BLE::MusicService::Event_Handler(void *Event)
                         if (attribute_modified->Attr_Handle == (albumArt.Get_Handle() + CHAR_VALUE_OFFSET)) {
                             sysState->Music_Build_Album_Art(data, length);
                         }
-                        if (attribute_modified->Attr_Handle == (trigger.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Music_Trigger();
-                        }
                         break;
 
                     default:
@@ -120,7 +117,7 @@ void BLE::MusicService::Init()
 
     Char_UUID_t artistUUID = BLE::UUID::CreateCharUUID({0x98,0x2f,0xc7,0x71,0xbc,0x48,0x11,0xef,0x99,0x08,0x08,0x00,0x20,0x0c,0x9a,0x66});
     artist = BLE::Char(UUID_TYPE_128, &artistUUID,
-            30,  /* TODO: need to truncate and determine UI parity */
+            30,
             CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
@@ -131,7 +128,7 @@ void BLE::MusicService::Init()
 
     Char_UUID_t trackUUID = BLE::UUID::CreateCharUUID({0x98,0x2f,0xc7,0x72,0xbc,0x48,0x11,0xef,0x99,0x08,0x08,0x00,0x20,0x0c,0x9a,0x66});
     track = BLE::Char(UUID_TYPE_128, &trackUUID,
-            30,  /* TODO: see prev */
+            30,
             CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
@@ -142,7 +139,7 @@ void BLE::MusicService::Init()
 
     Char_UUID_t albumUUID = BLE::UUID::CreateCharUUID({0x98,0x2f,0xc7,0x73,0xbc,0x48,0x11,0xef,0x99,0x08,0x08,0x00,0x20,0x0c,0x9a,0x66});
     album = BLE::Char(UUID_TYPE_128, &albumUUID,
-            30,  /* TODO: see prev */
+            30,
             CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
@@ -153,24 +150,13 @@ void BLE::MusicService::Init()
 
     Char_UUID_t albumArtUUID = BLE::UUID::CreateCharUUID({0x98,0x2f,0xc7,0x74,0xbc,0x48,0x11,0xef,0x99,0x08,0x08,0x00,0x20,0x0c,0x9a,0x66});
     albumArt = BLE::Char(UUID_TYPE_128, &albumArtUUID,
-            512,  /* TODO: receive in chunks */
+            512,  /* multiple 512 byte chunks */
             CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
             10,
             (uint8_t)VALUE_VARIABLE_LENGTH);
     if (albumArt.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
-        Sys::Error_Handler(); /* UNEXPECTED */
-
-    Char_UUID_t triggerUUID = BLE::UUID::CreateCharUUID({0x98,0x2f,0xc7,0x75,0xbc,0x48,0x11,0xef,0x99,0x08,0x08,0x00,0x20,0x0c,0x9a,0x66});
-    trigger = BLE::Char(UUID_TYPE_128, &triggerUUID,
-            1,
-            CHAR_PROP_WRITE,
-            ATTR_PERMISSION_NONE,
-            GATT_NOTIFY_ATTRIBUTE_WRITE,
-            10,
-            (uint8_t)VALUE_VARIABLE_LENGTH);
-    if (trigger.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
         Sys::Error_Handler(); /* UNEXPECTED */
 }
 

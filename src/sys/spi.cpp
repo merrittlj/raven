@@ -119,7 +119,7 @@ extern "C" {
             __HAL_RCC_SPI1_CLK_DISABLE();
 
             /**SPI1 GPIO Configuration
-              PA1     ------> SPI1_SCK
+              PA5     ------> SPI1_SCK
               PA7     ------> SPI1_MOSI
               */
             HAL_GPIO_DeInit(GPIOA, GPIO_PIN_5|GPIO_PIN_7);
