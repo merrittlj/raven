@@ -88,6 +88,7 @@ namespace Sys
         std::string face;
         /* Flipped/inverted when using dark mode */
         Scheme scheme;
+        uint8_t hideMusic;  /* 0: false 1: true */
     };
 
     class State

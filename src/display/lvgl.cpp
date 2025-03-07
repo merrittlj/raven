@@ -575,6 +575,14 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         lv_label_set_text(musicArtist, Truncate_Text(info.artist, 200 - 2).c_str());
         lv_label_set_text(musicAlbum, info.album.c_str());
 
+        if (state->Get_Pref()->hideMusic == 1) {
+            lv_obj_add_flag(musicTrack, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_add_flag(musicArtist, LV_OBJ_FLAG_HIDDEN);
+        } else {
+            lv_obj_clear_flag(musicTrack, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_clear_flag(musicArtist, LV_OBJ_FLAG_HIDDEN);
+        }
+
         static lv_image_dsc_t albumArt;
 
         /* The first 8 bytes of the data should be a palette */

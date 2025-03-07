@@ -37,6 +37,7 @@ namespace BLE
         public:
             BLE::Char face;
             BLE::Char colorScheme;
+            BLE::Char hideMusic;
 
             PrefService(GPIO::Controller *pGpioCtrl, Sys::State *pSysState);
             ~PrefService();

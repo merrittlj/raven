@@ -73,6 +73,9 @@ SVCCTL_EvtAckStatus_t BLE::PrefService::Event_Handler(void *Event)
                             sysState->Get_Pref()->scheme = ((Sys::Scheme)data[0]);
                             Display::Controller::Instance()->Refresh();
                         }
+                        if (attribute_modified->Attr_Handle == (hideMusic.Get_Handle() + CHAR_VALUE_OFFSET)) {
+                            sysState->Get_Pref()->hideMusic = (uint8_t)data[0];
+                        }
                         break;
 
                     default:
@@ -132,6 +135,17 @@ void BLE::PrefService::Init()
             10,
             (uint8_t)VALUE_VARIABLE_LENGTH);
     if (colorScheme.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
+        Sys::Error_Handler(); /* UNEXPECTED */
+
+    Char_UUID_t hideMusicUUID = BLE::UUID::CreateCharUUID({0xbd,0x77,0x11,0xb3,0xbb,0x11,0x11,0xef,0x99,0x08,0x08,0x00,0x20,0x0c,0x9a,0x66});
+    hideMusic = BLE::Char(UUID_TYPE_128, &hideMusicUUID,
+            1,
+            CHAR_PROP_WRITE,
+            ATTR_PERMISSION_NONE,
+            GATT_NOTIFY_ATTRIBUTE_WRITE,
+            10,
+            (uint8_t)VALUE_VARIABLE_LENGTH);
+    if (hideMusic.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
         Sys::Error_Handler(); /* UNEXPECTED */
 }
 
