@@ -14,7 +14,7 @@
 
 namespace BLE
 {
-    class MusicService : BLE::Service<MusicService>
+    class MusicService : public BLE::Service<MusicService>
     {
         protected:
             uintptr_t handle;
@@ -24,7 +24,7 @@ namespace BLE
              * service_max_attribute_record = 1 for service +
              *                                2 for each Write/Notify characteristic +
              *                                1 for client char configuration descriptor + */
-            const uint8_t SERVICE_MAX_ATT_RECORDS = 12;
+            const uint8_t SERVICE_MAX_ATT_RECORDS = 14;
 
             GPIO::Controller *gpioCtrl;
             Sys::State *sysState;
@@ -39,6 +39,7 @@ namespace BLE
             BLE::Char track;
             BLE::Char album;
             BLE::Char albumArt;
+            BLE::Char ready;
 
             MusicService(GPIO::Controller *pGpioCtrl, Sys::State *pSysState);
             ~MusicService();

@@ -2,6 +2,8 @@
 
 #include "app/common.hpp"
 #include "display/controller.hpp"
+#include "services/music.hpp"
+#include "ble/uuid.hpp"
 
 #include "lvgl.h"
 
@@ -205,6 +207,13 @@ namespace Sys
     void State::Music_Build_Album(std::string str)
     {
         Music_Builder.album = str;
+
+        uint8_t readyData = 1;
+        BLE::MusicService *musicService = BLE::MusicService::Instance();
+        if (musicService->Update_Char_Value(BLE::UUID::ExtractUUID16FromLE(musicService->ready.Get_UUID()),
+                    musicService->ready.Get_Value_Length(),
+                    &readyData) != BLE_STATUS_SUCCESS)
+            Sys::Error_Handler();
     }
 
     void State::Music_Build_Album_Art(uint8_t *arr, size_t length)
@@ -214,9 +223,9 @@ namespace Sys
         /* Chunks are 1-byte index + rest bytes data */
         size_t dataSize = length - 1;
         /* 511, not 512, only 511 bytes of data are written */
-        size_t chunkOffset = 511 * arr[0];  /* Where the first byte of the chunk is */
+        size_t chunkOffset = (240 - 1) * arr[0];  /* Where the first byte of the chunk is */
 
-        if (length <= 1 || dataSize > capacity || arr[0] > chunks - 1 || chunkOffset + dataSize > capacity) return;  /* Invalid inputs */
+        if (length <= 1 || dataSize > capacity || arr[0] > chunks - 1) return;  /* Invalid inputs */
 
         size_t available = capacity - chunkOffset;
 
@@ -224,16 +233,24 @@ namespace Sys
         if (available >= dataSize) {
             memcpy(&(Music_Builder.albumArt[chunkOffset]), &arr[1], dataSize);
             chunkWrites.set(arr[0]);
-        } else if (available > 0 && arr[0] == chunks - 1) {
+        } else if (available > 0) {
             /* Partial chunk can fit */
             /* Should only happen on the last chunk */
             memcpy(&(Music_Builder.albumArt[chunkOffset]), &arr[1], available);
             chunkWrites.set(arr[0]);
         } else return;
 
-        if (chunkWrites.all()) {
+        /* if (chunkWrites.all()) { */
+        if (arr[0] == 20) {
             Display::Controller::Instance()->Music_Send(Music_Builder);
             chunkWrites.reset();
+        } else {
+            uint8_t readyData = 1;
+            BLE::MusicService *musicService = BLE::MusicService::Instance();
+            if (musicService->Update_Char_Value(BLE::UUID::ExtractUUID16FromLE(musicService->ready.Get_UUID()),
+                        musicService->ready.Get_Value_Length(),
+                        &readyData) != BLE_STATUS_SUCCESS)
+                Sys::Error_Handler();
         }
     }
 
@@ -266,4 +283,4 @@ namespace Sys
     {
         return this->LED_Blue_Index;
     }
-}
+    }

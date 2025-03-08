@@ -24,7 +24,7 @@ namespace BLE
              * service_max_attribute_record = 1 for service +
              *                                2 for each Write/Notify characteristic +
              *                                1 for client char configuration descriptor + */
-            const uint8_t SERVICE_MAX_ATT_RECORDS = 6;
+            const uint8_t SERVICE_MAX_ATT_RECORDS = (2 * 3) + 2;
 
             GPIO::Controller *gpioCtrl;
             Sys::State *sysState;

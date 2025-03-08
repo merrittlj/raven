@@ -150,13 +150,24 @@ void BLE::MusicService::Init()
 
     Char_UUID_t albumArtUUID = BLE::UUID::CreateCharUUID({0x98,0x2f,0xc7,0x74,0xbc,0x48,0x11,0xef,0x99,0x08,0x08,0x00,0x20,0x0c,0x9a,0x66});
     albumArt = BLE::Char(UUID_TYPE_128, &albumArtUUID,
-            512,  /* multiple 512 byte chunks */
+            240,  /* multiple 240 byte chunks */
             CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
             10,
             (uint8_t)VALUE_VARIABLE_LENGTH);
     if (albumArt.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
+        Sys::Error_Handler(); /* UNEXPECTED */
+
+    Char_UUID_t readyUUID = BLE::UUID::CreateCharUUID({0x98,0x2f,0xc7,0x75,0xbc,0x48,0x11,0xef,0x99,0x08,0x08,0x00,0x20,0x0c,0x9a,0x66});
+    ready = BLE::Char(UUID_TYPE_128, &readyUUID,
+            1,
+            CHAR_PROP_NOTIFY,
+            ATTR_PERMISSION_NONE,
+            GATT_NOTIFY_ATTRIBUTE_WRITE,
+            10,
+            (uint8_t)VALUE_VARIABLE_LENGTH);
+    if (ready.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
         Sys::Error_Handler(); /* UNEXPECTED */
 }
 
@@ -169,5 +180,15 @@ void BLE::MusicService::Init()
 tBleStatus BLE::MusicService::Update_Char_Value(uint16_t UUID16, uint16_t newValueLength, uint8_t *pNewValue)
 {
     tBleStatus ret = BLE_STATUS_INVALID_PARAMS;
+    if (UUID16 == BLE::UUID::ExtractUUID16FromLE(ready.Get_UUID())) {
+        if (newValueLength <= ready.Get_Value_Length())
+        {
+            ret = aci_gatt_update_char_value(this->Get_Handle(),
+                    ready.Get_Handle(),
+                    0, /* charValOffset */
+                    newValueLength, /* charValueLen */
+                    (uint8_t *)pNewValue);
+        }
+    }
     return ret;
 }

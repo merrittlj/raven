@@ -113,7 +113,7 @@ namespace Sys
             MusicInfo Music_Builder;
             static constexpr size_t capacity = 5000;
             /* (5000 / 511) + 1 */
-            static constexpr size_t chunks = 10;
+            static constexpr size_t chunks = 21;
             std::bitset<chunks> chunkWrites;
 
             NavInfo Nav_Builder;
