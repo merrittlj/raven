@@ -7,14 +7,20 @@
 #include <math.h>
 #include <array>
 #include <string>
+#include <ctime>
 
 
 #define DEG2RAD 0.0174532925
 
-    LV_FONT_DECLARE(gloock_time)  /* 70 regular */
-    LV_FONT_DECLARE(gloock_date)  /* 18 regular */
+    LV_FONT_DECLARE(gloock_time)  /* Gloock 70 regular */
+    LV_FONT_DECLARE(gloock_date)  /* Gloock 18 regular */
     LV_FONT_DECLARE(seg)  /* 55 bold */
-LV_FONT_DECLARE(axel_ui)  /* 22 bold */
+LV_FONT_DECLARE(axel_ui)  /* Axel 22 bold */
+    LV_FONT_DECLARE(montserrat_time) /* Montserrat 20 medium */
+    LV_FONT_DECLARE(roboto_dow) /* Roboto Condensed 7 light */
+    LV_FONT_DECLARE(roboto_date) /* Roboto Condensed 13 bold */
+
+    LV_IMAGE_DECLARE(image_face_bg);  
 
     namespace Display
 {
@@ -100,108 +106,6 @@ LV_FONT_DECLARE(axel_ui)  /* 22 bold */
         std::string timeValue = (info.hour < 10 ? "0" : "") + std::to_string(info.hour) + ":" + (info.minute < 10 ? "0" : "") + std::to_string(info.minute);
 
         lv_label_set_text(time, timeValue.c_str());
-    }
-
-    Arcs_Face::Arcs_Face()
-    {}
-
-    Arcs_Face::~Arcs_Face()
-    {
-        lv_obj_clean(screen);
-    }
-
-    void Arcs_Face::Create()
-    {
-        static lv_style_t texts;
-        lv_style_init(&texts);
-        lv_style_set_text_color(&texts, lv_color_hex(0x000000));
-        lv_style_set_text_font(&texts, &gloock_time);
-
-        screen = lv_obj_create(NULL);
-    }
-
-    void Arcs_Face::Load_Screen()
-    {
-        LVGL::Safe_Screen_Load(screen);
-    }
-
-    void Arcs_Face::Draw(Sys::TimeInfo info)
-    {
-        Draw_Minute(info.minute);
-        Draw_Hour(info.hour);
-        Draw_Day(info.day);
-        Draw_Month(info.month);
-    }
-
-    void Arcs_Face::Draw_Minute(uint8_t minute)
-    {
-        float minuteAngle = 360.0 * (minute / 60.0);
-        uint8_t tick = (uint8_t)(360 / 60);
-
-        static lv_style_t arcs;
-        lv_style_init(&arcs);
-        lv_style_set_arc_color(&arcs, lv_color_hex(0x000000));
-        lv_style_set_arc_width(&arcs, 13);
-        lv_style_set_arc_rounded(&arcs, false);
-
-        lv_obj_t *arc = lv_arc_create(screen);
-        lv_obj_add_style(arc, &arcs, 0);
-        lv_arc_set_bg_angles(arc, 0, minuteAngle);
-        lv_obj_remove_style(arc, NULL, LV_PART_KNOB);  /* Remove knob */
-        lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE);
-        lv_arc_set_value(arc, 100);
-        lv_obj_set_size(arc, faceRadius*2, faceRadius*2);
-        lv_arc_set_rotation(arc, 270);  /* Start from top */
-        lv_obj_center(arc);
-        lv_obj_move_background(arc);
-
-        /* Existing ticks */
-        Arc_Ticks(tick, minuteAngle - tick, faceRadius - 13/2, 15, lv_color_hex(0xffffff), tick);
-        /* Future ticks */
-        Arc_Ticks(minuteAngle + tick, 360 - tick, faceRadius - 13/2, 7, lv_color_hex(0x000000), tick);
-    }
-
-    void Arcs_Face::Draw_Hour(uint8_t hour)
-    {
-
-    }
-
-    void Arcs_Face::Draw_Day(uint8_t day)
-    {
-
-    }
-
-    void Arcs_Face::Draw_Month(uint8_t month)
-    {
-
-    }
-
-    void Arcs_Face::Arc_Ticks(float startAngle, float endAngle, uint32_t radius, uint32_t width, lv_color_t color, uint32_t step)
-    {
-        uint8_t center_x = 100;
-        uint8_t center_y = 100;
-
-        lv_style_t *styleLine = new lv_style_t;
-        lv_style_init(styleLine);
-        lv_style_set_line_width(styleLine, 1);
-        lv_style_set_line_rounded(styleLine, true);
-        lv_style_set_line_color(styleLine, color);
-
-        // Draw colour blocks every inc degrees
-        for (float i = startAngle; i <= endAngle; i += step) {
-            float cx1 = center_x + (radius - width / 2) * cos((i - 90) * (float)DEG2RAD);
-            float cy1 = center_y + (radius - width / 2) * sin((i - 90) * (float)DEG2RAD);
-            float cx2 = center_x + (radius + width / 2) * cos((i - 90) * (float)DEG2RAD);
-            float cy2 = center_y + (radius + width / 2) * sin((i - 90) * (float)DEG2RAD);
-
-            lv_point_precise_t *linePoints = new lv_point_precise_t[2] {{(lv_value_precise_t)cx1, (lv_value_precise_t)cy1}, {(lv_value_precise_t)cx2, (lv_value_precise_t)cy2}};
-
-            lv_obj_t *line;
-            line = lv_line_create(screen);
-            lv_line_set_points(line, linePoints, 2);
-            lv_obj_add_style(line, styleLine, 0);
-            lv_obj_align(line, LV_ALIGN_TOP_LEFT, 0, 0);
-        }
     }
 
     Analog_Face::Analog_Face()
@@ -325,15 +229,15 @@ LV_FONT_DECLARE(axel_ui)  /* 22 bold */
         lv_line_set_points(minuteHand, minutePoints, 2);
     }
 
-    Speed_Face::Speed_Face()
+    Image_Face::Image_Face()
     {}
 
-    Speed_Face::~Speed_Face()
+    Image_Face::~Image_Face()
     {
         lv_obj_clean(screen);
     }
 
-    void Speed_Face::Create()
+    void Image_Face::Create()
     {
         static lv_style_t texts;
         lv_style_init(&texts);
@@ -341,45 +245,151 @@ LV_FONT_DECLARE(axel_ui)  /* 22 bold */
 
         screen = lv_obj_create(NULL);
 
-        lv_obj_t *tmp = lv_label_create(screen);
-        lv_obj_add_style(tmp, &texts, 0);
-        lv_label_set_text(tmp, "Speed Face");
-        lv_obj_set_style_text_font(tmp, &axel_ui, 0);
-        lv_obj_align(tmp, LV_ALIGN_CENTER, 0, 0);
+        dow = lv_label_create(screen);
+        lv_obj_add_style(dow, &texts, 0);
+        lv_label_set_text(dow, "DOW");
+        lv_obj_set_style_text_font(dow, &roboto_dow, 0);
+        lv_obj_align(dow, LV_ALIGN_TOP_MID, 0, 7);
+
+        date = lv_label_create(screen);
+        lv_obj_add_style(date, &texts, 0);
+        lv_label_set_text(date, "Month Day");
+        lv_obj_set_style_text_font(date, &roboto_date, 0);
+        lv_obj_align(date, LV_ALIGN_TOP_MID, 8, 27);
+
+        time = lv_label_create(screen);
+        lv_obj_add_style(time, &texts, 0);
+        lv_label_set_text(time, "00:00");
+        lv_obj_set_style_text_font(date, &montserrat_time, 0);
+        lv_obj_align(time, LV_ALIGN_BOTTOM_LEFT, 67, -20);
+
+        bg = lv_image_create(screen);
+        lv_image_set_src(bg, &image_face_bg);
+        lv_obj_align(bg, LV_ALIGN_CENTER, 0, 0);
+        lv_obj_move_background(bg);
     }
 
-    void Speed_Face::Load_Screen()
+    void Image_Face::Load_Screen()
     {
         LVGL::Safe_Screen_Load(screen);
     }
 
-    void Speed_Face::Draw(Sys::TimeInfo info)
+    void Image_Face::Draw(Sys::TimeInfo info)
     {
-        /* Draw circle */
-        Draw_Border();
-        /* Draw small(subsecond) ticks */
-        /* Draw second ticks */
-        /* Draw hour ticks */
-        /* Draw circles */
-        /* Draw hands */
+        std::string timeValue = (info.hour < 10 ? "0" : "") + std::to_string(info.hour) + ":" + (info.minute < 10 ? "0" : "") + std::to_string(info.minute);
+
+        const std::string dows[7] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+        const std::string months[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+
+        std::tm time_in = { info.second, info.minute, info.hour, // second, minute, hour
+            info.day, info.month - 1, info.year - 1900 }; // 1-based day, 0-based month, year since 1900
+        std::time_t time_temp = std::mktime(&time_in);
+        const std::tm * time_out = std::localtime(&time_temp);
+
+        lv_label_set_text(dow, dows[time_out->tm_wday].c_str());
+        lv_label_set_text(date, (months[info.month - 1] + " " + info.day).c_str());
+        lv_label_set_text(time, timeValue.c_str());
     }
 
-    void Speed_Face::Draw_Border()
+    Arcs_Face::Arcs_Face()
+    {}
+
+    Arcs_Face::~Arcs_Face()
     {
+        lv_obj_clean(screen);
+    }
+
+    void Arcs_Face::Create()
+    {
+        static lv_style_t texts;
+        lv_style_init(&texts);
+        lv_style_set_text_color(&texts, lv_color_hex(0x000000));
+        lv_style_set_text_font(&texts, &gloock_time);
+
+        screen = lv_obj_create(NULL);
+    }
+
+    void Arcs_Face::Load_Screen()
+    {
+        LVGL::Safe_Screen_Load(screen);
+    }
+
+    void Arcs_Face::Draw(Sys::TimeInfo info)
+    {
+        Draw_Minute(info.minute);
+        Draw_Hour(info.hour);
+        Draw_Day(info.day);
+        Draw_Month(info.month);
+    }
+
+    void Arcs_Face::Draw_Minute(uint8_t minute)
+    {
+        float minuteAngle = 360.0 * (minute / 60.0);
+        uint8_t tick = (uint8_t)(360 / 60);
+
         static lv_style_t arcs;
         lv_style_init(&arcs);
         lv_style_set_arc_color(&arcs, lv_color_hex(0x000000));
-        lv_style_set_arc_width(&arcs, 1);
+        lv_style_set_arc_width(&arcs, 13);
+        lv_style_set_arc_rounded(&arcs, false);
 
         lv_obj_t *arc = lv_arc_create(screen);
         lv_obj_add_style(arc, &arcs, 0);
-        lv_arc_set_bg_angles(arc, 0, 360);
+        lv_arc_set_bg_angles(arc, 0, minuteAngle);
         lv_obj_remove_style(arc, NULL, LV_PART_KNOB);  /* Remove knob */
         lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE);
         lv_arc_set_value(arc, 100);
-        lv_obj_set_size(arc, radius*2, radius*2);
+        lv_obj_set_size(arc, faceRadius*2, faceRadius*2);
         lv_arc_set_rotation(arc, 270);  /* Start from top */
         lv_obj_center(arc);
         lv_obj_move_background(arc);
+
+        /* Existing ticks */
+        Arc_Ticks(tick, minuteAngle - tick, faceRadius - 13/2, 15, lv_color_hex(0xffffff), tick);
+        /* Future ticks */
+        Arc_Ticks(minuteAngle + tick, 360 - tick, faceRadius - 13/2, 7, lv_color_hex(0x000000), tick);
+    }
+
+    void Arcs_Face::Draw_Hour(uint8_t hour)
+    {
+
+    }
+
+    void Arcs_Face::Draw_Day(uint8_t day)
+    {
+
+    }
+
+    void Arcs_Face::Draw_Month(uint8_t month)
+    {
+
+    }
+
+    void Arcs_Face::Arc_Ticks(float startAngle, float endAngle, uint32_t radius, uint32_t width, lv_color_t color, uint32_t step)
+    {
+        uint8_t center_x = 100;
+        uint8_t center_y = 100;
+
+        lv_style_t *styleLine = new lv_style_t;
+        lv_style_init(styleLine);
+        lv_style_set_line_width(styleLine, 1);
+        lv_style_set_line_rounded(styleLine, true);
+        lv_style_set_line_color(styleLine, color);
+
+        // Draw colour blocks every inc degrees
+        for (float i = startAngle; i <= endAngle; i += step) {
+            float cx1 = center_x + (radius - width / 2) * cos((i - 90) * (float)DEG2RAD);
+            float cy1 = center_y + (radius - width / 2) * sin((i - 90) * (float)DEG2RAD);
+            float cx2 = center_x + (radius + width / 2) * cos((i - 90) * (float)DEG2RAD);
+            float cy2 = center_y + (radius + width / 2) * sin((i - 90) * (float)DEG2RAD);
+
+            lv_point_precise_t *linePoints = new lv_point_precise_t[2] {{(lv_value_precise_t)cx1, (lv_value_precise_t)cy1}, {(lv_value_precise_t)cx2, (lv_value_precise_t)cy2}};
+
+            lv_obj_t *line;
+            line = lv_line_create(screen);
+            lv_line_set_points(line, linePoints, 2);
+            lv_obj_add_style(line, styleLine, 0);
+            lv_obj_align(line, LV_ALIGN_TOP_LEFT, 0, 0);
+        }
     }
 }

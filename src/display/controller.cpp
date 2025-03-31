@@ -86,9 +86,8 @@ namespace Display
         Face *face = new Digital_Face();
         if (pref == "big") face = new Big_Face();
         else if (pref == "digital") face = new Digital_Face();
-        else if (pref == "arcs") face = new Arcs_Face();
         else if (pref == "analog") face = new Analog_Face();
-        else if (pref == "speed") face = new Speed_Face();
+        else if (pref == "arcs") face = new Arcs_Face();
         lvgl.Set_Face(face);
 
         Time(Get_RTC());
