@@ -98,6 +98,30 @@ namespace Display
             void Draw(Sys::TimeInfo info);
     };
 
+    /* Square minimal analog face */
+    class Square_Analog_Face : public Face
+    {
+        private:
+            lv_obj_t *screen;
+            lv_obj_t *hourHand;
+            lv_obj_t *minuteHand;
+
+            lv_point_precise_t *hourPoints;
+            lv_point_precise_t *minutePoints;
+
+            void Draw_Ticks();
+            void Draw_Hands(uint8_t hour, uint8_t minute);
+
+        public:
+            Square_Analog_Face();
+            ~Square_Analog_Face();
+
+            void Create();
+            void Load_Screen();
+            void Draw(Sys::TimeInfo info);
+    };
+
+
     /* UNFINISHED: bad line drawing functions */
     class Arcs_Face : public Face
     {
