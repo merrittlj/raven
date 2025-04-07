@@ -19,6 +19,8 @@ namespace Display
             virtual void Draw(Sys::TimeInfo info) = 0;
     };
 
+    void Draw_Ticks(float startAngle, float endAngle, uint32_t radius, uint32_t width, uint32_t thickness, lv_color_t color, uint32_t step, lv_obj_t *screen);
+
     /* Large stylistic time with small date */
     class Big_Face : public Face
     {
@@ -106,10 +108,11 @@ namespace Display
             lv_obj_t *hourHand;
             lv_obj_t *minuteHand;
 
+            const uint8_t faceRadius = 88;
+
             lv_point_precise_t *hourPoints;
             lv_point_precise_t *minutePoints;
 
-            void Draw_Ticks();
             void Draw_Hands(uint8_t hour, uint8_t minute);
 
         public:
@@ -131,8 +134,6 @@ namespace Display
             const uint8_t faceRadius = 88;
             const uint8_t centerX = 100;
             const uint8_t centerY = 100;
-
-            void Arc_Ticks(float startAngle, float endAngle, uint32_t radius, uint32_t width, lv_color_t color, uint32_t step);
 
             void Draw_Minute(uint8_t minute);
             void Draw_Hour(uint8_t hour);

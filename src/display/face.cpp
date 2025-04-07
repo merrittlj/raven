@@ -24,6 +24,35 @@ LV_FONT_DECLARE(axel_ui)  /* Axel 22 bold */
 
     namespace Display
 {
+
+    void Draw_Ticks(float startAngle, float endAngle, uint32_t radius, uint32_t width, uint32_t thickness, lv_color_t color, uint32_t step, lv_obj_t *screen)
+    {
+        uint8_t center_x = 100;
+        uint8_t center_y = 100;
+
+        lv_style_t *styleLine = new lv_style_t;
+        lv_style_init(styleLine);
+        lv_style_set_line_width(styleLine, thickness);
+        lv_style_set_line_rounded(styleLine, true);
+        lv_style_set_line_color(styleLine, color);
+
+        // Draw colour blocks every inc degrees
+        for (float i = startAngle; i <= endAngle; i += step) {
+            float cx1 = center_x + (radius - width / 2) * cos((i - 90) * (float)DEG2RAD);
+            float cy1 = center_y + (radius - width / 2) * sin((i - 90) * (float)DEG2RAD);
+            float cx2 = center_x + (radius + width / 2) * cos((i - 90) * (float)DEG2RAD);
+            float cy2 = center_y + (radius + width / 2) * sin((i - 90) * (float)DEG2RAD);
+
+            lv_point_precise_t *linePoints = new lv_point_precise_t[2] {{(lv_value_precise_t)cx1, (lv_value_precise_t)cy1}, {(lv_value_precise_t)cx2, (lv_value_precise_t)cy2}};
+
+            lv_obj_t *line;
+            line = lv_line_create(screen);
+            lv_line_set_points(line, linePoints, 2);
+            lv_obj_add_style(line, styleLine, 0);
+            lv_obj_align(line, LV_ALIGN_TOP_LEFT, 0, 0);
+        }
+    }
+
     Big_Face::Big_Face()
     {}
 
@@ -306,8 +335,9 @@ LV_FONT_DECLARE(axel_ui)  /* Axel 22 bold */
         lv_style_set_text_color(&texts, lv_color_hex(0x000000));
 
         screen = lv_obj_create(NULL);
-
-        Draw_Ticks();
+         
+        uint8_t tick = (uint8_t)(360 / 12);
+        Draw_Ticks(tick, 360, faceRadius, 15, 3, lv_color_hex(0x000000), tick, screen);
 
         /* Two styles for different line widths, but I like them essentially the same */
         static lv_style_t hourStyle;
@@ -354,15 +384,9 @@ LV_FONT_DECLARE(axel_ui)  /* Axel 22 bold */
         Draw_Hands(info.hour, info.minute);
     }
 
-    void Square_Analog_Face::Draw_Ticks()
-    {
-        for (int i = 0; i < 12; ++i) {
-            
-        }
-    }
-
     void Square_Analog_Face::Draw_Hands(uint8_t hour, uint8_t minute)
     {
+        // A square face is just a normal round face w/ extended ticks, use normal angles
         float hourAngle = (360.0 * (hour / 12.0)) + (30.0 * (minute / 60.0));
         float minuteAngle = 360.0 * (minute / 60.0);
         const uint8_t hLength = 50;
@@ -437,9 +461,9 @@ LV_FONT_DECLARE(axel_ui)  /* Axel 22 bold */
         lv_obj_move_background(arc);
 
         /* Existing ticks */
-        Arc_Ticks(tick, minuteAngle - tick, faceRadius - 13/2, 15, lv_color_hex(0xffffff), tick);
+        Draw_Ticks(tick, minuteAngle - tick, faceRadius - 13/2, 15, 1, lv_color_hex(0xffffff), tick, screen);
         /* Future ticks */
-        Arc_Ticks(minuteAngle + tick, 360 - tick, faceRadius - 13/2, 7, lv_color_hex(0x000000), tick);
+        Draw_Ticks(minuteAngle + tick, 360 - tick, faceRadius - 13/2, 7, 1, lv_color_hex(0x000000), tick, screen);
     }
 
     void Arcs_Face::Draw_Hour(uint8_t hour)
@@ -457,31 +481,5 @@ LV_FONT_DECLARE(axel_ui)  /* Axel 22 bold */
 
     }
 
-    void Arcs_Face::Arc_Ticks(float startAngle, float endAngle, uint32_t radius, uint32_t width, lv_color_t color, uint32_t step)
-    {
-        uint8_t center_x = 100;
-        uint8_t center_y = 100;
 
-        lv_style_t *styleLine = new lv_style_t;
-        lv_style_init(styleLine);
-        lv_style_set_line_width(styleLine, 1);
-        lv_style_set_line_rounded(styleLine, true);
-        lv_style_set_line_color(styleLine, color);
-
-        // Draw colour blocks every inc degrees
-        for (float i = startAngle; i <= endAngle; i += step) {
-            float cx1 = center_x + (radius - width / 2) * cos((i - 90) * (float)DEG2RAD);
-            float cy1 = center_y + (radius - width / 2) * sin((i - 90) * (float)DEG2RAD);
-            float cx2 = center_x + (radius + width / 2) * cos((i - 90) * (float)DEG2RAD);
-            float cy2 = center_y + (radius + width / 2) * sin((i - 90) * (float)DEG2RAD);
-
-            lv_point_precise_t *linePoints = new lv_point_precise_t[2] {{(lv_value_precise_t)cx1, (lv_value_precise_t)cy1}, {(lv_value_precise_t)cx2, (lv_value_precise_t)cy2}};
-
-            lv_obj_t *line;
-            line = lv_line_create(screen);
-            lv_line_set_points(line, linePoints, 2);
-            lv_obj_add_style(line, styleLine, 0);
-            lv_obj_align(line, LV_ALIGN_TOP_LEFT, 0, 0);
-        }
-    }
 }
