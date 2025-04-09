@@ -87,9 +87,9 @@ namespace Display
         if (pref == "big") face = new Big_Face();
         else if (pref == "digital") face = new Digital_Face();
         else if (pref == "analog") face = new Analog_Face();
-        else if (pref == "image") face = new Image_Face();
         else if (pref == "square_analog") face = new Square_Analog_Face();
-        else if (pref == "arcs") face = new Arcs_Face();
+        else if (pref == "image1") face = new Image1_Face();
+        else if (pref == "image2") face = new Image2_Face();
         lvgl.Set_Face(face);
 
         Time(Get_RTC());

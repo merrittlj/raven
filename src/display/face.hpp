@@ -20,6 +20,17 @@ namespace Display
     };
 
     void Draw_Ticks(float startAngle, float endAngle, uint32_t radius, uint32_t width, uint32_t thickness, lv_color_t color, uint32_t step, lv_obj_t *screen);
+    std::string Digital_Time(Sys::TimeInfo info);
+    std::string Day_Suffix(uint8_t day);
+
+    /* Necessary characters to display: JanuryFebMchApilgstSmOoNvD */
+    const std::string months[12] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
+    /* JanFebMrApyulgSOctNovD */
+    const std::string months_abr[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+    /* MondayTuesWhrFiSt */
+    const std::string dows[7] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+    /* MonTueWdhFriSat */
+    const std::string dows_abr[7] = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
 
     /* Large stylistic time with small date */
     class Big_Face : public Face
@@ -81,25 +92,6 @@ namespace Display
             void Draw(Sys::TimeInfo info);
     };
 
-    /* Simple face with DOW, date, and time with an image background(inspired by Kitty-for-Watchy) */
-    class Image_Face : public Face
-    {
-        private:
-            lv_obj_t *screen;
-            lv_obj_t *dow;
-            lv_obj_t *date;
-            lv_obj_t *time;
-            lv_obj_t *bg;
-
-        public:
-            Image_Face();
-            ~Image_Face();
-
-            void Create();
-            void Load_Screen();
-            void Draw(Sys::TimeInfo info);
-    };
-
     /* Square minimal analog face */
     class Square_Analog_Face : public Face
     {
@@ -124,30 +116,43 @@ namespace Display
             void Draw(Sys::TimeInfo info);
     };
 
-
-    /* UNFINISHED: bad line drawing functions */
-    class Arcs_Face : public Face
+    /* Simple face with DOW, date, and time with an image background(inspired by Kitty-for-Watchy) */
+    class Image1_Face : public Face
     {
         private:
             lv_obj_t *screen;
-
-            const uint8_t faceRadius = 88;
-            const uint8_t centerX = 100;
-            const uint8_t centerY = 100;
-
-            void Draw_Minute(uint8_t minute);
-            void Draw_Hour(uint8_t hour);
-            void Draw_Day(uint8_t day);
-            void Draw_Month(uint8_t month);
+            lv_obj_t *dow;
+            lv_obj_t *date;
+            lv_obj_t *time;
+            lv_obj_t *bg;
 
         public:
-            Arcs_Face();
-            ~Arcs_Face();
+            Image1_Face();
+            ~Image1_Face();
 
             void Create();
             void Load_Screen();
             void Draw(Sys::TimeInfo info);
     };
+
+    /* Simple image face with time and date over image background */
+    class Image2_Face : public Face
+    {
+        private:
+            lv_obj_t *screen;
+            lv_obj_t *date;
+            lv_obj_t *time;
+            lv_obj_t *bg;
+
+        public:
+            Image2_Face();
+            ~Image2_Face();
+
+            void Create();
+            void Load_Screen();
+            void Draw(Sys::TimeInfo info);
+    };
+
 }
 
 

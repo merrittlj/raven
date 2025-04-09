@@ -17,7 +17,7 @@
 
 static const
 LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_FLAG
-uint8_t image_face_bg_map[] = {
+uint8_t image1_face_bg_map[] = {
 
     0x02,0x02,0x02,0xff,0xff,0xff,0xff,0xff,
 
@@ -124,14 +124,14 @@ uint8_t image_face_bg_map[] = {
 
 };
 
-const lv_image_dsc_t image_face_bg = {
+const lv_image_dsc_t image1_face_bg = {
   .header.magic = LV_IMAGE_HEADER_MAGIC,
   .header.cf = LV_COLOR_FORMAT_I1,
   .header.flags = 0,
   .header.w = 100,
   .header.h = 100,
   .header.stride = 13,
-  .data_size = sizeof(image_face_bg_map),
-  .data = image_face_bg_map,
+  .data_size = sizeof(image1_face_bg_map),
+  .data = image1_face_bg_map,
 };
 

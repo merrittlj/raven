@@ -15,12 +15,14 @@
     LV_FONT_DECLARE(gloock_time)  /* Gloock 70 regular */
     LV_FONT_DECLARE(gloock_date)  /* Gloock 18 regular */
     LV_FONT_DECLARE(seg)  /* 55 bold */
-LV_FONT_DECLARE(axel_ui)  /* Axel 22 bold */
+    LV_FONT_DECLARE(axel_ui)  /* Axel 22 bold */
     LV_FONT_DECLARE(montserrat_time) /* Montserrat 20 medium */
     LV_FONT_DECLARE(roboto_dow) /* Roboto Condensed 7 light */
     LV_FONT_DECLARE(roboto_date) /* Roboto Condensed 13 bold */
+LV_FONT_DECLARE(axel_time_date) /* Axel 22 bold */
 
-    LV_IMAGE_DECLARE(image_face_bg);  
+    LV_IMAGE_DECLARE(image1_face_bg);  
+    LV_IMAGE_DECLARE(image2_face_bg);  
 
     namespace Display
 {
@@ -51,6 +53,21 @@ LV_FONT_DECLARE(axel_ui)  /* Axel 22 bold */
             lv_obj_add_style(line, styleLine, 0);
             lv_obj_align(line, LV_ALIGN_TOP_LEFT, 0, 0);
         }
+    }
+
+    std::string Digital_Time(Sys::TimeInfo info)
+    {
+        return (info.hour < 10 ? "0" : "") + std::to_string(info.hour) + ":" + (info.minute < 10 ? "0" : "") + std::to_string(info.minute);
+    }
+
+    std::string Day_Suffix(uint8_t day)
+    {
+        std::string result = std::to_string(day);
+        if (day % 10 == 1 && day != 11) result += "st";
+        else if (day % 10 == 2 && day != 12) result += "nd";
+        else if (day % 10 == 3 && day != 13) result += "rd";
+        else result += "th";
+        return result;
     }
 
     Big_Face::Big_Face()
@@ -89,17 +106,8 @@ LV_FONT_DECLARE(axel_ui)  /* Axel 22 bold */
 
     void Big_Face::Draw(Sys::TimeInfo info)
     {
-        std::string timeValue = (info.hour < 10 ? "0" : "") + std::to_string(info.hour) + ":" + (info.minute < 10 ? "0" : "") + std::to_string(info.minute);
-
-        const std::string months[12] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
-        std::string day = std::to_string(info.day);
-        if (info.day % 10 == 1 && info.day != 11) day += "st";
-        else if (info.day % 10 == 2 && info.day != 12) day += "nd";
-        else if (info.day % 10 == 3 && info.day != 13) day += "rd";
-        else day += "th";
-
-        lv_label_set_text(time, timeValue.c_str());
-        lv_label_set_text(date, (months[info.month - 1] + " " + day).c_str());
+        lv_label_set_text(time, Digital_Time(info).c_str());
+        lv_label_set_text(date, (months[info.month - 1] + " " + Day_Suffix(info.day)).c_str());
     }
 
     Digital_Face::Digital_Face()
@@ -132,9 +140,7 @@ LV_FONT_DECLARE(axel_ui)  /* Axel 22 bold */
 
     void Digital_Face::Draw(Sys::TimeInfo info)
     {
-        std::string timeValue = (info.hour < 10 ? "0" : "") + std::to_string(info.hour) + ":" + (info.minute < 10 ? "0" : "") + std::to_string(info.minute);
-
-        lv_label_set_text(time, timeValue.c_str());
+        lv_label_set_text(time, Digital_Time(info).c_str());
     }
 
     Analog_Face::Analog_Face()
@@ -258,68 +264,6 @@ LV_FONT_DECLARE(axel_ui)  /* Axel 22 bold */
         lv_line_set_points(minuteHand, minutePoints, 2);
     }
 
-    Image_Face::Image_Face()
-    {}
-
-    Image_Face::~Image_Face()
-    {
-        lv_obj_clean(screen);
-    }
-
-    void Image_Face::Create()
-    {
-        static lv_style_t texts;
-        lv_style_init(&texts);
-        lv_style_set_text_color(&texts, lv_color_hex(0x000000));
-
-        screen = lv_obj_create(NULL);
-
-        dow = lv_label_create(screen);
-        lv_obj_add_style(dow, &texts, 0);
-        lv_label_set_text(dow, "DOW");
-        lv_obj_set_style_text_font(dow, &roboto_dow, 0);
-        lv_obj_align(dow, LV_ALIGN_TOP_MID, 0, 7);
-
-        date = lv_label_create(screen);
-        lv_obj_add_style(date, &texts, 0);
-        lv_label_set_text(date, "Month Day");
-        lv_obj_set_style_text_font(date, &roboto_date, 0);
-        lv_obj_align(date, LV_ALIGN_TOP_MID, 8, 27);
-
-        time = lv_label_create(screen);
-        lv_obj_add_style(time, &texts, 0);
-        lv_label_set_text(time, "00:00");
-        lv_obj_set_style_text_font(date, &montserrat_time, 0);
-        lv_obj_align(time, LV_ALIGN_BOTTOM_LEFT, 67, -20);
-
-        bg = lv_image_create(screen);
-        lv_image_set_src(bg, &image_face_bg);
-        lv_obj_align(bg, LV_ALIGN_CENTER, 0, 0);
-        lv_obj_move_background(bg);
-    }
-
-    void Image_Face::Load_Screen()
-    {
-        LVGL::Safe_Screen_Load(screen);
-    }
-
-    void Image_Face::Draw(Sys::TimeInfo info)
-    {
-        std::string timeValue = (info.hour < 10 ? "0" : "") + std::to_string(info.hour) + ":" + (info.minute < 10 ? "0" : "") + std::to_string(info.minute);
-
-        const std::string dows[7] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
-        const std::string months[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-
-        std::tm time_in = { info.second, info.minute, info.hour, // second, minute, hour
-            info.day, info.month - 1, info.year - 1900 }; // 1-based day, 0-based month, year since 1900
-        std::time_t time_temp = std::mktime(&time_in);
-        const std::tm * time_out = std::localtime(&time_temp);
-
-        lv_label_set_text(dow, dows[time_out->tm_wday].c_str());
-        lv_label_set_text(date, (months[info.month - 1] + " " + std::to_string(info.day)).c_str());
-        lv_label_set_text(time, timeValue.c_str());
-    }
-
     Square_Analog_Face::Square_Analog_Face()
     {}
 
@@ -335,7 +279,7 @@ LV_FONT_DECLARE(axel_ui)  /* Axel 22 bold */
         lv_style_set_text_color(&texts, lv_color_hex(0x000000));
 
         screen = lv_obj_create(NULL);
-         
+
         uint8_t tick = (uint8_t)(360 / 12);
         Draw_Ticks(tick, 360, faceRadius, 15, 3, lv_color_hex(0x000000), tick, screen);
 
@@ -406,80 +350,118 @@ LV_FONT_DECLARE(axel_ui)  /* Axel 22 bold */
         lv_line_set_points(minuteHand, minutePoints, 2);
     }
 
-
-    Arcs_Face::Arcs_Face()
+    Image1_Face::Image1_Face()
     {}
 
-    Arcs_Face::~Arcs_Face()
+    Image1_Face::~Image1_Face()
     {
         lv_obj_clean(screen);
     }
 
-    void Arcs_Face::Create()
+    void Image1_Face::Create()
     {
         static lv_style_t texts;
         lv_style_init(&texts);
         lv_style_set_text_color(&texts, lv_color_hex(0x000000));
-        lv_style_set_text_font(&texts, &gloock_time);
 
         screen = lv_obj_create(NULL);
+
+        dow = lv_label_create(screen);
+        lv_obj_add_style(dow, &texts, 0);
+        lv_label_set_text(dow, "DOW");
+        lv_obj_set_style_text_font(dow, &roboto_dow, 0);
+        lv_obj_align(dow, LV_ALIGN_TOP_MID, 0, 7);
+
+        date = lv_label_create(screen);
+        lv_obj_add_style(date, &texts, 0);
+        lv_label_set_text(date, "Month Day");
+        lv_obj_set_style_text_font(date, &roboto_date, 0);
+        lv_obj_align(date, LV_ALIGN_TOP_MID, 8, 27);
+
+        time = lv_label_create(screen);
+        lv_obj_add_style(time, &texts, 0);
+        lv_label_set_text(time, "00:00");
+        lv_obj_set_style_text_font(date, &montserrat_time, 0);
+        lv_obj_align(time, LV_ALIGN_BOTTOM_LEFT, 67, -20);
+
+        bg = lv_image_create(screen);
+        lv_image_set_src(bg, &image1_face_bg);
+        lv_obj_align(bg, LV_ALIGN_CENTER, 0, 0);
+        lv_obj_move_background(bg);
     }
 
-    void Arcs_Face::Load_Screen()
+    void Image1_Face::Load_Screen()
     {
         LVGL::Safe_Screen_Load(screen);
     }
 
-    void Arcs_Face::Draw(Sys::TimeInfo info)
+    void Image1_Face::Draw(Sys::TimeInfo info)
     {
-        Draw_Minute(info.minute);
-        Draw_Hour(info.hour);
-        Draw_Day(info.day);
-        Draw_Month(info.month);
+        std::tm time_in = { info.second, info.minute, info.hour, // second, minute, hour
+            info.day, info.month - 1, info.year - 1900 }; // 1-based day, 0-based month, year since 1900
+        std::time_t time_temp = std::mktime(&time_in);
+        const std::tm * time_out = std::localtime(&time_temp);
+
+        lv_label_set_text(dow, dows[time_out->tm_wday].c_str());
+        lv_label_set_text(date, (months_abr[info.month - 1] + " " + std::to_string(info.day)).c_str());
+        lv_label_set_text(time, Digital_Time(info).c_str());
     }
 
-    void Arcs_Face::Draw_Minute(uint8_t minute)
+    Image2_Face::Image2_Face()
+    {}
+
+    Image2_Face::~Image2_Face()
     {
-        float minuteAngle = 360.0 * (minute / 60.0);
-        uint8_t tick = (uint8_t)(360 / 60);
-
-        static lv_style_t arcs;
-        lv_style_init(&arcs);
-        lv_style_set_arc_color(&arcs, lv_color_hex(0x000000));
-        lv_style_set_arc_width(&arcs, 13);
-        lv_style_set_arc_rounded(&arcs, false);
-
-        lv_obj_t *arc = lv_arc_create(screen);
-        lv_obj_add_style(arc, &arcs, 0);
-        lv_arc_set_bg_angles(arc, 0, minuteAngle);
-        lv_obj_remove_style(arc, NULL, LV_PART_KNOB);  /* Remove knob */
-        lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE);
-        lv_arc_set_value(arc, 100);
-        lv_obj_set_size(arc, faceRadius*2, faceRadius*2);
-        lv_arc_set_rotation(arc, 270);  /* Start from top */
-        lv_obj_center(arc);
-        lv_obj_move_background(arc);
-
-        /* Existing ticks */
-        Draw_Ticks(tick, minuteAngle - tick, faceRadius - 13/2, 15, 1, lv_color_hex(0xffffff), tick, screen);
-        /* Future ticks */
-        Draw_Ticks(minuteAngle + tick, 360 - tick, faceRadius - 13/2, 7, 1, lv_color_hex(0x000000), tick, screen);
+        lv_obj_clean(screen);
     }
 
-    void Arcs_Face::Draw_Hour(uint8_t hour)
+    void Image2_Face::Create()
     {
+        static lv_style_t texts;
+        lv_style_init(&texts);
+        lv_style_set_text_color(&texts, lv_color_hex(0x000000));
 
+        static lv_style_t flexBox;
+        lv_style_set_border_width(&flexBox, 2);
+        lv_style_set_border_color(&flexBox, lv_color_hex(0x000000));
+        lv_style_set_bg_color(&flexBox, lv_color_hex(0xffffff));
+        lv_style_set_bg_opa(&flexBox, LV_OPA_100);
+        lv_style_set_radius(&flexBox, 5);
+        lv_style_set_pad_top(&flexBox, 1);
+        lv_style_set_pad_bottom(&flexBox, 1);
+        lv_style_set_pad_left(&flexBox, 3);
+        lv_style_set_pad_right(&flexBox, 3);
+
+        screen = lv_obj_create(NULL);
+
+        date = lv_label_create(screen);
+        lv_obj_add_style(date, &texts, 0);
+        lv_obj_add_style(date, &flexBox, 0);
+        lv_label_set_text(date, "Abr #");
+        lv_obj_set_style_text_font(date, &axel_time_date, 0);
+        lv_obj_align(date, LV_ALIGN_CENTER, 0, 50);
+
+        time = lv_label_create(screen);
+        lv_obj_add_style(time, &texts, 0);
+        lv_obj_add_style(time, &flexBox, 0);
+        lv_label_set_text(time, "XX:XX");
+        lv_obj_set_style_text_font(date, &axel_time_date, 0);
+        lv_obj_align(time, LV_ALIGN_CENTER, 0, 20);
+
+        bg = lv_image_create(screen);
+        lv_image_set_src(bg, &image2_face_bg);
+        lv_obj_align(bg, LV_ALIGN_CENTER, 0, 0);
+        lv_obj_move_background(bg);
     }
 
-    void Arcs_Face::Draw_Day(uint8_t day)
+    void Image2_Face::Load_Screen()
     {
-
+        LVGL::Safe_Screen_Load(screen);
     }
 
-    void Arcs_Face::Draw_Month(uint8_t month)
+    void Image2_Face::Draw(Sys::TimeInfo info)
     {
-
+        lv_label_set_text(date, (months_abr[info.month - 1] + " " + std::to_string(info.day)).c_str());
+        lv_label_set_text(time, Digital_Time(info).c_str());
     }
-
-
 }
