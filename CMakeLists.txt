@@ -103,6 +103,7 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCE_DIR}/display/icons/turn_slight_left.c
     ${PROJECT_SOURCE_DIR}/display/icons/turn_slight_right.c
     ${PROJECT_SOURCE_DIR}/display/icons/uturn.c
+
     ${PROJECT_SOURCE_DIR}/display/icons/image1_face_bg.c
     ${PROJECT_SOURCE_DIR}/display/icons/image2_face_bg.c
 )

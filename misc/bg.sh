@@ -9,3 +9,4 @@ python3 stucki.py ./$dst.png ./$dst.png
 mv ./$dst.png $2/
 python3 LVGLImage.py --ofmt C --cf I1 --compress NONE -o $2 $2/$dst.png
 echo "\${PROJECT_SOURCE_DIR}/display/icons/$dst.c"
+./f $2/$dst.png
