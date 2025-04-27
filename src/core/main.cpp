@@ -52,26 +52,25 @@ int main()
     /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
     HAL_Init();
 
-    /* Tune the HSE internal load capacitors - P-NUCLEO-WB55.Nucleo board */
     Sys::State sysState = Sys::State();
     Sys::Controller sysCtrl = Sys::Controller(&sysState);
-    sysCtrl.Config_HSE();
 
-    App::Debug_Controller debugCtrl = App::Debug_Controller();
     GPIO::Controller gpioCtrl = GPIO::Controller();
-    Sys::Event_Processor sysEvtP = Sys::Event_Processor(&sysState);
-    BLE::TimeService timeService = BLE::TimeService(&gpioCtrl, &sysState);
-    BLE::NotifyService notifyService = BLE::NotifyService(&gpioCtrl, &sysState);
-    BLE::PrefService prefService = BLE::PrefService(&gpioCtrl, &sysState);
-    BLE::NavService navService = BLE::NavService(&gpioCtrl, &sysState);
-    BLE::MusicService musicService = BLE::MusicService(&gpioCtrl, &sysState);
-    BLE::EventService eventService = BLE::EventService(&gpioCtrl, &sysState);
-    BLE::InfoService infoService = BLE::InfoService(&gpioCtrl, &sysState);
-    BLE::DataService dataService = BLE::DataService(&gpioCtrl, &sysState);
-    BLE::App bleApp = BLE::App(&gpioCtrl, &sysState);
 
-    /* Configure the debug support if needed */
-    debugCtrl.Init();
+    /* App::Debug_Controller debugCtrl = App::Debug_Controller(); */
+    /* Sys::Event_Processor sysEvtP = Sys::Event_Processor(&sysState); */
+    /* BLE::TimeService timeService = BLE::TimeService(&gpioCtrl, &sysState); */
+    /* BLE::NotifyService notifyService = BLE::NotifyService(&gpioCtrl, &sysState); */
+    /* BLE::PrefService prefService = BLE::PrefService(&gpioCtrl, &sysState); */
+    /* BLE::NavService navService = BLE::NavService(&gpioCtrl, &sysState); */
+    /* BLE::MusicService musicService = BLE::MusicService(&gpioCtrl, &sysState); */
+    /* BLE::EventService eventService = BLE::EventService(&gpioCtrl, &sysState); */
+    /* BLE::InfoService infoService = BLE::InfoService(&gpioCtrl, &sysState); */
+    /* BLE::DataService dataService = BLE::DataService(&gpioCtrl, &sysState); */
+    /* BLE::App bleApp = BLE::App(&gpioCtrl, &sysState); */
+
+    /* /1* Configure the debug support if needed *1/ */
+    /* debugCtrl.Init(); */
 
     sysCtrl.Config_SysClk();
     sysCtrl.Init_CPU2();
@@ -96,97 +95,100 @@ int main()
 
     gpioCtrl.Config();
     gpioCtrl.Init();
-    SPI_HandleTypeDef *spi = sysCtrl.Config_SPI();
-    Sys::SPI_Controller spiCtrl = Sys::SPI_Controller(spi, &gpioCtrl, Sys::SPI_Manager{busy,rst,dc,cs,pwr});
 
-    TIM_HandleTypeDef *tim2 = sysCtrl.Config_TIM2();
-    __HAL_TIM_SetCompare(tim2, TIM_CHANNEL_1, (uint64_t)I2C_ARR_IDEAL);
-    HAL_TIM_PWM_Start(tim2, TIM_CHANNEL_1);
-
-    I2C_HandleTypeDef *i2c = sysCtrl.Config_I2C();
-    Sys::I2C_Controller i2cCtrl = Sys::I2C_Controller(i2c, 0x4A << 1, &gpioCtrl);
-    Haptic::Driver driver = Haptic::Driver(&i2cCtrl);
-    Haptic::Controller hapticCtrl = Haptic::Controller(&driver);
-
-    if (!driver.begin()) Sys::Error_Handler();
-    if (!driver.defaultMotor()) Sys::Error_Handler();
-    driver.enableFreqTrack(false);
-    driver.setOperationMode(Haptic::INACTIVE);
-    driver.clearIrq(driver.getIrqEvent());  /* I hate this */
-
-    /* Set the red LED On to indicate that the CPU2 is initializing */
     gpioCtrl.Write_Component(sysState.Fetch_LED_Red(), SET);
 
-    /* Wait until the CPU2 gets initialized */
-    while((sysState.App_Flag_Get(Sys::State::App_Flag::CPU2_INITIALIZED) == Sys::State::Flag_Val::NOT_SET) \
-            || (sysState.App_Flag_Get(Sys::State::App_Flag::WIRELESS_FW_RUNNING) == Sys::State::Flag_Val::NOT_SET))
-    {
-        /* Process pending SYSTEM event coming from CPU2 (if any) */
-        sysEvtP.Sys_ProcessEvent();
-    }
+    /* SPI_HandleTypeDef *spi = sysCtrl.Config_SPI(); */
+    /* Sys::SPI_Controller spiCtrl = Sys::SPI_Controller(spi, &gpioCtrl, Sys::SPI_Manager{busy,rst,dc,cs,pwr}); */
 
-    /* Configure the CPU2 Debug (Optional) */
-    debugCtrl.EnableCPU2();
+    /* TIM_HandleTypeDef *tim2 = sysCtrl.Config_TIM2(); */
+    /* __HAL_TIM_SetCompare(tim2, TIM_CHANNEL_1, (uint64_t)I2C_ARR_IDEAL); */
+    /* HAL_TIM_PWM_Start(tim2, TIM_CHANNEL_1); */
 
-    /* Set the red LED Off to indicate that the CPU2 is initialized */
-    gpioCtrl.Write_Component(sysState.Fetch_LED_Red(), RESET);
+    /* I2C_HandleTypeDef *i2c = sysCtrl.Config_I2C(); */
+    /* Sys::I2C_Controller i2cCtrl = Sys::I2C_Controller(i2c, 0x4A << 1, &gpioCtrl); */
+    /* Haptic::Driver driver = Haptic::Driver(&i2cCtrl); */
+    /* Haptic::Controller hapticCtrl = Haptic::Controller(&driver); */
 
-    /* Set the green LED On to indicate that the wireless stack FW is running */
-    gpioCtrl.Write_Component(sysState.Fetch_LED_Green(), SET);
+    /* if (!driver.begin()) Sys::Error_Handler(); */
+    /* if (!driver.defaultMotor()) Sys::Error_Handler(); */
+    /* driver.enableFreqTrack(false); */
+    /* driver.setOperationMode(Haptic::INACTIVE); */
+    /* driver.clearIrq(driver.getIrqEvent());  /1* I hate this *1/ */
 
-    bleApp.Init();
-    timeService.Init();
-    notifyService.Init();
-    prefService.Init();
-    navService.Init();
-    infoService.Init();
-    dataService.Init();
-    musicService.Init();
-    eventService.Init();
+    /* /1* Set the red LED On to indicate that the CPU2 is initializing *1/ */
+    /* gpioCtrl.Write_Component(sysState.Fetch_LED_Red(), SET); */
 
-    bleApp.Advertising(SET);
+    /* /1* Wait until the CPU2 gets initialized *1/ */
+    /* while((sysState.App_Flag_Get(Sys::State::App_Flag::CPU2_INITIALIZED) == Sys::State::Flag_Val::NOT_SET) \ */
+    /*         || (sysState.App_Flag_Get(Sys::State::App_Flag::WIRELESS_FW_RUNNING) == Sys::State::Flag_Val::NOT_SET)) */
+    /* { */
+    /*     /1* Process pending SYSTEM event coming from CPU2 (if any) *1/ */
+    /*     sysEvtP.Sys_ProcessEvent(); */
+    /* } */
 
-    Display::Controller displayCtrl = Display::Controller(200, 200, spiCtrl, &sysState, &sysCtrl, &hapticCtrl, &infoService);
-    displayCtrl.Init();
+    /* /1* Configure the CPU2 Debug (Optional) *1/ */
+    /* debugCtrl.EnableCPU2(); */
 
-    Debouncer btnPort(BUTTON_PIN_0 | BUTTON_PIN_1 | BUTTON_PIN_2 | BUTTON_PIN_3);
+    /* /1* Set the red LED Off to indicate that the CPU2 is initialized *1/ */
+    /* gpioCtrl.Write_Component(sysState.Fetch_LED_Red(), RESET); */
 
-    sysCtrl.Config_RTC();
+    /* /1* Set the green LED On to indicate that the wireless stack FW is running *1/ */
+    /* gpioCtrl.Write_Component(sysState.Fetch_LED_Green(), SET); */
 
-    /* FreeRTOS */
-    NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
+    /* bleApp.Init(); */
+    /* timeService.Init(); */
+    /* notifyService.Init(); */
+    /* prefService.Init(); */
+    /* navService.Init(); */
+    /* infoService.Init(); */
+    /* dataService.Init(); */
+    /* musicService.Init(); */
+    /* eventService.Init(); */
 
-    RTOS::Process_Params *processParams = new RTOS::Process_Params;
-    processParams->evtP = &sysEvtP;
-    processParams->displayCtrl = &displayCtrl;
-    xTaskCreate(RTOS::Process_Task, "Process", configMINIMAL_STACK_SIZE, (void *)processParams, tskIDLE_PRIORITY + 1, (TaskHandle_t *)NULL);
+    /* bleApp.Advertising(SET); */
 
-    RTOS::Startup_Params *startupParams = new RTOS::Startup_Params;
-    startupParams->sysState = &sysState;
-    startupParams->info = &infoService;
-    xTaskCreate(RTOS::Startup_Task, "Startup", configMINIMAL_STACK_SIZE, (void *)startupParams, tskIDLE_PRIORITY, (TaskHandle_t *)NULL);
+    /* Display::Controller displayCtrl = Display::Controller(200, 200, spiCtrl, &sysState, &sysCtrl, &hapticCtrl, &infoService); */
+    /* displayCtrl.Init(); */
 
-    RTOS::Button_Params *buttonParams = new RTOS::Button_Params;
-    buttonParams->btnPort = &btnPort;
-    buttonParams->gpioCtrl = &gpioCtrl;
-    buttonParams->displayCtrl = &displayCtrl;
-    buttonParams->sysState = &sysState;
+    /* Debouncer btnPort(BUTTON_PIN_0 | BUTTON_PIN_1 | BUTTON_PIN_2 | BUTTON_PIN_3); */
 
-    buttonParams->btn1 = btn1;
-    buttonParams->btn2 = btn2;
-    buttonParams->btn3 = btn3;
-    buttonParams->btn4 = btn4;
-    xTaskCreate(RTOS::Button_Task, "Button", configMINIMAL_STACK_SIZE, (void *)buttonParams, tskIDLE_PRIORITY + 2, (TaskHandle_t *)NULL);
+    /* sysCtrl.Config_RTC(); */
+
+    /* /1* FreeRTOS *1/ */
+    /* NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4); */
+
+    /* RTOS::Process_Params *processParams = new RTOS::Process_Params; */
+    /* processParams->evtP = &sysEvtP; */
+    /* processParams->displayCtrl = &displayCtrl; */
+    /* xTaskCreate(RTOS::Process_Task, "Process", configMINIMAL_STACK_SIZE, (void *)processParams, tskIDLE_PRIORITY + 1, (TaskHandle_t *)NULL); */
+
+    /* RTOS::Startup_Params *startupParams = new RTOS::Startup_Params; */
+    /* startupParams->sysState = &sysState; */
+    /* startupParams->info = &infoService; */
+    /* xTaskCreate(RTOS::Startup_Task, "Startup", configMINIMAL_STACK_SIZE, (void *)startupParams, tskIDLE_PRIORITY, (TaskHandle_t *)NULL); */
+
+    /* RTOS::Button_Params *buttonParams = new RTOS::Button_Params; */
+    /* buttonParams->btnPort = &btnPort; */
+    /* buttonParams->gpioCtrl = &gpioCtrl; */
+    /* buttonParams->displayCtrl = &displayCtrl; */
+    /* buttonParams->sysState = &sysState; */
+
+    /* buttonParams->btn1 = btn1; */
+    /* buttonParams->btn2 = btn2; */
+    /* buttonParams->btn3 = btn3; */
+    /* buttonParams->btn4 = btn4; */
+    /* xTaskCreate(RTOS::Button_Task, "Button", configMINIMAL_STACK_SIZE, (void *)buttonParams, tskIDLE_PRIORITY + 2, (TaskHandle_t *)NULL); */
 
 
-    vTaskStartScheduler();
+    /* vTaskStartScheduler(); */
 
-    /* If all is well, the scheduler will now be running, and the following line
-     * will never be reached.  If the following line does execute, then there was
-     * insufficient FreeRTOS heap memory available for the idle and/or timer tasks
-     * to be created.  See the memory management section on the FreeRTOS web site
-     * for more details. */
-    for (;;) {}
+    /* /1* If all is well, the scheduler will now be running, and the following line */
+    /*  * will never be reached.  If the following line does execute, then there was */
+    /*  * insufficient FreeRTOS heap memory available for the idle and/or timer tasks */
+    /*  * to be created.  See the memory management section on the FreeRTOS web site */
+    /*  * for more details. *1/ */
+    /* for (;;) {} */
 }
 
 
