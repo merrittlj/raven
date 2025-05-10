@@ -4,57 +4,38 @@ import sys
 
 def stucki_dithering(input_image_path, output_image_path):
     threshold = 128
-    # Open the source image (assumed to be grayscale)
     src = Image.open(input_image_path).convert("L")
     width, height = src.size
-    out = Image.new("1", (width, height))  # Create an empty black-and-white image for output
+    out = Image.new("1", (width, height))  # 1-bit image (black and white)
     pixels = src.load()
     out_pixels = out.load()
 
-    # Initialize the error array (list of lists)
+    # Initialize error buffer
     errors = [[0 for _ in range(height)] for _ in range(width)]
 
-    for y in range(height - 2):
-        for x in range(2, width - 2):
-            # Get the grayscale pixel value (it's just one channel in grayscale mode)
-            gray = pixels[x, y]
-            error = 0
+    # Stucki diffusion matrix (normalized to 42)
+    diffusion = [
+        (1, 0, 8), (2, 0, 4),
+        (-2, 1, 2), (-1, 1, 4), (0, 1, 8), (1, 1, 4), (2, 1, 2),
+        (-2, 2, 1), (-1, 2, 2), (0, 2, 4), (1, 2, 2), (2, 2, 1)
+    ]
 
-            # Apply the Stucki dithering algorithm
-            if gray + errors[x][y] < threshold:
-                error = gray + errors[x][y]
-                gray = 0
-            else:
-                error = gray + errors[x][y] - 255
-                gray = 255
+    for y in range(height):
+        for x in range(width):
+            old_pixel = pixels[x, y] + errors[x][y]
+            new_pixel = 255 if old_pixel >= threshold else 0
+            out_pixels[x, y] = new_pixel
+            quant_error = old_pixel - new_pixel
 
-            # Distribute the error
-            errors[x + 1][y] += (8 * error) // 42
-            errors[x + 2][y] += (4 * error) // 42
+            for dx, dy, weight in diffusion:
+                nx, ny = x + dx, y + dy
+                if 0 <= nx < width and 0 <= ny < height:
+                    errors[nx][ny] += quant_error * weight // 42
 
-            errors[x - 2][y + 1] += (2 * error) // 42
-            errors[x - 1][y + 1] += (4 * error) // 42
-            errors[x][y + 1] += (8 * error) // 42
-            errors[x + 1][y + 1] += (4 * error) // 42
-            errors[x + 2][y + 1] += (2 * error) // 42
-
-            errors[x - 2][y + 2] += (1 * error) // 42
-            errors[x - 1][y + 2] += (2 * error) // 42
-            errors[x][y + 2] += (4 * error) // 42
-            errors[x + 1][y + 2] += (2 * error) // 42
-            errors[x + 2][y + 2] += (1 * error) // 42
-
-            # Set the pixel with the new dithered black-and-white value
-            out_pixels[x, y] = 255 if gray == 255 else 0
-
-    # Save the output image
     out.save(output_image_path)
 
-# Check if the script is run directly and take input and output file paths as arguments
 if __name__ == "__main__":
     if len(sys.argv) != 3:
         print("Usage: python3 stucki.py <input_image_path> <output_image_path>")
     else:
-        input_image_path = sys.argv[1]
-        output_image_path = sys.argv[2]
-        stucki_dithering(input_image_path, output_image_path)
+        stucki_dithering(sys.argv[1], sys.argv[2])

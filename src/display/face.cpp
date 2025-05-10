@@ -16,13 +16,13 @@
     LV_FONT_DECLARE(gloock_date)  /* Gloock 18 regular */
     LV_FONT_DECLARE(seg)  /* 55 bold */
     LV_FONT_DECLARE(axel_ui)  /* Axel 22 bold */
-    LV_FONT_DECLARE(montserrat_time) /* Montserrat 20 medium */
-    LV_FONT_DECLARE(roboto_dow) /* Roboto Condensed 7 light */
-    LV_FONT_DECLARE(roboto_date) /* Roboto Condensed 13 bold */
+    LV_FONT_DECLARE(montserrat_time) /* Montserrat 28 semibold */
+    LV_FONT_DECLARE(roboto_date) /* Roboto Condensed 18 regular */
 LV_FONT_DECLARE(axel_time_date) /* Axel 22 bold */
 
-    LV_IMAGE_DECLARE(image1_face_bg);  
-    LV_IMAGE_DECLARE(image2_face_bg);  
+    LV_IMAGE_DECLARE(image1);  
+    LV_IMAGE_DECLARE(image2);  
+    LV_IMAGE_DECLARE(casio);  
 
     namespace Display
 {
@@ -281,12 +281,17 @@ LV_FONT_DECLARE(axel_time_date) /* Axel 22 bold */
         screen = lv_obj_create(NULL);
 
         uint8_t tick = (uint8_t)(360 / 12);
-        Draw_Ticks(tick, 360, faceRadius, 15, 3, lv_color_hex(0x000000), tick, screen);
+        Draw_Ticks(tick, 360, radius, 100, 4, lv_color_hex(0x000000), tick, screen);
+
+        lv_obj_t *blocker = lv_obj_create(screen);
+        lv_obj_set_size(blocker, 170, 170);
+        lv_obj_align(blocker, LV_ALIGN_CENTER, 0, 0);
+        lv_obj_set_style_bg_color(blocker, lv_color_hex(0xffffff), 0);
 
         /* Two styles for different line widths, but I like them essentially the same */
         static lv_style_t hourStyle;
         lv_style_init(&hourStyle);
-        lv_style_set_line_width(&hourStyle, 5);
+        lv_style_set_line_width(&hourStyle, 7);
         lv_style_set_line_color(&hourStyle, lv_color_hex(0x000000));
         lv_style_set_line_rounded(&hourStyle, false);
 
@@ -330,19 +335,19 @@ LV_FONT_DECLARE(axel_time_date) /* Axel 22 bold */
 
     void Square_Analog_Face::Draw_Hands(uint8_t hour, uint8_t minute)
     {
-        // A square face is just a normal round face w/ extended ticks, use normal angles
         float hourAngle = (360.0 * (hour / 12.0)) + (30.0 * (minute / 60.0));
         float minuteAngle = 360.0 * (minute / 60.0);
-        const uint8_t hLength = 50;
-        const uint8_t mLength = 20;
+        const uint8_t hLength = radius - 50;
+        const uint8_t mLength = radius - 20;
+        const uint8_t bwLength = 10;
 
-        hourPoints[0].x = (lv_value_precise_t)(100 * cos((hourAngle - 90) * (float)DEG2RAD));
-        hourPoints[0].y = (lv_value_precise_t)(100 * sin((hourAngle - 90) * (float)DEG2RAD));
+        hourPoints[0].x = (lv_value_precise_t)(100 + -(bwLength) * cos((hourAngle - 90) * (float)DEG2RAD));;
+        hourPoints[0].y = (lv_value_precise_t)(100 + -(bwLength) * sin((hourAngle - 90) * (float)DEG2RAD));;
         hourPoints[1].x = (lv_value_precise_t)(100 + hLength * cos((hourAngle - 90) * (float)DEG2RAD));
         hourPoints[1].y = (lv_value_precise_t)(100 + hLength * sin((hourAngle - 90) * (float)DEG2RAD));
 
-        minutePoints[0].x = (lv_value_precise_t)(100 * cos((minuteAngle - 90) * (float)DEG2RAD));
-        minutePoints[0].y = (lv_value_precise_t)(100 * sin((minuteAngle - 90) * (float)DEG2RAD));
+        minutePoints[0].x = (lv_value_precise_t)(100 + -(bwLength) * cos((minuteAngle - 90) * (float)DEG2RAD));;
+        minutePoints[0].y = (lv_value_precise_t)(100 + -(bwLength) * sin((minuteAngle - 90) * (float)DEG2RAD));;
         minutePoints[1].x = (lv_value_precise_t)(100 + mLength * cos((minuteAngle - 90) * (float)DEG2RAD));
         minutePoints[1].y = (lv_value_precise_t)(100 + mLength * sin((minuteAngle - 90) * (float)DEG2RAD));
 
@@ -364,28 +369,35 @@ LV_FONT_DECLARE(axel_time_date) /* Axel 22 bold */
         lv_style_init(&texts);
         lv_style_set_text_color(&texts, lv_color_hex(0x000000));
 
-        screen = lv_obj_create(NULL);
+        static lv_style_t flexbox;
+        lv_style_set_border_width(&flexbox, 2);
+        lv_style_set_border_color(&flexbox, lv_color_hex(0xffffff));
+        lv_style_set_bg_color(&flexbox, lv_color_hex(0xffffff));
+        lv_style_set_bg_opa(&flexbox, LV_OPA_100);
+        lv_style_set_radius(&flexbox, 5);
+        lv_style_set_pad_top(&flexbox, 1);
+        lv_style_set_pad_bottom(&flexbox, 1);
+        lv_style_set_pad_left(&flexbox, 3);
+        lv_style_set_pad_right(&flexbox, 3);
 
-        dow = lv_label_create(screen);
-        lv_obj_add_style(dow, &texts, 0);
-        lv_label_set_text(dow, "DOW");
-        lv_obj_set_style_text_font(dow, &roboto_dow, 0);
-        lv_obj_align(dow, LV_ALIGN_TOP_MID, 0, 7);
+        screen = lv_obj_create(NULL);
 
         date = lv_label_create(screen);
         lv_obj_add_style(date, &texts, 0);
-        lv_label_set_text(date, "Month Day");
+        lv_obj_add_style(date, &flexbox, 0);
+        lv_label_set_text(date, "Mon XX");
         lv_obj_set_style_text_font(date, &roboto_date, 0);
-        lv_obj_align(date, LV_ALIGN_TOP_MID, 8, 27);
+        lv_obj_align(date, LV_ALIGN_BOTTOM_LEFT, 5, -5);
 
         time = lv_label_create(screen);
         lv_obj_add_style(time, &texts, 0);
-        lv_label_set_text(time, "00:00");
-        lv_obj_set_style_text_font(date, &montserrat_time, 0);
-        lv_obj_align(time, LV_ALIGN_BOTTOM_LEFT, 67, -20);
+        lv_obj_add_style(time, &flexbox, 0);
+        lv_label_set_text(time, "XX:XX");
+        lv_obj_set_style_text_font(time, &montserrat_time, 0);
+        lv_obj_align(time, LV_ALIGN_BOTTOM_LEFT, 5, -32);
 
         bg = lv_image_create(screen);
-        lv_image_set_src(bg, &image1_face_bg);
+        lv_image_set_src(bg, &image1);
         lv_obj_align(bg, LV_ALIGN_CENTER, 0, 0);
         lv_obj_move_background(bg);
     }
@@ -402,7 +414,6 @@ LV_FONT_DECLARE(axel_time_date) /* Axel 22 bold */
         std::time_t time_temp = std::mktime(&time_in);
         const std::tm * time_out = std::localtime(&time_temp);
 
-        lv_label_set_text(dow, dows[time_out->tm_wday].c_str());
         lv_label_set_text(date, (months_abr[info.month - 1] + " " + std::to_string(info.day)).c_str());
         lv_label_set_text(time, Digital_Time(info).c_str());
     }
@@ -421,37 +432,40 @@ LV_FONT_DECLARE(axel_time_date) /* Axel 22 bold */
         lv_style_init(&texts);
         lv_style_set_text_color(&texts, lv_color_hex(0x000000));
 
-        static lv_style_t flexBox;
-        lv_style_set_border_width(&flexBox, 2);
-        lv_style_set_border_color(&flexBox, lv_color_hex(0x000000));
-        lv_style_set_bg_color(&flexBox, lv_color_hex(0xffffff));
-        lv_style_set_bg_opa(&flexBox, LV_OPA_100);
-        lv_style_set_radius(&flexBox, 5);
-        lv_style_set_pad_top(&flexBox, 1);
-        lv_style_set_pad_bottom(&flexBox, 1);
-        lv_style_set_pad_left(&flexBox, 3);
-        lv_style_set_pad_right(&flexBox, 3);
+        static lv_style_t flexbox;
+        lv_style_set_border_width(&flexbox, 2);
+        lv_style_set_border_color(&flexbox, lv_color_hex(0x000000));
+        lv_style_set_bg_color(&flexbox, lv_color_hex(0xffffff));
+        lv_style_set_bg_opa(&flexbox, LV_OPA_100);
+        lv_style_set_radius(&flexbox, 5);
+        lv_style_set_pad_top(&flexbox, 1);
+        lv_style_set_pad_bottom(&flexbox, 1);
+        lv_style_set_pad_left(&flexbox, 3);
+        lv_style_set_pad_right(&flexbox, 3);
 
         screen = lv_obj_create(NULL);
 
         date = lv_label_create(screen);
         lv_obj_add_style(date, &texts, 0);
-        lv_obj_add_style(date, &flexBox, 0);
+        lv_obj_add_style(date, &flexbox, 0);
         lv_label_set_text(date, "Abr #");
         lv_obj_set_style_text_font(date, &axel_time_date, 0);
-        lv_obj_align(date, LV_ALIGN_CENTER, 0, 50);
+        lv_obj_align(date, LV_ALIGN_BOTTOM_LEFT, 15, -5);
 
         time = lv_label_create(screen);
         lv_obj_add_style(time, &texts, 0);
-        lv_obj_add_style(time, &flexBox, 0);
+        lv_obj_add_style(time, &flexbox, 0);
         lv_label_set_text(time, "XX:XX");
-        lv_obj_set_style_text_font(date, &axel_time_date, 0);
-        lv_obj_align(time, LV_ALIGN_CENTER, 0, 20);
+        lv_obj_set_style_text_font(time, &axel_time_date, 0);
+        lv_obj_align(time, LV_ALIGN_BOTTOM_LEFT, 15, -35);
 
         bg = lv_image_create(screen);
-        lv_image_set_src(bg, &image2_face_bg);
+        lv_image_set_src(bg, &image2);
         lv_obj_align(bg, LV_ALIGN_CENTER, 0, 0);
         lv_obj_move_background(bg);
+
+        lv_obj_add_flag(date, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_add_flag(time, LV_OBJ_FLAG_HIDDEN);
     }
 
     void Image2_Face::Load_Screen()

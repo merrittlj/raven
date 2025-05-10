@@ -11,7 +11,6 @@
 
     LV_FONT_DECLARE(axel_ui)  /* 22 bold */
     LV_FONT_DECLARE(axel_text)  /* 20 regular */
-LV_FONT_DECLARE(tag)  /* 110 regular */
 
     LV_IMAGE_DECLARE(cont);
     LV_IMAGE_DECLARE(cont_left);
@@ -27,6 +26,8 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
     LV_IMAGE_DECLARE(uturn);
     LV_IMAGE_DECLARE(close);
     LV_IMAGE_DECLARE(flag);
+
+    LV_IMAGE_DECLARE(tag);
 
     namespace Display
 {
@@ -184,11 +185,10 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
         lv_style_set_line_color(&styleLine, lv_color_hex(0x000000));
 
         tagScreen = lv_screen_active();
-        lv_obj_t *tagText = lv_label_create(tagScreen);
-        lv_obj_add_style(tagText, &texts, 0);
-        lv_label_set_text(tagText, "Raven");
-        lv_obj_set_style_text_font(tagText, &tag, 0);
-        lv_obj_align(tagText, LV_ALIGN_CENTER, 0, 0);
+        lv_obj_t *tagBG = lv_image_create(tagScreen);
+        lv_image_set_src(tagBG, &tag);
+        lv_obj_align(tagBG, LV_ALIGN_CENTER, 0, 0);
+        lv_obj_move_background(tagBG);
 
         alertScreen = lv_obj_create(NULL);
         static lv_style_t box;
@@ -337,28 +337,28 @@ LV_FONT_DECLARE(tag)  /* 110 regular */
 
         musicScreen = lv_obj_create(NULL);
 
-        static lv_style_t flexBox;
-        lv_style_set_border_width(&flexBox, 2);
-        lv_style_set_border_color(&flexBox, lv_color_hex(0x000000));
-        lv_style_set_bg_color(&flexBox, lv_color_hex(0xffffff));
-        lv_style_set_bg_opa(&flexBox, LV_OPA_100);
-        lv_style_set_radius(&flexBox, 5);
-        lv_style_set_pad_top(&flexBox, 1);
-        lv_style_set_pad_bottom(&flexBox, 1);
-        lv_style_set_pad_left(&flexBox, 3);
-        lv_style_set_pad_right(&flexBox, 3);
+        static lv_style_t flexbox;
+        lv_style_set_border_width(&flexbox, 2);
+        lv_style_set_border_color(&flexbox, lv_color_hex(0x000000));
+        lv_style_set_bg_color(&flexbox, lv_color_hex(0xffffff));
+        lv_style_set_bg_opa(&flexbox, LV_OPA_100);
+        lv_style_set_radius(&flexbox, 5);
+        lv_style_set_pad_top(&flexbox, 1);
+        lv_style_set_pad_bottom(&flexbox, 1);
+        lv_style_set_pad_left(&flexbox, 3);
+        lv_style_set_pad_right(&flexbox, 3);
 
 
         musicTrack = lv_label_create(musicScreen);
         lv_obj_add_style(musicTrack, &texts, 0);
-        lv_obj_add_style(musicTrack, &flexBox, 0);
+        lv_obj_add_style(musicTrack, &flexbox, 0);
         lv_label_set_text(musicTrack, "Track");
         lv_obj_set_style_text_font(musicTrack, &axel_text, 0);
         lv_obj_align(musicTrack, LV_ALIGN_BOTTOM_LEFT, 0, -25);
 
         musicArtist = lv_label_create(musicScreen);
         lv_obj_add_style(musicArtist, &texts, 0);
-        lv_obj_add_style(musicArtist, &flexBox, 0);
+        lv_obj_add_style(musicArtist, &flexbox, 0);
         lv_label_set_text(musicArtist, "Artist");
         lv_obj_set_style_text_font(musicArtist, &axel_text, 0);
         lv_obj_align(musicArtist, LV_ALIGN_BOTTOM_LEFT, 0, 0);

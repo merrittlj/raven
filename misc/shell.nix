@@ -6,6 +6,7 @@ let
 in
 pkgs.mkShellNoCC {
   packages = with pkgs; [
+    imagemagick
     pngquant
     python311Packages.pillow
     python311Packages.configargparse

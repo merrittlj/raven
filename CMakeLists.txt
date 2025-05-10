@@ -83,9 +83,7 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCE_DIR}/display/fonts/seg.c
     ${PROJECT_SOURCE_DIR}/display/fonts/axel_ui.c
     ${PROJECT_SOURCE_DIR}/display/fonts/axel_text.c
-    ${PROJECT_SOURCE_DIR}/display/fonts/tag.c
     ${PROJECT_SOURCE_DIR}/display/fonts/montserrat_time.c
-    ${PROJECT_SOURCE_DIR}/display/fonts/roboto_dow.c
     ${PROJECT_SOURCE_DIR}/display/fonts/roboto_date.c
     ${PROJECT_SOURCE_DIR}/display/fonts/axel_time_date.c
 
@@ -104,8 +102,10 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCE_DIR}/display/icons/turn_slight_right.c
     ${PROJECT_SOURCE_DIR}/display/icons/uturn.c
 
-    ${PROJECT_SOURCE_DIR}/display/icons/image1_face_bg.c
-    ${PROJECT_SOURCE_DIR}/display/icons/image2_face_bg.c
+    ${PROJECT_SOURCE_DIR}/display/icons/tag.c
+
+    ${PROJECT_SOURCE_DIR}/display/icons/image1.c
+    ${PROJECT_SOURCE_DIR}/display/icons/image2.c
 )
 
 target_link_directories(${PROJECT_NAME}

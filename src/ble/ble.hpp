@@ -22,7 +22,7 @@ namespace BLE
             uint8_t bd_address_udn[BD_ADDR_SIZE_LOCAL];
 
             /* Generic Access GATT Service Characteristics configuration data  */
-            const char gap_device_name[10] = { 'R', 'a', 'v', 'e', 'n', ' ', 'V', '0', '.', '7' };
+            const char gap_device_name[10] = { 'R', 'a', 'v', 'e', 'n' };
             const uint16_t gap_appearance = BLE_CFG_GAP_APPEARANCE;
 
             /* GAP Advertising data */
@@ -36,7 +36,7 @@ namespace BLE
              * you can safely omit it and get those 14 bytes back.
              *
              * Here, we do not use manufacturer data, freeing space for the name */ 
-            const char ad_local_name[11] = { AD_TYPE_COMPLETE_LOCAL_NAME, 'R', 'a', 'v', 'e', 'n', ' ', 'V', '0', '.', '7' };
+            const char ad_local_name[11] = { AD_TYPE_COMPLETE_LOCAL_NAME, 'R', 'a', 'v', 'e', 'n' };
             
             const uint8_t a_MBdAddr[BD_ADDR_SIZE_LOCAL] =
             {

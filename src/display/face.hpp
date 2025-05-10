@@ -100,7 +100,7 @@ namespace Display
             lv_obj_t *hourHand;
             lv_obj_t *minuteHand;
 
-            const uint8_t faceRadius = 88;
+            const uint8_t radius = 95;
 
             lv_point_precise_t *hourPoints;
             lv_point_precise_t *minutePoints;
@@ -152,7 +152,6 @@ namespace Display
             void Load_Screen();
             void Draw(Sys::TimeInfo info);
     };
-
 }
 
 
