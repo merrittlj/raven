@@ -571,8 +571,8 @@
     void LVGL::Music(Sys::MusicInfo info)
     {
         /* subtract 2 border width */
-        lv_label_set_text(musicTrack, Truncate_Text(info.track, 200 - 2).c_str());
-        lv_label_set_text(musicArtist, Truncate_Text(info.artist, 200 - 2).c_str());
+        lv_label_set_text(musicTrack, Truncate_Text(info.track, 200 - 5).c_str());
+        lv_label_set_text(musicArtist, Truncate_Text(info.artist, 200 - 5).c_str());
         lv_label_set_text(musicAlbum, info.album.c_str());
 
         if (state->Get_Pref()->hideMusic == 1) {

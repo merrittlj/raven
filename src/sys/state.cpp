@@ -1,5 +1,6 @@
 #include "sys/state.hpp"
 
+#include "sys/sys.hpp"
 #include "app/common.hpp"
 #include "display/controller.hpp"
 #include "services/music.hpp"
@@ -65,6 +66,11 @@ namespace Sys
     void State::Set_Weather(WeatherInfo value)
     {
         weather = value;
+    }
+
+    void State::Screens_Clear()
+    {
+        screens.fill(0);
     }
 
     void State::Screen_Activate(Screen s)
@@ -207,13 +213,6 @@ namespace Sys
     void State::Music_Build_Album(std::string str)
     {
         Music_Builder.album = str;
-
-        uint8_t readyData = 1;
-        BLE::MusicService *musicService = BLE::MusicService::Instance();
-        if (musicService->Update_Char_Value(BLE::UUID::ExtractUUID16FromLE(musicService->ready.Get_UUID()),
-                    musicService->ready.Get_Value_Length(),
-                    &readyData) != BLE_STATUS_SUCCESS)
-            Sys::Error_Handler();
     }
 
     void State::Music_Build_Album_Art(uint8_t *arr, size_t length)
@@ -240,18 +239,21 @@ namespace Sys
             chunkWrites.set(arr[0]);
         } else return;
 
-        /* if (chunkWrites.all()) { */
+        uint8_t readyData = 1;
         if (arr[0] == 20) {
-            Display::Controller::Instance()->Music_Send(Music_Builder);
+            readyData = 0;
             chunkWrites.reset();
-        } else {
-            uint8_t readyData = 1;
-            BLE::MusicService *musicService = BLE::MusicService::Instance();
-            if (musicService->Update_Char_Value(BLE::UUID::ExtractUUID16FromLE(musicService->ready.Get_UUID()),
-                        musicService->ready.Get_Value_Length(),
-                        &readyData) != BLE_STATUS_SUCCESS)
-                Sys::Error_Handler();
         }
+        BLE::MusicService *musicService = BLE::MusicService::Instance();
+        if (musicService->Update_Char_Value(BLE::UUID::ExtractUUID16FromLE(musicService->ready.Get_UUID()),
+                    musicService->ready.Get_Value_Length(),
+                    &readyData) != BLE_STATUS_SUCCESS)
+            Sys::Error_Handler();
+    }
+
+    void State::Music_Trigger()
+    {
+        Display::Controller::Instance()->Music_Send(Music_Builder);
     }
 
     void State::Register_LED_Red(uint32_t pIndex)

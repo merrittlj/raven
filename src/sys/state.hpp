@@ -168,6 +168,7 @@ namespace Sys
             WeatherInfo Get_Weather();
             void Set_Weather(WeatherInfo value);
 
+            void Screens_Clear();
             void Screen_Activate(Screen s);
             void Screen_Deactivate(Screen s);
             /* 0 or 1 depending on if a screen is active(ran) */
@@ -201,7 +202,7 @@ namespace Sys
             void Music_Build_Track(std::string str);
             void Music_Build_Album(std::string str);
             void Music_Build_Album_Art(uint8_t *arr, size_t length);
-            /* Triggered via last album art chunk */
+            void Music_Trigger();
 
             void Register_LED_Red(uint32_t pIndex);
             uint32_t Fetch_LED_Red();

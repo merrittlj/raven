@@ -335,6 +335,7 @@ SVCCTL_UserEvtFlowStatus_t BLE::App::SVCCTL_Notification_Handler(void *pckt)
         case HCI_DISCONNECTION_COMPLETE_EVT_CODE:
             this->sysState->App_Flag_Reset(Sys::State::App_Flag::BLE_CONNECTED);
 
+            this->sysState->Screens_Clear();
             Display::Controller::Instance()->Tag_Screen();
 
             /* Start advertising */

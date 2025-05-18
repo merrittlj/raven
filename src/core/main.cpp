@@ -79,7 +79,7 @@ int main()
     uint8_t red = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 1), GPIO::Types::LED));
     uint8_t green = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 0), GPIO::Types::LED));
     uint8_t blue = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 5), GPIO::Types::LED));
-    sysState.Register_LED_Red(red);
+    /* sysState.Register_LED_Red(red); */
     sysState.Register_LED_Green(green);
     sysState.Register_LED_Blue(blue);
 
@@ -115,7 +115,7 @@ int main()
     driver.clearIrq(driver.getIrqEvent());  /* I hate this */
 
     /* Set the red LED On to indicate that the CPU2 is initializing */
-    gpioCtrl.Write_Component(sysState.Fetch_LED_Red(), SET);
+    /* gpioCtrl.Write_Component(sysState.Fetch_LED_Red(), SET); */
 
     /* Wait until the CPU2 gets initialized */
     while((sysState.App_Flag_Get(Sys::State::App_Flag::CPU2_INITIALIZED) == Sys::State::Flag_Val::NOT_SET) \
@@ -129,7 +129,7 @@ int main()
     debugCtrl.EnableCPU2();
 
     /* Set the red LED Off to indicate that the CPU2 is initialized */
-    gpioCtrl.Write_Component(sysState.Fetch_LED_Red(), RESET);
+    /* gpioCtrl.Write_Component(sysState.Fetch_LED_Red(), RESET); */
 
     /* Set the green LED On to indicate that the wireless stack FW is running */
     gpioCtrl.Write_Component(sysState.Fetch_LED_Green(), SET);

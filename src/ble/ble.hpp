@@ -48,10 +48,6 @@ namespace BLE
                 (uint8_t)((CFG_ADV_BD_ADDRESS & 0xFF0000000000) >> 40)
             };
 
-            /* More details about BlueST protocol and how it is used in our demos and examples
-               can be found in the related documentation, e.g. in UM2496 */
-
-
             GPIO::Controller *gpioCtrl;
             Sys::State *sysState;
 
@@ -61,8 +57,6 @@ namespace BLE
             const uint8_t* GetBdAddress();
 
         public:
-            uint8_t notifyCharacteristicData[2] = {0x00, 0x00};
-
             static App *Instance(App *cur = nullptr);
 
             App(GPIO::Controller *pGpioCtrl, Sys::State *pSysState);
