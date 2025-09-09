@@ -56,6 +56,7 @@ void Sys::Controller::Config_SysClk()
     RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
     RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
 
+    // LSE essentially required for BLE but can be disabled here
     /** Configure LSE Drive Capability 
     */
     HAL_PWR_EnableBkUpAccess();
@@ -326,25 +327,14 @@ I2C_HandleTypeDef *Sys::Controller::Config_I2C()
 }
 
 /**
- * @brief Read the HSE trimming value from OTP memory
+ * @brief Set HSE
  * @param None
  * @retval None
  */
 void Sys::Controller::Config_HSE()
 {
-    /* !!! WARNING !!! Following code is valid only for P-NUCLEO-WB55 boards. 
-       Code must be reviewed and optionally reimplemented depending on the target HW 
-       and HSE capacitor tuning value storage location. 
-       Please read AN5042 - HSE trimming for RF applications using the STM32WB series. */
-
-    OTP_ID0_t * p_otp;
-
-    /* Read HSE_Tuning from OTP */
-    p_otp = (OTP_ID0_t *) OTP_Read(0);
-    if (p_otp)
-    {
-        LL_RCC_HSE_SetCapacitorTuning(p_otp->hse_tuning);
-    }
+    uint32_t hse = 32;
+    LL_RCC_HSE_SetCapacitorTuning(hse);
 }
 
 TIM_HandleTypeDef *Sys::Controller::Config_TIM2()

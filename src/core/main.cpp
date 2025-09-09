@@ -4,7 +4,6 @@
 
 #include "core/main.hpp"
 #include "app/common.hpp"
-#include "app/debug.hpp"
 #include "hw/conf.hpp"
 #include "gpio/gpio.hpp"
 #include "ble/ble.hpp"
@@ -52,12 +51,13 @@ int main()
     /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
     HAL_Init();
 
-    /* Tune the HSE internal load capacitors - P-NUCLEO-WB55.Nucleo board */
     Sys::State sysState = Sys::State();
     Sys::Controller sysCtrl = Sys::Controller(&sysState);
-    sysCtrl.Config_HSE();
+    /* Tune the HSE internal load capacitors - P-NUCLEO-WB55.Nucleo board */
+    // TODO: is this necessary to run or not?
+    // is it 32 tuning by default?
+    // sysCtrl.Config_HSE();
 
-    App::Debug_Controller debugCtrl = App::Debug_Controller();
     GPIO::Controller gpioCtrl = GPIO::Controller();
     Sys::Event_Processor sysEvtP = Sys::Event_Processor(&sysState);
     BLE::TimeService timeService = BLE::TimeService(&gpioCtrl, &sysState);
@@ -70,16 +70,14 @@ int main()
     BLE::DataService dataService = BLE::DataService(&gpioCtrl, &sysState);
     BLE::App bleApp = BLE::App(&gpioCtrl, &sysState);
 
-    /* Configure the debug support if needed */
-    debugCtrl.Init();
-
     sysCtrl.Config_SysClk();
     sysCtrl.Init_CPU2();
 
+    // CHECK THESE!!!!
     uint8_t red = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 1), GPIO::Types::LED));
     uint8_t green = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 0), GPIO::Types::LED));
     uint8_t blue = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 5), GPIO::Types::LED));
-    /* sysState.Register_LED_Red(red); */
+    sysState.Register_LED_Red(red);
     sysState.Register_LED_Green(green);
     sysState.Register_LED_Blue(blue);
 
@@ -96,6 +94,9 @@ int main()
 
     gpioCtrl.Config();
     gpioCtrl.Init();
+
+    gpioCtrl.Write_Component(sysState.Fetch_LED_Red(), SET);
+
     SPI_HandleTypeDef *spi = sysCtrl.Config_SPI();
     Sys::SPI_Controller spiCtrl = Sys::SPI_Controller(spi, &gpioCtrl, Sys::SPI_Manager{busy,rst,dc,cs,pwr});
 
@@ -108,14 +109,12 @@ int main()
     Haptic::Driver driver = Haptic::Driver(&i2cCtrl);
     Haptic::Controller hapticCtrl = Haptic::Controller(&driver);
 
-    if (!driver.begin()) Sys::Error_Handler();
-    if (!driver.defaultMotor()) Sys::Error_Handler();
-    driver.enableFreqTrack(false);
-    driver.setOperationMode(Haptic::INACTIVE);
-    driver.clearIrq(driver.getIrqEvent());  /* I hate this */
-
-    /* Set the red LED On to indicate that the CPU2 is initializing */
-    /* gpioCtrl.Write_Component(sysState.Fetch_LED_Red(), SET); */
+    // Haptics are DISABLED
+    // if (!driver.begin()) Sys::Error_Handler();
+    // if (!driver.defaultMotor()) Sys::Error_Handler();
+    // driver.enableFreqTrack(false);
+    // driver.setOperationMode(Haptic::INACTIVE);
+    // driver.clearIrq(driver.getIrqEvent());  /* I hate this */
 
     /* Wait until the CPU2 gets initialized */
     while((sysState.App_Flag_Get(Sys::State::App_Flag::CPU2_INITIALIZED) == Sys::State::Flag_Val::NOT_SET) \
@@ -125,14 +124,7 @@ int main()
         sysEvtP.Sys_ProcessEvent();
     }
 
-    /* Configure the CPU2 Debug (Optional) */
-    debugCtrl.EnableCPU2();
-
-    /* Set the red LED Off to indicate that the CPU2 is initialized */
-    /* gpioCtrl.Write_Component(sysState.Fetch_LED_Red(), RESET); */
-
-    /* Set the green LED On to indicate that the wireless stack FW is running */
-    gpioCtrl.Write_Component(sysState.Fetch_LED_Green(), SET);
+    gpioCtrl.Write_Component(sysState.Fetch_LED_Blue(), SET);
 
     bleApp.Init();
     timeService.Init();
