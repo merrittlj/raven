@@ -575,7 +575,7 @@
         lv_label_set_text(musicArtist, Truncate_Text(info.artist, 200 - 5).c_str());
         lv_label_set_text(musicAlbum, info.album.c_str());
 
-        if (state->Get_Pref()->hideMusic == 1) {
+        if (state->Get_Pref()->hideMusic == 1 || (info.track.empty() && info.artist.empty())) {
             lv_obj_add_flag(musicTrack, LV_OBJ_FLAG_HIDDEN);
             lv_obj_add_flag(musicArtist, LV_OBJ_FLAG_HIDDEN);
         } else {
