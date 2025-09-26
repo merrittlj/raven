@@ -141,7 +141,7 @@ add_custom_command(TARGET ${PROJECT_NAME}
 )
 
 add_custom_target(flash
-    COMMAND openocd -f interface/stlink.cfg -f board/st_nucleo_wb55.cfg -c "program ${PROJECT_NAME} verify reset exit"
+    COMMAND dfu-util -a 0 -s 0x08000000:leave -D ${PROJECT_NAME}.bin
     DEPENDS ${PROJECT_NAME}
 )
 

@@ -8,10 +8,10 @@ pkgs.mkShellNoCC {
   packages = with pkgs; [
     cmake
     ninja
-    openocd
     picocom
     doxygen
     newlib
     newlib-nano
+    dfu-util
   ]++ [ unstable.gcc-arm-embedded-13 ]; # Stable gdb has deprecated python links
 }
