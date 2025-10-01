@@ -74,12 +74,12 @@ int main()
     sysCtrl.Init_CPU2();
 
     // CHECK THESE!!!!
-    uint8_t red = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 1), GPIO::Types::LED));
-    uint8_t green = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 0), GPIO::Types::LED));
-    uint8_t blue = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 5), GPIO::Types::LED));
-    sysState.Register_LED_Red(red);
-    sysState.Register_LED_Green(green);
-    sysState.Register_LED_Blue(blue);
+    uint8_t batt = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 0), GPIO::Types::LED));
+    uint8_t f1 = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 1), GPIO::Types::LED));
+    uint8_t f2 = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 5), GPIO::Types::LED));
+    sysState.Register_LED_Batt(batt);
+    sysState.Register_LED_F1(f1);
+    sysState.Register_LED_F2(f2);
 
     uint8_t busy = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 2), { .Mode = GPIO_MODE_INPUT, .Pull = GPIO_NOPULL, }));
     uint8_t rst = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 3), GPIO::Types::SPI));
@@ -95,7 +95,7 @@ int main()
     gpioCtrl.Config();
     gpioCtrl.Init();
 
-    gpioCtrl.Write_Component(sysState.Fetch_LED_Red(), SET);
+    gpioCtrl.Write_Component(sysState.Fetch_LED_Batt(), SET);
 
     SPI_HandleTypeDef *spi = sysCtrl.Config_SPI();
     Sys::SPI_Controller spiCtrl = Sys::SPI_Controller(spi, &gpioCtrl, Sys::SPI_Manager{busy,rst,dc,cs,pwr});
@@ -123,8 +123,6 @@ int main()
         /* Process pending SYSTEM event coming from CPU2 (if any) */
         sysEvtP.Sys_ProcessEvent();
     }
-
-    gpioCtrl.Write_Component(sysState.Fetch_LED_Blue(), SET);
 
     bleApp.Init();
     timeService.Init();

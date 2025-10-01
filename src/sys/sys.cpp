@@ -255,7 +255,6 @@ extern "C" {
         /* Do not actually need to set RTC/time, just need to remind display to update from existing RTC */
         Sys::State *state = Display::Controller::Instance()->Get_State();
         state->App_Flag_Set(Sys::State::App_Flag::LOGIC_TIME_UPDATE_PENDING);
-        HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_1);
     }
 
     void HAL_RTCEx_AlarmBEventCallback(RTC_HandleTypeDef *hrtc)

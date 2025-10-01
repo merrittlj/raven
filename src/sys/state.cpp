@@ -256,33 +256,33 @@ namespace Sys
         Display::Controller::Instance()->Music_Send(Music_Builder);
     }
 
-    void State::Register_LED_Red(uint32_t pIndex)
+    void State::Register_LED_Batt(uint32_t pIndex)
     {
-        this->LED_Red_Index = pIndex;
+        this->LED_Batt_Index = pIndex;
     }
 
-    uint32_t State::Fetch_LED_Red()
+    uint32_t State::Fetch_LED_Batt()
     {
-        return this->LED_Red_Index;
+        return this->LED_Batt_Index;
     }
 
-    void State::Register_LED_Green(uint32_t pIndex)
+    void State::Register_LED_F1(uint32_t pIndex)
     {
-        this->LED_Green_Index = pIndex;
+        this->LED_F1_Index = pIndex;
     }
 
-    uint32_t State::Fetch_LED_Green()
+    uint32_t State::Fetch_LED_F1()
     {
-        return this->LED_Green_Index;
+        return this->LED_F1_Index;
     }
 
-    void State::Register_LED_Blue(uint32_t pIndex)
+    void State::Register_LED_F2(uint32_t pIndex)
     {
-        this->LED_Blue_Index = pIndex;
+        this->LED_F2_Index = pIndex;
     }
 
-    uint32_t State::Fetch_LED_Blue()
+    uint32_t State::Fetch_LED_F2()
     {
-        return this->LED_Blue_Index;
+        return this->LED_F2_Index;
     }
     }

@@ -118,12 +118,12 @@ namespace Sys
 
             NavInfo Nav_Builder;
 
-            /* Component index of the Red LED */
-            uint32_t LED_Red_Index = 0;
-            /* Component index of the Green LED */
-            uint32_t LED_Green_Index = 0;
-            /* Component index of the Blue LED */
-            uint32_t LED_Blue_Index = 0;
+            /* Component index of the Batt LED */
+            uint32_t LED_Batt_Index = 0;
+            /* Component index of the F1 LED */
+            uint32_t LED_F1_Index = 0;
+            /* Component index of the F2 LED */
+            uint32_t LED_F2_Index = 0;
         public:
             /* PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static uint8_t EvtPool[EVENT_POOL_SIZE]; */
             PLACE_IN_SECTION("MB_MEM2") ALIGN(4) inline static uint8_t EvtPool[EVENT_POOL_SIZE];
@@ -204,14 +204,14 @@ namespace Sys
             void Music_Build_Album_Art(uint8_t *arr, size_t length);
             void Music_Trigger();
 
-            void Register_LED_Red(uint32_t pIndex);
-            uint32_t Fetch_LED_Red();
+            void Register_LED_Batt(uint32_t pIndex);
+            uint32_t Fetch_LED_Batt();
 
-            void Register_LED_Green(uint32_t pIndex);
-            uint32_t Fetch_LED_Green();
+            void Register_LED_F1(uint32_t pIndex);
+            uint32_t Fetch_LED_F1();
 
-            void Register_LED_Blue(uint32_t pIndex);
-            uint32_t Fetch_LED_Blue();
+            void Register_LED_F2(uint32_t pIndex);
+            uint32_t Fetch_LED_F2();
     };
 }
 

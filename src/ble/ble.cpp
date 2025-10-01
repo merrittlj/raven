@@ -40,7 +40,7 @@ void BLE::App::Init()
     /* Initialize BLE (BLE TL, BLE stack, HAL, HCI, GATT, GAP) */
     BLE_Init();
 
-    this->gpioCtrl->Write_Component(this->sysState->Fetch_LED_Blue(), SET);
+    this->gpioCtrl->Write_Component(this->sysState->Fetch_LED_F1(), SET);
     /* TODO: add more */
 }
 
@@ -348,6 +348,8 @@ SVCCTL_UserEvtFlowStatus_t BLE::App::SVCCTL_Notification_Handler(void *pckt)
                 case HCI_LE_CONNECTION_COMPLETE_SUBEVT_CODE:
                     this->sysState->App_Flag_Reset(Sys::State::App_Flag::BLE_ADVERTISING);
                     this->sysState->App_Flag_Set(Sys::State::App_Flag::BLE_CONNECTED);
+
+                    this->gpioCtrl->Write_Component(this->sysState->Fetch_LED_F2(), SET);
                     break; /* HCI_LE_CONNECTION_COMPLETE_SUBEVT_CODE */
                 default:
                     break;
@@ -358,7 +360,6 @@ SVCCTL_UserEvtFlowStatus_t BLE::App::SVCCTL_Notification_Handler(void *pckt)
             switch (blecore_evt->ecode)
             {
                 case EVT_END_OF_RADIO_ACTIVITY:
-                    this->gpioCtrl->Toggle_Component(this->sysState->Fetch_LED_Green());
                     break; /* EVT_END_OF_RADIO_ACTIVITY */
             }
             break; /* HCI_VENDOR_SPECIFIC_DEBUG_EVT_CODE */
