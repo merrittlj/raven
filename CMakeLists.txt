@@ -145,6 +145,11 @@ add_custom_target(flash
     DEPENDS ${PROJECT_NAME}
 )
 
+add_custom_target(start
+    COMMAND STM32_Programmer_CLI -c port=usb1 -startwirelessstack
+    DEPENDS ${PROJECT_NAME}
+)
+
 add_custom_target(debug
     COMMAND ${CMAKE_SOURCE_DIR}/debug.sh
     DEPENDS ${PROJECT_NAME}
