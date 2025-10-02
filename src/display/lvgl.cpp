@@ -474,7 +474,7 @@
     void LVGL::Time(Sys::TimeInfo value)
     {
         if (face != nullptr) {
-            if (lv_screen_active() == tagScreen) hapticCtrl->Vibrate_Pulse(500);
+            // if (lv_screen_active() == tagScreen) hapticCtrl->Vibrate_Pulse(500);
             face->Draw(value);
         }
     }
@@ -482,9 +482,9 @@
     void LVGL::Alert(Sys::AlertInfo info)
     {
         /* Better UX to have before load rather than after */
-        hapticCtrl->Vibrate_Pulse(100);
-        Sys::Delay(30);
-        hapticCtrl->Vibrate_Pulse(50);
+        // hapticCtrl->Vibrate_Pulse(100);
+        // Sys::Delay(30);
+        // hapticCtrl->Vibrate_Pulse(50);
 
         lv_label_set_text(source, info.source.c_str());
         lv_label_set_text(title, info.title.c_str());
@@ -680,7 +680,7 @@
 
     void LVGL::Button(uint8_t b)
     {
-        hapticCtrl->Vibrate_Pulse(50);
+        // hapticCtrl->Vibrate_Pulse(50);
         if (b == 1) {
             /* All screens: load face */
             face->Load_Screen();
@@ -821,7 +821,7 @@
 
     void LVGL::Button_Double(uint8_t b1, uint8_t b2)
     {
-        hapticCtrl->Vibrate_Pulse(50);
+        // hapticCtrl->Vibrate_Pulse(50);
         /* Button 1 & 2 double press */
         if ((b1 == 1 && b2 == 2) || (b1 == 2 && b2 == 1)) {
             /* Global summary screen */

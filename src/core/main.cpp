@@ -1,4 +1,6 @@
 /* requires stm32wb5x_BLE_Stack_fw.bin binary on wireless coprocessor */
+/* use full(not extended, not light) stack on the v1.20 branch of STM32CubeWB,
+ * with FUS v1.2.0(do not upgrade or mess with this!) */
 
 #include "main.hpp"
 
@@ -46,13 +48,12 @@ int main()
      */
     __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_OPTVERR);
 
-    uint32_t prevTick = 0;
-
     /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
     HAL_Init();
 
     Sys::State sysState = Sys::State();
     Sys::Controller sysCtrl = Sys::Controller(&sysState);
+
     /* Tune the HSE internal load capacitors - P-NUCLEO-WB55.Nucleo board */
     // TODO: is this necessary to run or not?
     // is it 32 tuning by default?
@@ -73,7 +74,6 @@ int main()
     sysCtrl.Config_SysClk();
     sysCtrl.Init_CPU2();
 
-    // CHECK THESE!!!!
     uint8_t batt = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 0), GPIO::Types::LED));
     uint8_t f1 = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 1), GPIO::Types::LED));
     uint8_t f2 = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 5), GPIO::Types::LED));
@@ -104,12 +104,13 @@ int main()
     __HAL_TIM_SetCompare(tim2, TIM_CHANNEL_1, (uint64_t)I2C_ARR_IDEAL);
     HAL_TIM_PWM_Start(tim2, TIM_CHANNEL_1);
 
-    I2C_HandleTypeDef *i2c = sysCtrl.Config_I2C();
-    Sys::I2C_Controller i2cCtrl = Sys::I2C_Controller(i2c, 0x4A << 1, &gpioCtrl);
-    Haptic::Driver driver = Haptic::Driver(&i2cCtrl);
-    Haptic::Controller hapticCtrl = Haptic::Controller(&driver);
-
     // Haptics are DISABLED
+
+    // I2C_HandleTypeDef *i2c = sysCtrl.Config_I2C();
+    // Sys::I2C_Controller i2cCtrl = Sys::I2C_Controller(i2c, 0x4A << 1, &gpioCtrl);
+    // Haptic::Driver driver = Haptic::Driver(&i2cCtrl);
+    // Haptic::Controller hapticCtrl = Haptic::Controller(&driver);
+
     // if (!driver.begin()) Sys::Error_Handler();
     // if (!driver.defaultMotor()) Sys::Error_Handler();
     // driver.enableFreqTrack(false);
@@ -136,10 +137,11 @@ int main()
 
     bleApp.Advertising(SET);
 
-    Display::Controller displayCtrl = Display::Controller(200, 200, spiCtrl, &sysState, &sysCtrl, &hapticCtrl, &infoService);
+    Display::Controller displayCtrl = Display::Controller(200, 200, spiCtrl, &sysState, &sysCtrl, 0, &infoService);
     displayCtrl.Init();
 
-    Debouncer btnPort(BUTTON_PIN_0 | BUTTON_PIN_1 | BUTTON_PIN_2 | BUTTON_PIN_3);
+    // Debouncer btnPort(BUTTON_PIN_0 | BUTTON_PIN_1 | BUTTON_PIN_2 | BUTTON_PIN_3);
+    Debouncer btnPort(0);
 
     sysCtrl.Config_RTC();
 
