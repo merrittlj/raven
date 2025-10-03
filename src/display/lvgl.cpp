@@ -481,7 +481,6 @@
 
     void LVGL::Alert(Sys::AlertInfo info)
     {
-        /* Better UX to have before load rather than after */
         // hapticCtrl->Vibrate_Pulse(100);
         // Sys::Delay(30);
         // hapticCtrl->Vibrate_Pulse(50);
