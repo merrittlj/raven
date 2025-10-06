@@ -108,11 +108,11 @@ int main()
     Haptic::Driver driver = Haptic::Driver(&i2cCtrl);
     Haptic::Controller hapticCtrl = Haptic::Controller(&driver);
 
-    if (!driver.begin()) Sys::Error_Handler();
-    if (!driver.defaultMotor()) Sys::Error_Handler();
-    driver.enableFreqTrack(false);
-    driver.setOperationMode(Haptic::INACTIVE);
-    driver.clearIrq(driver.getIrqEvent());  /* I hate this */
+    // if (!driver.begin()) Sys::Error_Handler();
+    // if (!driver.defaultMotor()) Sys::Error_Handler();
+    // driver.enableFreqTrack(false);
+    // driver.setOperationMode(Haptic::INACTIVE);
+    // driver.clearIrq(driver.getIrqEvent());  /* I hate this */
 
     /* Set the red LED On to indicate that the CPU2 is initializing */
     /* gpioCtrl.Write_Component(sysState.Fetch_LED_Red(), SET); */
