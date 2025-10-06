@@ -39,9 +39,6 @@ void BLE::App::Init()
 
     /* Initialize BLE (BLE TL, BLE stack, HAL, HCI, GATT, GAP) */
     BLE_Init();
-
-    this->gpioCtrl->Write_Component(this->sysState->Fetch_LED_F1(), SET);
-    /* TODO: add more */
 }
 
 /**
@@ -335,6 +332,8 @@ SVCCTL_UserEvtFlowStatus_t BLE::App::SVCCTL_Notification_Handler(void *pckt)
         case HCI_DISCONNECTION_COMPLETE_EVT_CODE:
             this->sysState->App_Flag_Reset(Sys::State::App_Flag::BLE_CONNECTED);
 
+            this->gpioCtrl->Write_Component(this->sysState->Fetch_LED_F1(), RESET);
+
             this->sysState->Screens_Clear();
             Display::Controller::Instance()->Tag_Screen();
 
@@ -348,8 +347,8 @@ SVCCTL_UserEvtFlowStatus_t BLE::App::SVCCTL_Notification_Handler(void *pckt)
                 case HCI_LE_CONNECTION_COMPLETE_SUBEVT_CODE:
                     this->sysState->App_Flag_Reset(Sys::State::App_Flag::BLE_ADVERTISING);
                     this->sysState->App_Flag_Set(Sys::State::App_Flag::BLE_CONNECTED);
-
-                    this->gpioCtrl->Write_Component(this->sysState->Fetch_LED_F2(), SET);
+    
+                    this->gpioCtrl->Write_Component(this->sysState->Fetch_LED_F1(), SET);
                     break; /* HCI_LE_CONNECTION_COMPLETE_SUBEVT_CODE */
                 default:
                     break;

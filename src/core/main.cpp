@@ -100,9 +100,9 @@ int main()
     SPI_HandleTypeDef *spi = sysCtrl.Config_SPI();
     Sys::SPI_Controller spiCtrl = Sys::SPI_Controller(spi, &gpioCtrl, Sys::SPI_Manager{busy,rst,dc,cs,pwr});
 
-    TIM_HandleTypeDef *tim2 = sysCtrl.Config_TIM2();
-    __HAL_TIM_SetCompare(tim2, TIM_CHANNEL_1, (uint64_t)I2C_ARR_IDEAL);
-    HAL_TIM_PWM_Start(tim2, TIM_CHANNEL_1);
+    // TIM_HandleTypeDef *tim2 = sysCtrl.Config_TIM2();
+    // __HAL_TIM_SetCompare(tim2, TIM_CHANNEL_1, (uint64_t)I2C_ARR_IDEAL);
+    // HAL_TIM_PWM_Start(tim2, TIM_CHANNEL_1);
 
     // Haptics are DISABLED
 

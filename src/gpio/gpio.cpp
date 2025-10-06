@@ -6,7 +6,7 @@
 
 GPIO_InitTypeDef GPIO::Types::LED = {
     .Mode = GPIO_MODE_OUTPUT_PP,
-    .Pull = GPIO_PULLUP,
+    .Pull = GPIO_NOPULL,
     .Speed = GPIO_SPEED_FREQ_HIGH,
 };
 
