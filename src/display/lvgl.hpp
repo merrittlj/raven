@@ -4,7 +4,6 @@
 
 #include "display/display.hpp"
 #include "display/face.hpp"
-#include "sys/state.hpp"
 #include "haptic/haptic.hpp"
 #include "services/info.hpp"
 
@@ -19,7 +18,6 @@ namespace Display
     class LVGL
     {
         private:
-            Sys::State *state;
             Haptic::Controller *hapticCtrl;
             BLE::InfoService *infoServ;
 
@@ -99,7 +97,7 @@ namespace Display
 
         public:
             LVGL();
-            LVGL(Display::Manager man, Sys::State *sysState, Haptic::Controller *ctrl, BLE::InfoService *infoService);
+            LVGL(Display::Manager man, Haptic::Controller *ctrl, BLE::InfoService *infoService);
 
             static void Safe_Screen_Load(lv_obj_t *screen);
 

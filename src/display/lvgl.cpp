@@ -34,10 +34,9 @@
     LVGL::LVGL()
     {}
 
-    LVGL::LVGL(Display::Manager man, Sys::State *sysState, Haptic::Controller *ctrl, BLE::InfoService *infoService)
+    LVGL::LVGL(Display::Manager man, Haptic::Controller *ctrl, BLE::InfoService *infoService)
     {
         manager = man;
-        state = sysState;
         hapticCtrl = ctrl;
         infoServ = infoService;
     }
@@ -59,6 +58,7 @@
         lv_display_set_flush_cb(eInk, Flush);
 
 
+        Sys::State *state = Sys::Controller::Instance()->sysState;
         state->Screen_Deactivate(Sys::Screen::NAVIGATION);
         state->Screen_Deactivate(Sys::Screen::MUSIC);
     }
@@ -387,12 +387,12 @@
 
     void LVGL::Timer_Check_Update(lv_timer_t *timer)
     {
-        LVGL *data = static_cast<LVGL *>(timer->user_data);
+        Sys::State *state = Sys::Controller::Instance()->sysState;
 
         /* If to update, set timer from saved sys state value */
-        if (data->state->App_Flag_Get(Sys::State::App_Flag::LOGIC_TIME_UPDATE_PENDING) == Sys::State::Flag_Val::SET) {
-            data->state->Display_Time();
-            data->state->App_Flag_Reset(Sys::State::App_Flag::LOGIC_TIME_UPDATE_PENDING);
+        if (state->App_Flag_Get(Sys::State::App_Flag::LOGIC_TIME_UPDATE_PENDING) == Sys::State::Flag_Val::SET) {
+            state->Display_Time();
+            state->App_Flag_Reset(Sys::State::App_Flag::LOGIC_TIME_UPDATE_PENDING);
         }
     }
 
@@ -436,6 +436,7 @@
         lv_obj_clean(summaryScreen);
         Recreate_Summary();
 
+        Sys::State *state = Sys::Controller::Instance()->sysState;
         Sys::TimeInfo timeInfo = state->Get_Time();
 
         std::string time = (timeInfo.hour < 10 ? "0" : "") + std::to_string(timeInfo.hour) + ":" + (timeInfo.minute < 10 ? "0" : "") + std::to_string(timeInfo.minute);
@@ -493,6 +494,7 @@
         if (info.mode == 1) lv_obj_add_flag(alertBorder, LV_OBJ_FLAG_HIDDEN);
 
         Safe_Screen_Load(alertScreen);
+        Sys::State *state = Sys::Controller::Instance()->sysState;
         state->Screen_Activate(Sys::Screen::ALERTS_LIST);  /* Until dismissal, activate unread alerts */
     }
 
@@ -518,6 +520,7 @@
         if (isView) lv_obj_add_flag(eventBorder, LV_OBJ_FLAG_HIDDEN);
 
         Safe_Screen_Load(eventScreen);
+        Sys::State *state = Sys::Controller::Instance()->sysState;
         state->Screen_Activate(Sys::Screen::EVENTS_LIST);
     }
 
@@ -542,6 +545,7 @@
         if (info.action == "close") lv_image_set_src(navAction, &close);
         if (info.action == "flag") lv_image_set_src(navAction, &flag);
 
+        Sys::State *state = Sys::Controller::Instance()->sysState;
         if (!state->Is_Screen_Active(Sys::Screen::NAVIGATION)) {
             Safe_Screen_Load(navScreen);
             state->Screen_Activate(Sys::Screen::NAVIGATION);
@@ -569,6 +573,8 @@
 
     void LVGL::Music(Sys::MusicInfo info)
     {
+        Sys::State *state = Sys::Controller::Instance()->sysState;
+
         /* subtract 2 border width */
         lv_label_set_text(musicTrack, Truncate_Text(info.track, 200 - 5).c_str());
         lv_label_set_text(musicArtist, Truncate_Text(info.artist, 200 - 5).c_str());
@@ -615,6 +621,7 @@
         lv_obj_clean(activeScreen);
         activeItems.clear();
 
+        Sys::State *state = Sys::Controller::Instance()->sysState;
         std::array<uint8_t, (size_t)Sys::Screen::Enum_Length> screens = state->Get_Screens();
         for (uint8_t i = 0; i < screens.size(); ++i) {
             volatile Sys::Screen s = (Sys::Screen)i;
@@ -638,6 +645,7 @@
     {
         lv_obj_clean(alertsListScreen);
 
+        Sys::State *state = Sys::Controller::Instance()->sysState;
         std::vector<Sys::AlertInfo> *stateAlerts = state->Get_Alerts();
         std::vector<std::string> stateSources;
         for (Sys::AlertInfo alert : *stateAlerts) {
@@ -653,6 +661,7 @@
     {
         lv_obj_clean(eventsListScreen);
 
+        Sys::State *state = Sys::Controller::Instance()->sysState;
         std::vector<Sys::EventInfo> stateEvents = state->Get_Events();
         std::vector<std::string> eventItems;
         for (Sys::EventInfo event : stateEvents) {
@@ -680,6 +689,7 @@
     void LVGL::Button(uint8_t b)
     {
         // hapticCtrl->Vibrate_Pulse(50);
+        Sys::State *state = Sys::Controller::Instance()->sysState;
         if (b == 1) {
             /* All screens: load face */
             face->Load_Screen();
@@ -821,6 +831,8 @@
     void LVGL::Button_Double(uint8_t b1, uint8_t b2)
     {
         // hapticCtrl->Vibrate_Pulse(50);
+        Sys::State *state = Sys::Controller::Instance()->sysState;
+        
         /* Button 1 & 2 double press */
         if ((b1 == 1 && b2 == 2) || (b1 == 2 && b2 == 1)) {
             /* Global summary screen */

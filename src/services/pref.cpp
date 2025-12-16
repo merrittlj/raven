@@ -12,10 +12,9 @@
 #include "ble_types.h"
 
 
-BLE::PrefService::PrefService(GPIO::Controller *pGpioCtrl, Sys::State *pSysState)
+BLE::PrefService::PrefService(GPIO::Controller *pGpioCtrl)
 {
     this->gpioCtrl = pGpioCtrl;
-    this->sysState = pSysState;
 
     BLE::PrefService::Instance(this);
 }
@@ -54,6 +53,7 @@ SVCCTL_EvtAckStatus_t BLE::PrefService::Event_Handler(void *Event)
     return_value = SVCCTL_EvtNotAck;
     event_pckt = (hci_event_pckt *)(((hci_uart_pckt*)Event)->data);
 
+    Sys::State *state = Sys::Controller::Instance()->sysState;
     switch (event_pckt->evt) {
         case HCI_VENDOR_SPECIFIC_DEBUG_EVT_CODE:
             {
@@ -66,15 +66,15 @@ SVCCTL_EvtAckStatus_t BLE::PrefService::Event_Handler(void *Event)
                         data = attribute_modified->Attr_Data;
                         length = (size_t)(attribute_modified->Attr_Data_Length);
                         if (attribute_modified->Attr_Handle == (face.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Get_Pref()->face = std::string((const char *)data, length);
+                            state->Get_Pref()->face = std::string((const char *)data, length);
                             Display::Controller::Instance()->Update_Face();
                         }
                         if (attribute_modified->Attr_Handle == (colorScheme.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Get_Pref()->scheme = ((Sys::Scheme)data[0]);
+                            state->Get_Pref()->scheme = ((Sys::Scheme)data[0]);
                             Display::Controller::Instance()->Refresh();
                         }
                         if (attribute_modified->Attr_Handle == (hideMusic.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Get_Pref()->hideMusic = (uint8_t)data[0];
+                            state->Get_Pref()->hideMusic = (uint8_t)data[0];
                         }
                         break;
 

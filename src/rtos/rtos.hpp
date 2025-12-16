@@ -2,7 +2,6 @@
 #define RTOS_HPP
 
 #include "sys/sys.hpp"
-#include "sys/state.hpp"
 #include "display/controller.hpp"
 #include "gpio/gpio.hpp"
 #include "services/info.hpp"
@@ -22,7 +21,6 @@ namespace RTOS
     };
 
     struct Startup_Params {
-        Sys::State *sysState;
         BLE::InfoService *info;
     };
 
@@ -30,7 +28,6 @@ namespace RTOS
         Debouncer *btnPort;
         GPIO::Controller *gpioCtrl;
         Display::Controller *displayCtrl;
-        Sys::State *sysState;
 
         uint8_t btn1;
         uint8_t btn2;

@@ -60,16 +60,16 @@ int main()
     // sysCtrl.Config_HSE();
 
     GPIO::Controller gpioCtrl = GPIO::Controller();
-    Sys::Event_Processor sysEvtP = Sys::Event_Processor(&sysState);
-    BLE::TimeService timeService = BLE::TimeService(&gpioCtrl, &sysState);
-    BLE::NotifyService notifyService = BLE::NotifyService(&gpioCtrl, &sysState);
-    BLE::PrefService prefService = BLE::PrefService(&gpioCtrl, &sysState);
-    BLE::NavService navService = BLE::NavService(&gpioCtrl, &sysState);
-    BLE::MusicService musicService = BLE::MusicService(&gpioCtrl, &sysState);
-    BLE::EventService eventService = BLE::EventService(&gpioCtrl, &sysState);
-    BLE::InfoService infoService = BLE::InfoService(&gpioCtrl, &sysState);
-    BLE::DataService dataService = BLE::DataService(&gpioCtrl, &sysState);
-    BLE::App bleApp = BLE::App(&gpioCtrl, &sysState);
+    Sys::Event_Processor sysEvtP = Sys::Event_Processor();
+    BLE::TimeService timeService = BLE::TimeService(&gpioCtrl);
+    BLE::NotifyService notifyService = BLE::NotifyService(&gpioCtrl);
+    BLE::PrefService prefService = BLE::PrefService(&gpioCtrl);
+    BLE::NavService navService = BLE::NavService(&gpioCtrl);
+    BLE::MusicService musicService = BLE::MusicService(&gpioCtrl);
+    BLE::EventService eventService = BLE::EventService(&gpioCtrl);
+    BLE::InfoService infoService = BLE::InfoService(&gpioCtrl);
+    BLE::DataService dataService = BLE::DataService(&gpioCtrl);
+    BLE::App bleApp = BLE::App(&gpioCtrl);
 
     sysCtrl.Config_SysClk();
     sysCtrl.Init_CPU2();
@@ -137,7 +137,7 @@ int main()
 
     bleApp.Advertising(SET);
 
-    Display::Controller displayCtrl = Display::Controller(200, 200, spiCtrl, &sysState, &sysCtrl, 0, &infoService);
+    Display::Controller displayCtrl = Display::Controller(200, 200, spiCtrl, &sysCtrl, 0, &infoService);
     displayCtrl.Init();
 
     // Debouncer btnPort(BUTTON_PIN_0 | BUTTON_PIN_1 | BUTTON_PIN_2 | BUTTON_PIN_3);
@@ -154,7 +154,6 @@ int main()
     xTaskCreate(RTOS::Process_Task, "Process", configMINIMAL_STACK_SIZE, (void *)processParams, tskIDLE_PRIORITY + 1, (TaskHandle_t *)NULL);
 
     RTOS::Startup_Params *startupParams = new RTOS::Startup_Params;
-    startupParams->sysState = &sysState;
     startupParams->info = &infoService;
     xTaskCreate(RTOS::Startup_Task, "Startup", configMINIMAL_STACK_SIZE, (void *)startupParams, tskIDLE_PRIORITY, (TaskHandle_t *)NULL);
 
@@ -162,7 +161,6 @@ int main()
     buttonParams->btnPort = &btnPort;
     buttonParams->gpioCtrl = &gpioCtrl;
     buttonParams->displayCtrl = &displayCtrl;
-    buttonParams->sysState = &sysState;
 
     buttonParams->btn1 = btn1;
     buttonParams->btn2 = btn2;

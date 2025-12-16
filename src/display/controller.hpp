@@ -21,7 +21,6 @@ namespace Display
         private:
             inline static Controller *theInstance;
 
-            Sys::State *state;
             Sys::Controller *sysCtrl;
 
             BLE::InfoService *info;
@@ -33,13 +32,11 @@ namespace Display
 
         public:
             Controller();
-            Controller(uint16_t displayWidth, uint16_t displayHeight, Sys::SPI_Controller ctrl, Sys::State *sysState, Sys::Controller *userSys, Haptic::Controller *userHaptic, BLE::InfoService *infoService);
+            Controller(uint16_t displayWidth, uint16_t displayHeight, Sys::SPI_Controller ctrl, Sys::Controller *userSys, Haptic::Controller *userHaptic, BLE::InfoService *infoService);
             ~Controller();
 
             static Controller *Instance(Controller *cur = nullptr);
             Manager Get_Manager();
-
-            Sys::State *Get_State();
 
             void Init();
             void Process();

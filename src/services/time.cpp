@@ -11,10 +11,9 @@
 #include "ble_types.h"
 
 
-BLE::TimeService::TimeService(GPIO::Controller *pGpioCtrl, Sys::State *pSysState)
+BLE::TimeService::TimeService(GPIO::Controller *pGpioCtrl)
 {
     this->gpioCtrl = pGpioCtrl;
-    this->sysState = pSysState;
 
     BLE::TimeService::Instance(this);
 }
@@ -54,6 +53,7 @@ SVCCTL_EvtAckStatus_t BLE::TimeService::Event_Handler(void *Event)
     return_value = SVCCTL_EvtNotAck;
     event_pckt = (hci_event_pckt *)(((hci_uart_pckt*)Event)->data);
 
+    Sys::State *state = Sys::Controller::Instance()->sysState;
     switch (event_pckt->evt) {
         case HCI_VENDOR_SPECIFIC_DEBUG_EVT_CODE:
             {
@@ -64,8 +64,8 @@ SVCCTL_EvtAckStatus_t BLE::TimeService::Event_Handler(void *Event)
                         uint8_t *data;
                         data = attribute_modified->Attr_Data;
                         if (attribute_modified->Attr_Handle == (currentTime.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Set_Time(Sys::TimeInfo{(uint16_t)(((uint16_t)data[1] << 8) | data[0]), data[2], data[3], data[4], data[5], data[6]});
-                            sysState->Display_Time();
+                            state->Set_Time(Sys::TimeInfo{(uint16_t)(((uint16_t)data[1] << 8) | data[0]), data[2], data[3], data[4], data[5], data[6]});
+                            state->Display_Time();
                         }
                         break;
 

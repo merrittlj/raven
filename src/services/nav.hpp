@@ -5,7 +5,6 @@
 #include "ble/service.hpp"
 #include "ble/char.hpp"
 #include "gpio/gpio.hpp"
-#include "sys/state.hpp"
 
 #include "ble.h"
 #include "ble_common.h"
@@ -27,7 +26,6 @@ namespace BLE
             const uint8_t SERVICE_MAX_ATT_RECORDS = 12;
 
             GPIO::Controller *gpioCtrl;
-            Sys::State *sysState;
 
             tBleStatus Add();
 
@@ -41,7 +39,7 @@ namespace BLE
             BLE::Char action;
             BLE::Char trigger;
 
-            NavService(GPIO::Controller *pGpioCtrl, Sys::State *pSysState);
+            NavService(GPIO::Controller *pGpioCtrl);
             ~NavService();
 
             uintptr_t Get_Handle() const;

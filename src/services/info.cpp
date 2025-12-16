@@ -4,17 +4,15 @@
 #include "ble/uuid.hpp"
 #include "gpio/gpio.hpp"
 #include "sys/sys.hpp"
-#include "sys/state.hpp"
 
 #include "ble_common.h"
 #include "ble.h"
 #include "ble_types.h"
 
 
-BLE::InfoService::InfoService(GPIO::Controller *pGpioCtrl, Sys::State *pSysState)
+BLE::InfoService::InfoService(GPIO::Controller *pGpioCtrl)
 {
     this->gpioCtrl = pGpioCtrl;
-    this->sysState = pSysState;
 
     BLE::InfoService::Instance(this);
 }

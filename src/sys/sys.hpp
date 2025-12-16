@@ -25,15 +25,20 @@ namespace Sys
     class Controller
     {
         private:
-            Sys::State *sysState;
+            inline static Controller *theInstance;
+
             RTC_HandleTypeDef hrtc;
             TIM_HandleTypeDef htim2;
             SPI_HandleTypeDef spi1;
             I2C_HandleTypeDef hi2c1;
 
         public:
+            Sys::State *sysState;
+
             Controller(Sys::State *state);
             ~Controller();
+
+            static Controller *Instance(Controller *cur = nullptr);
 
             void Config_SysClk();
             void Config_RTC();
@@ -51,11 +56,8 @@ namespace Sys
         private:
             inline static Event_Processor *theInstance;
 
-            Sys::State *sysState;
-
         public:
             Event_Processor();
-            Event_Processor(Sys::State *state);
             ~Event_Processor();
 
             static Event_Processor *Instance(Event_Processor *cur = nullptr);

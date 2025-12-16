@@ -41,10 +41,19 @@ void Sys::Error_Handler()
 Sys::Controller::Controller(Sys::State *state)
 {
     this->sysState = state;
+    Sys::Controller::Instance(this);
 }
 
 Sys::Controller::~Controller()
-{}
+{
+    delete theInstance;
+}
+
+Sys::Controller *Sys::Controller::Instance(Sys::Controller *cur)
+{
+    if (!theInstance) theInstance = cur;
+    return theInstance;
+}
 
 /**
  * @brief System Clock Configuration
@@ -253,7 +262,7 @@ extern "C" {
             Sys::Error_Handler();
 
         /* Do not actually need to set RTC/time, just need to remind display to update from existing RTC */
-        Sys::State *state = Display::Controller::Instance()->Get_State();
+        Sys::State *state = Sys::Controller::Instance()->sysState;
         state->App_Flag_Set(Sys::State::App_Flag::LOGIC_TIME_UPDATE_PENDING);
     }
 
@@ -427,12 +436,7 @@ void Sys::Controller::Init_CPU2()
 }
 
 Sys::Event_Processor::Event_Processor()
-{}
-
-Sys::Event_Processor::Event_Processor(Sys::State *state)
 {
-    this->sysState = state;
-
     Sys::Event_Processor::Instance(this);
 }
 
@@ -474,7 +478,7 @@ void Sys::Event_Processor::Sys_UserEventReceivedCallback(void *pData)
     SHCI_C2_Ready_Evt_t *p_sys_ready_event;
     SCHI_SystemErrCode_t *p_sys_error_code;
 
-    Sys::State *state = Sys::Event_Processor::Instance()->sysState;
+    Sys::State *state = Sys::Controller::Instance()->sysState;
 
     p_sys_event = (TL_AsynchEvt_t*)(((tSHCI_UserEvtRxParam*)pData)->pckt->evtserial.evt.payload);
 
@@ -623,9 +627,10 @@ void Sys::Event_Processor::BLE_StatusNotificationCallback(HCI_TL_CmdStatus_t sta
  */
 void Sys::Event_Processor::Sys_ProcessEvent()
 {
-    if (this->sysState->App_Flag_Get(Sys::State::App_Flag::SHCI_EVENT_PENDING) == Sys::State::Flag_Val::SET)
+    Sys::State *state = Sys::Controller::Instance()->sysState;
+    if (state->App_Flag_Get(Sys::State::App_Flag::SHCI_EVENT_PENDING) == Sys::State::Flag_Val::SET)
     {
-        this->sysState->App_Flag_Reset(Sys::State::App_Flag::SHCI_EVENT_PENDING);
+        state->App_Flag_Reset(Sys::State::App_Flag::SHCI_EVENT_PENDING);
         shci_user_evt_proc();
     }
 }
@@ -637,9 +642,10 @@ void Sys::Event_Processor::Sys_ProcessEvent()
  */
 void Sys::Event_Processor::BLE_ProcessEvent()
 {
-    if (this->sysState->App_Flag_Get(Sys::State::App_Flag::HCI_EVENT_PENDING) == Sys::State::Flag_Val::SET)
+    Sys::State *state = Sys::Controller::Instance()->sysState;
+    if (state->App_Flag_Get(Sys::State::App_Flag::HCI_EVENT_PENDING) == Sys::State::Flag_Val::SET)
     {
-        this->sysState->App_Flag_Reset(Sys::State::App_Flag::HCI_EVENT_PENDING);
+        state->App_Flag_Reset(Sys::State::App_Flag::HCI_EVENT_PENDING);
         hci_user_evt_proc();
     }
 }
@@ -659,7 +665,8 @@ void Sys::Event_Processor::BLE_ProcessEvent()
  */
 void Sys::Event_Processor::SHCI_Notify_Event_Handler(void* pdata)
 {
-    this->sysState->App_Flag_Set(Sys::State::App_Flag::SHCI_EVENT_PENDING);
+    Sys::State *state = Sys::Controller::Instance()->sysState;
+    state->App_Flag_Set(Sys::State::App_Flag::SHCI_EVENT_PENDING);
     return;
 }
 
@@ -678,7 +685,8 @@ void Sys::Event_Processor::SHCI_Notify_Event_Handler(void* pdata)
  */
 void Sys::Event_Processor::HCI_Notify_Event_Handler(void* pdata)
 {
-    this->sysState->App_Flag_Set(Sys::State::App_Flag::HCI_EVENT_PENDING);
+    Sys::State *state = Sys::Controller::Instance()->sysState;
+    state->App_Flag_Set(Sys::State::App_Flag::HCI_EVENT_PENDING);
     return;
 }
 

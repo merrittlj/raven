@@ -11,10 +11,9 @@
 #include "ble_types.h"
 
 
-BLE::NavService::NavService(GPIO::Controller *pGpioCtrl, Sys::State *pSysState)
+BLE::NavService::NavService(GPIO::Controller *pGpioCtrl)
 {
     this->gpioCtrl = pGpioCtrl;
-    this->sysState = pSysState;
 
     BLE::NavService::Instance(this);
 }
@@ -53,6 +52,7 @@ SVCCTL_EvtAckStatus_t BLE::NavService::Event_Handler(void *Event)
     return_value = SVCCTL_EvtNotAck;
     event_pckt = (hci_event_pckt *)(((hci_uart_pckt*)Event)->data);
 
+    Sys::State *state = Sys::Controller::Instance()->sysState;
     switch (event_pckt->evt) {
         case HCI_VENDOR_SPECIFIC_DEBUG_EVT_CODE:
             {
@@ -65,19 +65,19 @@ SVCCTL_EvtAckStatus_t BLE::NavService::Event_Handler(void *Event)
                         data = attribute_modified->Attr_Data;
                         length = attribute_modified->Attr_Data_Length;
                         if (attribute_modified->Attr_Handle == (instruction.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Nav_Build_Instruction(std::string((const char *)data, (size_t)length));
+                            state->Nav_Build_Instruction(std::string((const char *)data, (size_t)length));
                         }
                         if (attribute_modified->Attr_Handle == (distance.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Nav_Build_Distance(std::string((const char *)data, (size_t)length));
+                            state->Nav_Build_Distance(std::string((const char *)data, (size_t)length));
                         }
                         if (attribute_modified->Attr_Handle == (eta.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Nav_Build_ETA(std::string((const char *)data, (size_t)length));
+                            state->Nav_Build_ETA(std::string((const char *)data, (size_t)length));
                         }
                         if (attribute_modified->Attr_Handle == (action.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Nav_Build_Action(std::string((const char *)data, (size_t)length));
+                            state->Nav_Build_Action(std::string((const char *)data, (size_t)length));
                         }
                         if (attribute_modified->Attr_Handle == (trigger.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Nav_Trigger();
+                            state->Nav_Trigger();
                         }
                         break;
 

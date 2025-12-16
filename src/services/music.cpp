@@ -11,10 +11,9 @@
 #include "ble_types.h"
 
 
-BLE::MusicService::MusicService(GPIO::Controller *pGpioCtrl, Sys::State *pSysState)
+BLE::MusicService::MusicService(GPIO::Controller *pGpioCtrl)
 {
     this->gpioCtrl = pGpioCtrl;
-    this->sysState = pSysState;
 
     BLE::MusicService::Instance(this);
 }
@@ -53,6 +52,7 @@ SVCCTL_EvtAckStatus_t BLE::MusicService::Event_Handler(void *Event)
     return_value = SVCCTL_EvtNotAck;
     event_pckt = (hci_event_pckt *)(((hci_uart_pckt*)Event)->data);
 
+    Sys::State *state = Sys::Controller::Instance()->sysState;
     switch (event_pckt->evt) {
         case HCI_VENDOR_SPECIFIC_DEBUG_EVT_CODE:
             {
@@ -70,19 +70,19 @@ SVCCTL_EvtAckStatus_t BLE::MusicService::Event_Handler(void *Event)
                         data = attribute_modified->Attr_Data;
                         length = (size_t)(attribute_modified->Attr_Data_Length);
                         if (attribute_modified->Attr_Handle == (artist.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Music_Build_Artist(std::string((const char *)data, length));
+                            state->Music_Build_Artist(std::string((const char *)data, length));
                         }
                         if (attribute_modified->Attr_Handle == (track.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Music_Build_Track(std::string((const char *)data, length));
+                            state->Music_Build_Track(std::string((const char *)data, length));
                         }
                         if (attribute_modified->Attr_Handle == (album.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Music_Build_Album(std::string((const char *)data, length));
+                            state->Music_Build_Album(std::string((const char *)data, length));
                         }
                         if (attribute_modified->Attr_Handle == (albumArt.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Music_Build_Album_Art(data, length);
+                            state->Music_Build_Album_Art(data, length);
                         }
                         if (attribute_modified->Attr_Handle == (trigger.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Music_Trigger();
+                            state->Music_Trigger();
                         }
                         break;
 

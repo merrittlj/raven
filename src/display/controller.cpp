@@ -12,9 +12,8 @@ namespace Display
 
     }
 
-    Controller::Controller(uint16_t displayWidth, uint16_t displayHeight, Sys::SPI_Controller ctrl, Sys::State *sysState, Sys::Controller *userSys, Haptic::Controller *userHaptic, BLE::InfoService *infoService)
+    Controller::Controller(uint16_t displayWidth, uint16_t displayHeight, Sys::SPI_Controller ctrl, Sys::Controller *userSys, Haptic::Controller *userHaptic, BLE::InfoService *infoService)
     {
-        state = sysState;
         sysCtrl = userSys;
         
         info = infoService;
@@ -25,10 +24,10 @@ namespace Display
         manager.width = displayWidth;
         manager.height = displayHeight;
 
-        display = Display::EInk(manager, ctrl, sysState);
+        display = Display::EInk(manager, ctrl);
         manager.displayCallback = &display;
 
-        lvgl = Display::LVGL(manager, sysState, userHaptic, infoService);
+        lvgl = Display::LVGL(manager, userHaptic, infoService);
         /* Be careful not to use LVGL here, not init'd yet */
     }
 
@@ -46,11 +45,6 @@ namespace Display
     Manager Controller::Get_Manager()
     {
         return manager;
-    }
-
-    Sys::State *Controller::Get_State()
-    {
-        return state;
     }
 
     void Controller::Init()
@@ -81,6 +75,7 @@ namespace Display
 
     void Controller::Update_Face()
     {
+        Sys::State *state = Sys::Controller::Instance()->sysState;
         std::string pref = state->Get_Pref()->face;
 
         Face *face = new Digital_Face();

@@ -11,10 +11,9 @@
 #include "ble_types.h"
 
 
-BLE::NotifyService::NotifyService(GPIO::Controller *pGpioCtrl, Sys::State *pSysState)
+BLE::NotifyService::NotifyService(GPIO::Controller *pGpioCtrl)
 {
     this->gpioCtrl = pGpioCtrl;
-    this->sysState = pSysState;
 
     BLE::NotifyService::Instance(this);
 }
@@ -53,6 +52,7 @@ SVCCTL_EvtAckStatus_t BLE::NotifyService::Event_Handler(void *Event)
     return_value = SVCCTL_EvtNotAck;
     event_pckt = (hci_event_pckt *)(((hci_uart_pckt*)Event)->data);
 
+    Sys::State *state = Sys::Controller::Instance()->sysState;
     switch (event_pckt->evt) {
         case HCI_VENDOR_SPECIFIC_DEBUG_EVT_CODE:
             {
@@ -65,17 +65,17 @@ SVCCTL_EvtAckStatus_t BLE::NotifyService::Event_Handler(void *Event)
                         data = attribute_modified->Attr_Data;
                         length = attribute_modified->Attr_Data_Length;
                         if (attribute_modified->Attr_Handle == (source.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Alert_Build_Source(std::string((const char *)data, (size_t)length));
+                            state->Alert_Build_Source(std::string((const char *)data, (size_t)length));
                         }
                         if (attribute_modified->Attr_Handle == (title.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Alert_Build_Title(std::string((const char *)data, (size_t)length));
+                            state->Alert_Build_Title(std::string((const char *)data, (size_t)length));
                         }
                         if (attribute_modified->Attr_Handle == (body.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Alert_Build_Body(std::string((const char *)data, (size_t)length));
+                            state->Alert_Build_Body(std::string((const char *)data, (size_t)length));
                         }
                         if (attribute_modified->Attr_Handle == (trigger.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            gpioCtrl->Toggle_Component(sysState->Fetch_LED_Batt());                            
-                            sysState->Alert_Trigger();
+                            gpioCtrl->Toggle_Component(state->Fetch_LED_Batt());                            
+                            state->Alert_Trigger();
                         }
                         break;
 

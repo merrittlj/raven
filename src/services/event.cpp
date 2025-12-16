@@ -11,10 +11,9 @@
 #include "ble_types.h"
 
 
-BLE::EventService::EventService(GPIO::Controller *pGpioCtrl, Sys::State *pSysState)
+BLE::EventService::EventService(GPIO::Controller *pGpioCtrl)
 {
     this->gpioCtrl = pGpioCtrl;
-    this->sysState = pSysState;
 
     BLE::EventService::Instance(this);
 }
@@ -54,6 +53,7 @@ SVCCTL_EvtAckStatus_t BLE::EventService::Event_Handler(void *Event)
     return_value = SVCCTL_EvtNotAck;
     event_pckt = (hci_event_pckt *)(((hci_uart_pckt*)Event)->data);
 
+    Sys::State *state = Sys::Controller::Instance()->sysState;
     switch (event_pckt->evt) {
         case HCI_VENDOR_SPECIFIC_DEBUG_EVT_CODE:
             {
@@ -66,29 +66,29 @@ SVCCTL_EvtAckStatus_t BLE::EventService::Event_Handler(void *Event)
                         data = attribute_modified->Attr_Data;
                         length = (size_t)(attribute_modified->Attr_Data_Length);
                         if (attribute_modified->Attr_Handle == (type.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Event_Build_Type(data[0]);
+                            state->Event_Build_Type(data[0]);
                         }
                         if (attribute_modified->Attr_Handle == (id.Get_Handle() + CHAR_VALUE_OFFSET)) {
                             volatile uint64_t res = 0;
                             for (int i = 0; i < 8; i++) {
                                 res |= (uint64_t)data[i] << ((i - 7) * 8);
                             }
-                            sysState->Event_Build_Id(res);
+                            state->Event_Build_Id(res);
                         }
                         if (attribute_modified->Attr_Handle == (title.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Event_Build_Title(std::string((const char *)data, length));
+                            state->Event_Build_Title(std::string((const char *)data, length));
                         }
                         if (attribute_modified->Attr_Handle == (desc.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Event_Build_Desc(std::string((const char *)data, length));
+                            state->Event_Build_Desc(std::string((const char *)data, length));
                         }
                         if (attribute_modified->Attr_Handle == (time.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Event_Build_Time(std::string((const char *)data, length));
+                            state->Event_Build_Time(std::string((const char *)data, length));
                         }
                         if (attribute_modified->Attr_Handle == (repDur.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Event_Build_RepDur(std::string((const char *)data, length));
+                            state->Event_Build_RepDur(std::string((const char *)data, length));
                         }
                         if (attribute_modified->Attr_Handle == (trigger.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Event_Trigger();
+                            state->Event_Trigger();
                         }
                         break;
 

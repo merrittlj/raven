@@ -12,10 +12,9 @@
 #include "ble_types.h"
 
 
-BLE::DataService::DataService(GPIO::Controller *pGpioCtrl, Sys::State *pSysState)
+BLE::DataService::DataService(GPIO::Controller *pGpioCtrl)
 {
     this->gpioCtrl = pGpioCtrl;
-    this->sysState = pSysState;
 
     BLE::DataService::Instance(this);
 }
@@ -54,6 +53,7 @@ SVCCTL_EvtAckStatus_t BLE::DataService::Event_Handler(void *Event)
     return_value = SVCCTL_EvtNotAck;
     event_pckt = (hci_event_pckt *)(((hci_uart_pckt*)Event)->data);
 
+    Sys::State *state = Sys::Controller::Instance()->sysState;
     switch (event_pckt->evt) {
         case HCI_VENDOR_SPECIFIC_DEBUG_EVT_CODE:
             {
@@ -66,7 +66,7 @@ SVCCTL_EvtAckStatus_t BLE::DataService::Event_Handler(void *Event)
                         data = attribute_modified->Attr_Data;
                         length = (size_t)(attribute_modified->Attr_Data_Length);
                         if (attribute_modified->Attr_Handle == (weather.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            sysState->Set_Weather(Sys::WeatherInfo{std::string((const char *)data, length)});
+                            state->Set_Weather(Sys::WeatherInfo{std::string((const char *)data, length)});
                         }
                         break;
 

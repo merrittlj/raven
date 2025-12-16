@@ -58,11 +58,10 @@ namespace Display
     EInk::EInk()
     {}
 
-    EInk::EInk(Display::Manager man, Sys::SPI_Controller ctrl, Sys::State *sysState)
+    EInk::EInk(Display::Manager man, Sys::SPI_Controller ctrl)
     {
         manager = man;
         spi = ctrl;
-        state = sysState;
     }
 
     std::vector<uint8_t> *EInk::GetBuf()
@@ -229,6 +228,7 @@ namespace Display
         SetCursor(0, 0);
 
         spi.SendCommand(0x24);  /* Write RAM(BW) */
+        Sys::State *state = Sys::Controller::Instance()->sysState;
         for (uint16_t j = 0; j < manager.height; j++) {
             for (uint16_t i = 0; i < widthBytes; i++) {
                 if (state->Get_Pref()->scheme == Sys::Scheme::LIGHT)

@@ -4,7 +4,6 @@
 
 #include "services/time.hpp"
 #include "gpio/gpio.hpp"
-#include "sys/state.hpp"
 #include "sys/sys.hpp"
 
 #define EVT_END_OF_RADIO_ACTIVITY           0x0004
@@ -49,7 +48,6 @@ namespace BLE
             };
 
             GPIO::Controller *gpioCtrl;
-            Sys::State *sysState;
 
             void BLE_Init();
             void Tl_Init();
@@ -59,7 +57,7 @@ namespace BLE
         public:
             static App *Instance(App *cur = nullptr);
 
-            App(GPIO::Controller *pGpioCtrl, Sys::State *pSysState);
+            App(GPIO::Controller *pGpioCtrl);
             ~App();
 
             void Init();
