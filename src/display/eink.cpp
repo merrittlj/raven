@@ -259,6 +259,7 @@ namespace Display
             }
         }
         TurnOnDisplayPart();
+        Sleep();
     }
 
     void EInk::DisplayPart()
@@ -272,10 +273,14 @@ namespace Display
             }
         }
         TurnOnDisplayPart();
+        Sleep();
     }
 
     void EInk::Sleep()
     {
+        // Sleep to avoid having on high voltage for long periods of time!
+        // Must re-init after sleep or commands will be ignored
+        spi.BlockBusy();
         spi.SendCommand(0x10);  /* Deep sleep mode control */
         spi.SendData(0x01);
         Sys::Delay(100);

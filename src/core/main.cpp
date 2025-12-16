@@ -87,10 +87,10 @@ int main()
     uint8_t cs = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 6), GPIO::Types::SPI));
     uint8_t pwr = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOA, 8), GPIO::Types::SPI));
 
-    uint8_t btn1 = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 12), GPIO::Types::Button));
-    uint8_t btn2 = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 13), GPIO::Types::Button));
-    uint8_t btn3 = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 14), GPIO::Types::Button));
-    uint8_t btn4 = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 15), GPIO::Types::Button));
+    uint8_t btn1 = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 13), GPIO::Types::Button));
+    uint8_t btn2 = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 12), GPIO::Types::Button));
+    uint8_t btn3 = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 15), GPIO::Types::Button));
+    uint8_t btn4 = gpioCtrl.Add_Component(GPIO::Component(GPIO::Pin(GPIOB, 14), GPIO::Types::Button));
 
     gpioCtrl.Config();
     gpioCtrl.Init();
