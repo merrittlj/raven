@@ -7,11 +7,10 @@ namespace Sys
     I2C_Controller::I2C_Controller()
     {}
 
-    I2C_Controller::I2C_Controller(I2C_HandleTypeDef *handle, uint8_t address, GPIO::Controller *gpio)
+    I2C_Controller::I2C_Controller(I2C_HandleTypeDef *handle, uint8_t address)
     {
         i2c = handle;
         addr = address;
-        gpioCtrl = gpio;
     }
 
     // This generic function handles I2C write commands for modifying individual

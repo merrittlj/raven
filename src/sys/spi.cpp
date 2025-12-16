@@ -1,6 +1,7 @@
 #include "sys/spi.hpp"
 
 #include "sys/sys.hpp"
+#include "gpio/gpio.hpp"
 
 #include "stm32wbxx_hal.h"
 
@@ -10,10 +11,9 @@ Sys::SPI_Controller::SPI_Controller()
 
 }
 
-Sys::SPI_Controller::SPI_Controller(SPI_HandleTypeDef *handle, GPIO::Controller *gpio, SPI_Manager spiM)
+Sys::SPI_Controller::SPI_Controller(SPI_HandleTypeDef *handle, SPI_Manager spiM)
 {
     this->spi = handle;
-    this->gpioCtrl = gpio;
     this->manager = spiM;
 }
 
@@ -36,6 +36,7 @@ void Sys::SPI_Controller::WriteBytes(uint8_t *value, uint16_t len)
 
 void Sys::SPI_Controller::SendCommand(uint8_t reg)
 {
+    GPIO::Controller *gpioCtrl = GPIO::Controller::Instance();
     gpioCtrl->Write_Component(manager.dc, RESET);
     gpioCtrl->Write_Component(manager.cs, RESET);
     WriteByte(reg);
@@ -44,6 +45,7 @@ void Sys::SPI_Controller::SendCommand(uint8_t reg)
 
 void Sys::SPI_Controller::SendData(uint8_t data)
 {
+    GPIO::Controller *gpioCtrl = GPIO::Controller::Instance();
     gpioCtrl->Write_Component(manager.dc, SET);
     gpioCtrl->Write_Component(manager.cs, RESET);
     WriteByte(data);
@@ -52,6 +54,7 @@ void Sys::SPI_Controller::SendData(uint8_t data)
 
 void Sys::SPI_Controller::Reset()
 {
+    GPIO::Controller *gpioCtrl = GPIO::Controller::Instance();
     gpioCtrl->Write_Component(manager.rst, SET);
     gpioCtrl->Write_Component(manager.rst, RESET);
     Delay(10);
@@ -61,17 +64,20 @@ void Sys::SPI_Controller::Reset()
 
 void Sys::SPI_Controller::BlockBusy()
 {
+    GPIO::Controller *gpioCtrl = GPIO::Controller::Instance();
     while (gpioCtrl->Read_Component(manager.busy) == SET)
         Delay(10);
 }
 
 void Sys::SPI_Controller::Enable()
 {
+    GPIO::Controller *gpioCtrl = GPIO::Controller::Instance();
     gpioCtrl->Write_Component(manager.pwr, SET);
 }
 
 void Sys::SPI_Controller::Disable()
 {
+    GPIO::Controller *gpioCtrl = GPIO::Controller::Instance();
     gpioCtrl->Write_Component(manager.pwr, RESET);
 }
 

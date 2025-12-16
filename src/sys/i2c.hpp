@@ -2,8 +2,6 @@
 #define I2C_HPP
 
 
-#include "gpio/gpio.hpp"
-
 #include <cstddef>
 #include <cstdint>
 
@@ -17,11 +15,10 @@ namespace Sys
         private:
             I2C_HandleTypeDef *i2c;
             uint8_t addr;
-            GPIO::Controller *gpioCtrl;
 
         public:
             I2C_Controller();
-            I2C_Controller(I2C_HandleTypeDef *handle, uint8_t address, GPIO::Controller *gpio);
+            I2C_Controller(I2C_HandleTypeDef *handle, uint8_t address);
 
             // This generic function handles I2C write commands for modifying individual
             // bits in an eight bit register. Paramaters include the register's address, a mask

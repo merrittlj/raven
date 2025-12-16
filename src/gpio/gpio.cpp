@@ -73,15 +73,26 @@ void GPIO::Component::Toggle()
 }
 
 GPIO::Controller::Controller()
-{}
+{
+    GPIO::Controller::Instance(this);
+}
 
 GPIO::Controller::Controller(std::array<GPIO::Component, 128> pComponents)
 {
     this->components = pComponents;
+    GPIO::Controller::Instance(this);
 }
 
 GPIO::Controller::~Controller()
-{}
+{
+    delete theInstance;
+}
+
+GPIO::Controller *GPIO::Controller::Instance(GPIO::Controller *cur)
+{
+    if (!theInstance) theInstance = cur;
+    return theInstance;
+}
 
 /**
  * @brief Configure GPIO controller

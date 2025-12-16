@@ -61,15 +61,15 @@ int main()
 
     GPIO::Controller gpioCtrl = GPIO::Controller();
     Sys::Event_Processor sysEvtP = Sys::Event_Processor();
-    BLE::TimeService timeService = BLE::TimeService(&gpioCtrl);
-    BLE::NotifyService notifyService = BLE::NotifyService(&gpioCtrl);
-    BLE::PrefService prefService = BLE::PrefService(&gpioCtrl);
-    BLE::NavService navService = BLE::NavService(&gpioCtrl);
-    BLE::MusicService musicService = BLE::MusicService(&gpioCtrl);
-    BLE::EventService eventService = BLE::EventService(&gpioCtrl);
-    BLE::InfoService infoService = BLE::InfoService(&gpioCtrl);
-    BLE::DataService dataService = BLE::DataService(&gpioCtrl);
-    BLE::App bleApp = BLE::App(&gpioCtrl);
+    BLE::TimeService timeService = BLE::TimeService();
+    BLE::NotifyService notifyService = BLE::NotifyService();
+    BLE::PrefService prefService = BLE::PrefService();
+    BLE::NavService navService = BLE::NavService();
+    BLE::MusicService musicService = BLE::MusicService();
+    BLE::EventService eventService = BLE::EventService();
+    BLE::InfoService infoService = BLE::InfoService();
+    BLE::DataService dataService = BLE::DataService();
+    BLE::App bleApp = BLE::App();
 
     sysCtrl.Config_SysClk();
     sysCtrl.Init_CPU2();
@@ -98,7 +98,7 @@ int main()
     gpioCtrl.Write_Component(sysState.Fetch_LED_Batt(), SET);
 
     SPI_HandleTypeDef *spi = sysCtrl.Config_SPI();
-    Sys::SPI_Controller spiCtrl = Sys::SPI_Controller(spi, &gpioCtrl, Sys::SPI_Manager{busy,rst,dc,cs,pwr});
+    Sys::SPI_Controller spiCtrl = Sys::SPI_Controller(spi, Sys::SPI_Manager{busy,rst,dc,cs,pwr});
 
     // TIM_HandleTypeDef *tim2 = sysCtrl.Config_TIM2();
     // __HAL_TIM_SetCompare(tim2, TIM_CHANNEL_1, (uint64_t)I2C_ARR_IDEAL);
@@ -107,7 +107,7 @@ int main()
     // Haptics are DISABLED
 
     // I2C_HandleTypeDef *i2c = sysCtrl.Config_I2C();
-    // Sys::I2C_Controller i2cCtrl = Sys::I2C_Controller(i2c, 0x4A << 1, &gpioCtrl);
+    // Sys::I2C_Controller i2cCtrl = Sys::I2C_Controller(i2c, 0x4A << 1);
     // Haptic::Driver driver = Haptic::Driver(&i2cCtrl);
     // Haptic::Controller hapticCtrl = Haptic::Controller(&driver);
 
@@ -159,7 +159,6 @@ int main()
 
     RTOS::Button_Params *buttonParams = new RTOS::Button_Params;
     buttonParams->btnPort = &btnPort;
-    buttonParams->gpioCtrl = &gpioCtrl;
     buttonParams->displayCtrl = &displayCtrl;
 
     buttonParams->btn1 = btn1;

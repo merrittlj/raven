@@ -2,7 +2,6 @@
 
 #include "ble/char.hpp"
 #include "ble/uuid.hpp"
-#include "gpio/gpio.hpp"
 #include "sys/sys.hpp"
 
 #include "ble_common.h"
@@ -10,10 +9,8 @@
 #include "ble_types.h"
 
 
-BLE::InfoService::InfoService(GPIO::Controller *pGpioCtrl)
+BLE::InfoService::InfoService()
 {
-    this->gpioCtrl = pGpioCtrl;
-
     BLE::InfoService::Instance(this);
 }
 

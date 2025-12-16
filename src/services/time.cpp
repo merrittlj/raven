@@ -2,7 +2,6 @@
 
 #include "ble/char.hpp"
 #include "ble/uuid.hpp"
-#include "gpio/gpio.hpp"
 #include "sys/sys.hpp"
 #include "sys/state.hpp"
 
@@ -11,10 +10,8 @@
 #include "ble_types.h"
 
 
-BLE::TimeService::TimeService(GPIO::Controller *pGpioCtrl)
+BLE::TimeService::TimeService()
 {
-    this->gpioCtrl = pGpioCtrl;
-
     BLE::TimeService::Instance(this);
 }
 

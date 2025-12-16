@@ -2,7 +2,6 @@
 
 #include "ble/char.hpp"
 #include "ble/uuid.hpp"
-#include "gpio/gpio.hpp"
 #include "sys/sys.hpp"
 #include "sys/state.hpp"
 #include "display/controller.hpp"
@@ -12,10 +11,8 @@
 #include "ble_types.h"
 
 
-BLE::DataService::DataService(GPIO::Controller *pGpioCtrl)
+BLE::DataService::DataService()
 {
-    this->gpioCtrl = pGpioCtrl;
-
     BLE::DataService::Instance(this);
 }
 

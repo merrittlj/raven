@@ -4,7 +4,6 @@
 
 #include "ble/service.hpp"
 #include "ble/char.hpp"
-#include "gpio/gpio.hpp"
 
 #include "ble.h"
 #include "ble_common.h"
@@ -25,8 +24,6 @@ namespace BLE
              *                                1 for client char configuration descriptor + */
             const uint8_t SERVICE_MAX_ATT_RECORDS = 7;
 
-            GPIO::Controller *gpioCtrl;
-
             tBleStatus Add();
 
             static SVCCTL_EvtAckStatus_t Static_Event_Handler(void *Event);
@@ -36,7 +33,7 @@ namespace BLE
             BLE::Char deviceReset;
             BLE::Char musicButton;
 
-            InfoService(GPIO::Controller *pGpioCtrl);
+            InfoService();
             ~InfoService();
 
             uintptr_t Get_Handle() const;

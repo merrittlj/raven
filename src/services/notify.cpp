@@ -2,19 +2,17 @@
 
 #include "ble/char.hpp"
 #include "ble/uuid.hpp"
-#include "gpio/gpio.hpp"
 #include "sys/sys.hpp"
 #include "sys/state.hpp"
+#include "gpio/gpio.hpp"
 
 #include "ble_common.h"
 #include "ble.h"
 #include "ble_types.h"
 
 
-BLE::NotifyService::NotifyService(GPIO::Controller *pGpioCtrl)
+BLE::NotifyService::NotifyService()
 {
-    this->gpioCtrl = pGpioCtrl;
-
     BLE::NotifyService::Instance(this);
 }
 
@@ -53,6 +51,7 @@ SVCCTL_EvtAckStatus_t BLE::NotifyService::Event_Handler(void *Event)
     event_pckt = (hci_event_pckt *)(((hci_uart_pckt*)Event)->data);
 
     Sys::State *state = Sys::Controller::Instance()->sysState;
+    GPIO::Controller *gpioCtrl = GPIO::Controller::Instance();
     switch (event_pckt->evt) {
         case HCI_VENDOR_SPECIFIC_DEBUG_EVT_CODE:
             {

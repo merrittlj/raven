@@ -49,10 +49,14 @@ namespace GPIO
         private:
             uint8_t cmpPos = 0;
             std::array<GPIO::Component, 128> components;
+
+            inline static Controller *theInstance;
         public:
             Controller();
             Controller(std::array<GPIO::Component, 128> pComponents);
             ~Controller();
+
+            static Controller *Instance(Controller *cur = nullptr);
 
             void Config();
             void Init();

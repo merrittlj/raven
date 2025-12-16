@@ -2,9 +2,10 @@
 #define SPI_HPP
 
 
-#include "gpio/gpio.hpp"
+#include "hw/if.hpp"
 
 #include <cstddef>
+#include <cstdint>
 
 
 namespace Sys
@@ -22,12 +23,11 @@ namespace Sys
     {
         private:
             SPI_HandleTypeDef *spi;
-            GPIO::Controller *gpioCtrl;
             SPI_Manager manager;
 
         public:
             SPI_Controller();
-            SPI_Controller(SPI_HandleTypeDef *handle, GPIO::Controller *gpio, SPI_Manager spiM);
+            SPI_Controller(SPI_HandleTypeDef *handle, SPI_Manager spiM);
 
             void WriteByte(uint8_t value);
             void WriteBytes(uint8_t *value, uint16_t len);

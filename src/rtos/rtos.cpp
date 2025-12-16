@@ -3,6 +3,7 @@
 #include "sys/state.hpp"
 #include "ble/uuid.hpp"
 #include "services/info.hpp"
+#include "gpio/gpio.hpp"
 
 #include "lvgl.h"
 #include "FreeRTOS.h"
@@ -62,15 +63,16 @@ namespace RTOS
     void Button_Task(void *params)
     {
         Button_Params *p = (Button_Params *)params;
+        GPIO::Controller *gpioCtrl = GPIO::Controller::Instance();
         for (;;) {
-            p->btnPort->ButtonProcess(p->gpioCtrl->Read_Component(p->btn1) | (p->gpioCtrl->Read_Component(p->btn2) << 1) | (p->gpioCtrl->Read_Component(p->btn3) << 2) | (p->gpioCtrl->Read_Component(p->btn4) << 3));
+            p->btnPort->ButtonProcess(gpioCtrl->Read_Component(p->btn1) | (gpioCtrl->Read_Component(p->btn2) << 1) | (gpioCtrl->Read_Component(p->btn3) << 2) | (gpioCtrl->Read_Component(p->btn4) << 3));
 
             if (p->btnPort->ButtonPressed(BUTTON_PIN_0)) {
                 /* Button 1, wait for 2 double */
 
                 bool db = false;
                 for (uint8_t i = 0; i < DOUBLE_PRESS_TIMEOUT; ++i) {
-                    p->btnPort->ButtonProcess(p->gpioCtrl->Read_Component(p->btn1) | (p->gpioCtrl->Read_Component(p->btn2) << 1) | (p->gpioCtrl->Read_Component(p->btn3) << 2) | (p->gpioCtrl->Read_Component(p->btn4) << 3));
+                    p->btnPort->ButtonProcess(gpioCtrl->Read_Component(p->btn1) | (gpioCtrl->Read_Component(p->btn2) << 1) | (gpioCtrl->Read_Component(p->btn3) << 2) | (gpioCtrl->Read_Component(p->btn4) << 3));
                     if (p->btnPort->ButtonPressed(BUTTON_PIN_1)) {
                         db = true;
                         p->displayCtrl->Button_Double(1, 2);
@@ -84,7 +86,7 @@ namespace RTOS
 
                 bool db = false;
                 for (uint8_t i = 0; i < DOUBLE_PRESS_TIMEOUT; ++i) {
-                    p->btnPort->ButtonProcess(p->gpioCtrl->Read_Component(p->btn1) | (p->gpioCtrl->Read_Component(p->btn2) << 1) | (p->gpioCtrl->Read_Component(p->btn3) << 2) | (p->gpioCtrl->Read_Component(p->btn4) << 3));
+                    p->btnPort->ButtonProcess(gpioCtrl->Read_Component(p->btn1) | (gpioCtrl->Read_Component(p->btn2) << 1) | (gpioCtrl->Read_Component(p->btn3) << 2) | (gpioCtrl->Read_Component(p->btn4) << 3));
                     if (p->btnPort->ButtonPressed(BUTTON_PIN_0)) {
                         db = true;
                         p->displayCtrl->Button_Double(2, 1);
@@ -98,7 +100,7 @@ namespace RTOS
 
                 bool db = false;
                 for (uint8_t i = 0; i < DOUBLE_PRESS_TIMEOUT; ++i) {
-                    p->btnPort->ButtonProcess(p->gpioCtrl->Read_Component(p->btn1) | (p->gpioCtrl->Read_Component(p->btn2) << 1) | (p->gpioCtrl->Read_Component(p->btn3) << 2) | (p->gpioCtrl->Read_Component(p->btn4) << 3));
+                    p->btnPort->ButtonProcess(gpioCtrl->Read_Component(p->btn1) | (gpioCtrl->Read_Component(p->btn2) << 1) | (gpioCtrl->Read_Component(p->btn3) << 2) | (gpioCtrl->Read_Component(p->btn4) << 3));
                     if (p->btnPort->ButtonPressed(BUTTON_PIN_3)) {
                         db = true;
                         p->displayCtrl->Button_Double(3, 4);
@@ -112,7 +114,7 @@ namespace RTOS
 
                 bool db = false;
                 for (uint8_t i = 0; i < DOUBLE_PRESS_TIMEOUT; ++i) {
-                    p->btnPort->ButtonProcess(p->gpioCtrl->Read_Component(p->btn1) | (p->gpioCtrl->Read_Component(p->btn2) << 1) | (p->gpioCtrl->Read_Component(p->btn3) << 2) | (p->gpioCtrl->Read_Component(p->btn4) << 3));
+                    p->btnPort->ButtonProcess(gpioCtrl->Read_Component(p->btn1) | (gpioCtrl->Read_Component(p->btn2) << 1) | (gpioCtrl->Read_Component(p->btn3) << 2) | (gpioCtrl->Read_Component(p->btn4) << 3));
                     if (p->btnPort->ButtonPressed(BUTTON_PIN_2)) {
                         db = true;
                         p->displayCtrl->Button_Double(4, 3);

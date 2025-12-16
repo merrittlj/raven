@@ -5,15 +5,14 @@
 #include "sys/sys.hpp"
 #include "sys/state.hpp"
 #include "display/controller.hpp"
+#include "gpio/gpio.hpp"
 
 #include "shci.h"
 #include "otp.h"
 
 
-BLE::App::App(GPIO::Controller *pGpioCtrl)
+BLE::App::App()
 {
-    this->gpioCtrl = pGpioCtrl;
-
     BLE::App::Instance(this);
 }
 
@@ -329,12 +328,13 @@ SVCCTL_UserEvtFlowStatus_t BLE::App::SVCCTL_Notification_Handler(void *pckt)
     event_pckt = (hci_event_pckt*) ((hci_uart_pckt *) pckt)->data;
 
     Sys::State *state = Sys::Controller::Instance()->sysState;
+    GPIO::Controller *gpioCtrl = GPIO::Controller::Instance();
     switch (event_pckt->evt)
     {
         case HCI_DISCONNECTION_COMPLETE_EVT_CODE:
             state->App_Flag_Reset(Sys::State::App_Flag::BLE_CONNECTED);
 
-            this->gpioCtrl->Write_Component(state->Fetch_LED_F1(), RESET);
+            gpioCtrl->Write_Component(state->Fetch_LED_F1(), RESET);
 
             state->Screens_Clear();
             Display::Controller::Instance()->Tag_Screen();
@@ -350,7 +350,7 @@ SVCCTL_UserEvtFlowStatus_t BLE::App::SVCCTL_Notification_Handler(void *pckt)
                     state->App_Flag_Reset(Sys::State::App_Flag::BLE_ADVERTISING);
                     state->App_Flag_Set(Sys::State::App_Flag::BLE_CONNECTED);
     
-                    this->gpioCtrl->Write_Component(state->Fetch_LED_F1(), SET);
+                    gpioCtrl->Write_Component(state->Fetch_LED_F1(), SET);
                     break; /* HCI_LE_CONNECTION_COMPLETE_SUBEVT_CODE */
                 default:
                     break;

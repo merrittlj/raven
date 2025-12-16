@@ -2,7 +2,6 @@
 
 #include "ble/char.hpp"
 #include "ble/uuid.hpp"
-#include "gpio/gpio.hpp"
 #include "sys/sys.hpp"
 #include "sys/state.hpp"
 
@@ -11,10 +10,8 @@
 #include "ble_types.h"
 
 
-BLE::EventService::EventService(GPIO::Controller *pGpioCtrl)
+BLE::EventService::EventService()
 {
-    this->gpioCtrl = pGpioCtrl;
-
     BLE::EventService::Instance(this);
 }
 

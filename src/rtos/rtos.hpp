@@ -3,7 +3,6 @@
 
 #include "sys/sys.hpp"
 #include "display/controller.hpp"
-#include "gpio/gpio.hpp"
 #include "services/info.hpp"
 
 #include "button_debounce.h"
@@ -26,7 +25,6 @@ namespace RTOS
 
     struct Button_Params {
         Debouncer *btnPort;
-        GPIO::Controller *gpioCtrl;
         Display::Controller *displayCtrl;
 
         uint8_t btn1;

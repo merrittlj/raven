@@ -2,7 +2,6 @@
 
 #include "ble/char.hpp"
 #include "ble/uuid.hpp"
-#include "gpio/gpio.hpp"
 #include "sys/sys.hpp"
 #include "sys/state.hpp"
 
@@ -11,10 +10,8 @@
 #include "ble_types.h"
 
 
-BLE::NavService::NavService(GPIO::Controller *pGpioCtrl)
+BLE::NavService::NavService()
 {
-    this->gpioCtrl = pGpioCtrl;
-
     BLE::NavService::Instance(this);
 }
 

@@ -3,7 +3,6 @@
 
 
 #include "services/time.hpp"
-#include "gpio/gpio.hpp"
 #include "sys/sys.hpp"
 
 #define EVT_END_OF_RADIO_ACTIVITY           0x0004
@@ -47,8 +46,6 @@ namespace BLE
                 (uint8_t)((CFG_ADV_BD_ADDRESS & 0xFF0000000000) >> 40)
             };
 
-            GPIO::Controller *gpioCtrl;
-
             void BLE_Init();
             void Tl_Init();
             void Hci_Gap_Gatt_Init();
@@ -57,7 +54,7 @@ namespace BLE
         public:
             static App *Instance(App *cur = nullptr);
 
-            App(GPIO::Controller *pGpioCtrl);
+            App();
             ~App();
 
             void Init();
