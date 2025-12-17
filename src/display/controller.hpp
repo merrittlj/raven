@@ -52,6 +52,7 @@ namespace Display
             void Event_Send(Sys::EventInfo event);
             void Nav_Send(Sys::NavInfo nav);
             void Music_Send(Sys::MusicInfo music);
+            void Custom_Image_Send(Sys::CustomImageInfo img);
 
             void Button(uint8_t b);
             void Button_Double(uint8_t b1, uint8_t b2);

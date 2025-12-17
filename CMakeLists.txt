@@ -46,6 +46,7 @@ add_executable(${PROJECT_NAME}
 
     ${PROJECT_SOURCE_DIR}/sys/sys.cpp
     ${PROJECT_SOURCE_DIR}/sys/state.cpp
+    ${PROJECT_SOURCE_DIR}/sys/image_handler.cpp
     ${PROJECT_SOURCE_DIR}/sys/spi.cpp
     ${PROJECT_SOURCE_DIR}/sys/i2c.cpp
 

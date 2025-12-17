@@ -65,6 +65,7 @@
         Sys::State *state = Sys::Controller::Instance()->sysState;
         state->Screen_Deactivate(Sys::Screen::NAVIGATION);
         state->Screen_Deactivate(Sys::Screen::MUSIC);
+        state->Screen_Deactivate(Sys::Screen::CUSTOM_IMAGE);
     }
 
     void LVGL::Recreate_Summary()
@@ -380,6 +381,14 @@
         lv_obj_move_background(musicBG);
 
 
+
+        customImageScreen = lv_obj_create(NULL);
+        customImageBG = lv_image_create(customImageScreen);
+        lv_image_set_src(customImageBG, &flag);
+        lv_obj_align(customImageBG, LV_ALIGN_CENTER, 0, 0);
+        lv_obj_move_background(customImageBG);
+
+
         summaryScreen = lv_obj_create(NULL);
         Recreate_Summary();
 
@@ -598,6 +607,27 @@
         return newText;
     }
 
+    void LVGL::Create_Image_Descriptor(ImageDescriptor &result, uint8_t *imageData, size_t imageSize)
+    {
+        // Create palette (first 8 bytes)
+        uint8_t palette[8] = {
+            0x00, 0x00, 0x00, 0xff,  // Black
+            0xff, 0xff, 0xff, 0xff   // White
+        };
+        
+        memcpy(result.buffer, palette, 8);
+        memcpy(&result.buffer[8], imageData, imageSize);
+        
+        result.desc.header.magic = LV_IMAGE_HEADER_MAGIC;
+        result.desc.header.flags = 0;
+        result.desc.header.w = 200;
+        result.desc.header.h = 200;
+        result.desc.header.stride = 25;
+        result.desc.header.cf = LV_COLOR_FORMAT_I1;
+        result.desc.data_size = imageSize + 8;
+        result.desc.data = result.buffer;
+    }
+
     void LVGL::Music(Sys::MusicInfo info)
     {
         Sys::State *state = Sys::Controller::Instance()->sysState;
@@ -615,27 +645,8 @@
             lv_obj_clear_flag(musicArtist, LV_OBJ_FLAG_HIDDEN);
         }
 
-        static lv_image_dsc_t albumArt;
-
-        /* The first 8 bytes of the data should be a palette */
-        const size_t dataSize = 5000 + 8;
-        albumArt.header.magic = LV_IMAGE_HEADER_MAGIC;
-        albumArt.header.flags = 0;
-        albumArt.header.w = 200;
-        albumArt.header.h = 200;
-        albumArt.header.stride = 25;
-        albumArt.header.cf = LV_COLOR_FORMAT_I1;
-        albumArt.data_size = dataSize;
-
-        static uint8_t builder[dataSize];
-        /* Apparently data is stored w/ a palette, 1st 4 bytes are black, 2nd 4 bytes are white */
-        uint8_t palette[8] = {0x00,0x00,0x00,0xff,   0xff,0xff,0xff,0xff};
-        memcpy(builder, palette, 8);
-        memcpy(&builder[8], info.albumArt, dataSize - 8);
-
-        albumArt.data = builder;
-
-        lv_image_set_src(musicBG, &albumArt);
+        Create_Image_Descriptor(musicBGBuffer, info.albumArt, info.imageSize);
+        lv_image_set_src(musicBG, &musicBGBuffer.desc);
 
         if (!state->Is_Screen_Active(Sys::Screen::MUSIC)) {
             Safe_Screen_Load(musicScreen);
@@ -662,6 +673,7 @@
             if (s == Sys::Screen::EVENTS_LIST) activeItems.push_back("Upcoming Events");
             if (s == Sys::Screen::NAVIGATION) activeItems.push_back("Navigation");
             if (s == Sys::Screen::MUSIC) activeItems.push_back("Music");
+            if (s == Sys::Screen::CUSTOM_IMAGE) activeItems.push_back("Custom Image");
         }
         Create_Selectors(activeScreen, false, activeItems);
 
@@ -722,12 +734,12 @@
             face->Load_Screen();
         }
 
-        if (b == 2) {
+        else if (b == 2) {
             /* All screens: load active screen */
             Active_Screen();
         }
 
-        if (b == 3) {
+        else if (b == 3) {
             /* Alert screen: dismiss alert */
             if (lv_screen_active() == alertScreen) {
                 state->Alert_Dismiss(alertIndex);
@@ -797,7 +809,7 @@
             }
         }
 
-        if (b == 4) {
+        else if (b == 4) {
             /* Alert screen: shortcut to alert list */
             if (lv_screen_active() == alertScreen) {
                 Alerts_List_Screen();
@@ -866,7 +878,7 @@
             Summary();
         }
         /* Button 3 & 4 double press */
-        if ((b1 == 3 && b2 == 4) || (b1 == 4 && b2 == 3)) {
+        else if ((b1 == 3 && b2 == 4) || (b1 == 4 && b2 == 3)) {
             if (lv_screen_active() == activeScreen) {
                 /* If the group has been selected */
                 if (prevButton > 0) {
@@ -877,7 +889,7 @@
                 else prevButton = 3;
             }
             /* Alerts list screen: selector */
-            if (lv_screen_active() == alertsListScreen) {
+            else if (lv_screen_active() == alertsListScreen) {
                 /* If the group has been selected */
                 if (prevButton > 0) {
                     uint16_t index = List_Handler(prevButton, 3);

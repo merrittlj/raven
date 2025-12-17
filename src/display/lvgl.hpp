@@ -17,6 +17,11 @@
 
 namespace Display
 {
+    struct ImageDescriptor {
+        lv_image_dsc_t desc;
+        uint8_t buffer[5008];
+    };
+
     class LVGL
     {
         private:
@@ -73,6 +78,10 @@ namespace Display
             lv_obj_t *musicArtist;
             lv_obj_t *musicAlbum;
             lv_obj_t *musicBG;
+            ImageDescriptor musicBGBuffer;
+
+            lv_obj_t *customImageScreen;
+            lv_obj_t *customImageBG;
 
             lv_obj_t *summaryScreen;
             lv_obj_t *summaryDateTime;
@@ -97,6 +106,8 @@ namespace Display
             void Load_Screen_By_Name(std::string name);
 
             std::string Truncate_Text(std::string text, uint32_t limit);
+
+            void Create_Image_Descriptor(ImageDescriptor &result, uint8_t *imageData, size_t imageSize);
 
         public:
             LVGL();

@@ -17,7 +17,6 @@ namespace Sys
     State::State()
     {
         pref.scheme = Scheme::LIGHT;
-        Music_Builder.albumArt = new uint8_t[5000]();
     }
 
     State::~State()
@@ -217,43 +216,47 @@ namespace Sys
 
     void State::Music_Build_Album_Art(uint8_t *arr, size_t length)
     {
-        if (!arr) return;
-
-        /* Chunks are 1-byte index + rest bytes data */
-        size_t dataSize = length - 1;
-        /* 511, not 512, only 511 bytes of data are written */
-        size_t chunkOffset = (240 - 1) * arr[0];  /* Where the first byte of the chunk is */
-
-        if (length <= 1 || dataSize > capacity || arr[0] > chunks - 1) return;  /* Invalid inputs */
-
-        size_t available = capacity - chunkOffset;
-
-        /* Full chunk can fit */
-        if (available >= dataSize) {
-            memcpy(&(Music_Builder.albumArt[chunkOffset]), &arr[1], dataSize);
-            chunkWrites.set(arr[0]);
-        } else if (available > 0) {
-            /* Partial chunk can fit */
-            /* Should only happen on the last chunk */
-            memcpy(&(Music_Builder.albumArt[chunkOffset]), &arr[1], available);
-            chunkWrites.set(arr[0]);
-        } else return;
-
-        uint8_t readyData = 1;
-        if (arr[0] == 20) {
-            readyData = 0;
-            chunkWrites.reset();
-        }
+       bool isComplete = musicAlbumArtHandler.ProcessChunk(arr, length);
+    
+        // Update the ready characteristic
         BLE::MusicService *musicService = BLE::MusicService::Instance();
-        if (musicService->Update_Char_Value(BLE::UUID::ExtractUUID16FromLE(musicService->ready.Get_UUID()),
-                    musicService->ready.Get_Value_Length(),
-                    &readyData) != BLE_STATUS_SUCCESS)
+        uint8_t readyData = musicAlbumArtHandler.GetReadyStatus();
+        
+        if (musicService->Update_Char_Value(
+                BLE::UUID::ExtractUUID16FromLE(musicService->ready.Get_UUID()),
+                musicService->ready.Get_Value_Length(),
+                &readyData) != BLE_STATUS_SUCCESS)
             Sys::Error_Handler();
+        
+        // Reset for next image if complete
+        if (isComplete) {
+            Music_Builder.imageSize = musicAlbumArtHandler.GetImageSize();
+            Music_Builder.albumArt = musicAlbumArtHandler.GetImageData();
+            musicAlbumArtHandler.Reset();
+        } 
     }
 
     void State::Music_Trigger()
     {
         Display::Controller::Instance()->Music_Send(Music_Builder);
+    }
+
+    void State::Custom_Image_Build(uint8_t *arr, size_t length)
+    {
+        bool isComplete = customImageHandler.ProcessChunk(arr, length);
+        
+        if (isComplete) {
+            Custom_Image_Trigger();
+            customImageHandler.Reset();
+        }
+    }
+    
+    void State::Custom_Image_Trigger()
+    {
+        CustomImageInfo info;
+        info.image = customImageHandler.GetImageData(),
+        info.imageSize = customImageHandler.GetImageSize(),
+        Display::Controller::Instance()->Custom_Image_Send(info);
     }
 
     void State::Register_LED_Batt(uint32_t pIndex)

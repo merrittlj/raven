@@ -3,6 +3,7 @@
 
 
 #include "app/common.hpp"
+#include "sys/image_handler.hpp"
 
 #include "tl.h"
 #include "lvgl.h"
@@ -28,6 +29,7 @@ namespace Sys
         EVENTS_LIST, /* Default inactive */
         NAVIGATION,  /* Default inactive */
         MUSIC,  /* Default inactive */
+        CUSTOM_IMAGE,  /* Default inactive */
         Enum_Length
     };
 
@@ -77,6 +79,12 @@ namespace Sys
         std::string artist;
         std::string album;
         uint8_t *albumArt;  /* Make sure to initialize!(done in State) */
+        size_t imageSize;
+    };
+
+    struct CustomImageInfo {
+        uint8_t *image;
+        size_t imageSize;
     };
 
     enum class Scheme {
@@ -110,11 +118,10 @@ namespace Sys
             std::vector<EventInfo> events;
             EventInfo Event_Builder;
 
+            ImageHandler musicAlbumArtHandler;
+            ImageHandler customImageHandler;
+
             MusicInfo Music_Builder;
-            static constexpr size_t capacity = 5000;
-            /* (5000 / 511) + 1 */
-            static constexpr size_t chunks = 21;
-            std::bitset<chunks> chunkWrites;
 
             NavInfo Nav_Builder;
 
@@ -203,6 +210,14 @@ namespace Sys
             void Music_Build_Album(std::string str);
             void Music_Build_Album_Art(uint8_t *arr, size_t length);
             void Music_Trigger();
+
+            // New: Get album art handler
+            ImageHandler* Get_Music_Album_Art_Handler() { return &musicAlbumArtHandler; }
+            
+            // Custom image methods
+            void Custom_Image_Build(uint8_t *arr, size_t length);
+            void Custom_Image_Trigger();
+            ImageHandler* Get_Custom_Image_Handler() { return &customImageHandler; }
 
             void Register_LED_Batt(uint32_t pIndex);
             uint32_t Fetch_LED_Batt();
