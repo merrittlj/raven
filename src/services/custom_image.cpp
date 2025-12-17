@@ -1,4 +1,4 @@
-#include "services/music.hpp"
+#include "services/custom_image.hpp"
 
 #include "ble/char.hpp"
 #include "ble/uuid.hpp"
@@ -10,18 +10,18 @@
 #include "ble_types.h"
 
 
-BLE::MusicService::MusicService()
+BLE::CustomImageService::CustomImageService()
 {
-    BLE::MusicService::Instance(this);
+    BLE::CustomImageService::Instance(this);
 }
 
-BLE::MusicService::~MusicService()
+BLE::CustomImageService::~CustomImageService()
 {}
 
-tBleStatus BLE::MusicService::Add()
+tBleStatus BLE::CustomImageService::Add()
 {
     uint16_t retHandle;
-    Char_UUID_t serviceUUID = BLE::UUID::CreateCharUUID({0x98,0x2f,0xc7,0x70,0xbc,0x48,0x11,0xef,0x99,0x08,0x08,0x00,0x20,0x0c,0x9a,0x66});
+    Char_UUID_t serviceUUID = BLE::UUID::CreateCharUUID({0x30,0xcf,0xc2,0x3b,0x55,0xf0,0x41,0x2b,0xb3,0xbc,0x25,0x33,0xdb,0xf8,0xe2,0x8e});
     tBleStatus ret = aci_gatt_add_service(UUID_TYPE_128, (Service_UUID_t *)&serviceUUID,
             PRIMARY_SERVICE,
             SERVICE_MAX_ATT_RECORDS,
@@ -30,9 +30,9 @@ tBleStatus BLE::MusicService::Add()
     return ret;
 }
 
-SVCCTL_EvtAckStatus_t BLE::MusicService::Static_Event_Handler(void *Event)
+SVCCTL_EvtAckStatus_t BLE::CustomImageService::Static_Event_Handler(void *Event)
 {
-    return BLE::MusicService::Instance()->Event_Handler(Event);
+    return BLE::CustomImageService::Instance()->Event_Handler(Event);
 }
 
 /**
@@ -40,7 +40,7 @@ SVCCTL_EvtAckStatus_t BLE::MusicService::Static_Event_Handler(void *Event)
  * @param  Event: Address of the buffer holding the Event
  * @retval Ack: Return whether the Event has been managed or not
  */
-SVCCTL_EvtAckStatus_t BLE::MusicService::Event_Handler(void *Event)
+SVCCTL_EvtAckStatus_t BLE::CustomImageService::Event_Handler(void *Event)
 {
     SVCCTL_EvtAckStatus_t return_value;
     hci_event_pckt *event_pckt;
@@ -66,17 +66,9 @@ SVCCTL_EvtAckStatus_t BLE::MusicService::Event_Handler(void *Event)
                         size_t length;
                         data = attribute_modified->Attr_Data;
                         length = (size_t)(attribute_modified->Attr_Data_Length);
-                        if (attribute_modified->Attr_Handle == (artist.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            state->Music_Build_Artist(std::string((const char *)data, length));
-                        }
-                        if (attribute_modified->Attr_Handle == (track.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            state->Music_Build_Track(std::string((const char *)data, length));
-                        }
-                        if (attribute_modified->Attr_Handle == (album.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            state->Music_Build_Album(std::string((const char *)data, length));
-                        }
-                        if (attribute_modified->Attr_Handle == (albumArt.Get_Handle() + CHAR_VALUE_OFFSET)) {
-                            state->Music_Build_Album_Art(data, length);
+
+                        if (attribute_modified->Attr_Handle == (image.Get_Handle() + CHAR_VALUE_OFFSET)) {
+                            state->Custom_Image_Build(data, length);
                         }
                         break;
 
@@ -93,12 +85,12 @@ SVCCTL_EvtAckStatus_t BLE::MusicService::Event_Handler(void *Event)
     return(return_value);
 }
 
-uintptr_t BLE::MusicService::Get_Handle() const
+uintptr_t BLE::CustomImageService::Get_Handle() const
 {
     return this->handle;
 }
 
-void BLE::MusicService::Set_Handle(uintptr_t pHandle)
+void BLE::CustomImageService::Set_Handle(uintptr_t pHandle)
 {
     this->handle = pHandle;
 }
@@ -108,60 +100,27 @@ void BLE::MusicService::Set_Handle(uintptr_t pHandle)
  * @param  None
  * @retval None
  */
-void BLE::MusicService::Init()
+void BLE::CustomImageService::Init()
 {
     /* Register the event handler to the BLE controller */
-    SVCCTL_RegisterSvcHandler(BLE::MusicService::Static_Event_Handler);
+    SVCCTL_RegisterSvcHandler(BLE::CustomImageService::Static_Event_Handler);
 
     /* Add Service */
     if (this->Add() != BLE_STATUS_SUCCESS)
         Sys::Error_Handler(); /* UNEXPECTED */
 
-    Char_UUID_t artistUUID = BLE::UUID::CreateCharUUID({0x98,0x2f,0xc7,0x71,0xbc,0x48,0x11,0xef,0x99,0x08,0x08,0x00,0x20,0x0c,0x9a,0x66});
-    artist = BLE::Char(UUID_TYPE_128, &artistUUID,
-            30,
-            CHAR_PROP_READ | CHAR_PROP_WRITE,
-            ATTR_PERMISSION_NONE,
-            GATT_NOTIFY_ATTRIBUTE_WRITE,
-            10,
-            (uint8_t)VALUE_VARIABLE_LENGTH);
-    if (artist.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
-        Sys::Error_Handler(); /* UNEXPECTED */
-
-    Char_UUID_t trackUUID = BLE::UUID::CreateCharUUID({0x98,0x2f,0xc7,0x72,0xbc,0x48,0x11,0xef,0x99,0x08,0x08,0x00,0x20,0x0c,0x9a,0x66});
-    track = BLE::Char(UUID_TYPE_128, &trackUUID,
-            30,
-            CHAR_PROP_READ | CHAR_PROP_WRITE,
-            ATTR_PERMISSION_NONE,
-            GATT_NOTIFY_ATTRIBUTE_WRITE,
-            10,
-            (uint8_t)VALUE_VARIABLE_LENGTH);
-    if (track.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
-        Sys::Error_Handler(); /* UNEXPECTED */
-
-    Char_UUID_t albumUUID = BLE::UUID::CreateCharUUID({0x98,0x2f,0xc7,0x73,0xbc,0x48,0x11,0xef,0x99,0x08,0x08,0x00,0x20,0x0c,0x9a,0x66});
-    album = BLE::Char(UUID_TYPE_128, &albumUUID,
-            30,
-            CHAR_PROP_READ | CHAR_PROP_WRITE,
-            ATTR_PERMISSION_NONE,
-            GATT_NOTIFY_ATTRIBUTE_WRITE,
-            10,
-            (uint8_t)VALUE_VARIABLE_LENGTH);
-    if (album.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
-        Sys::Error_Handler(); /* UNEXPECTED */
-
-    Char_UUID_t albumArtUUID = BLE::UUID::CreateCharUUID({0x98,0x2f,0xc7,0x74,0xbc,0x48,0x11,0xef,0x99,0x08,0x08,0x00,0x20,0x0c,0x9a,0x66});
-    albumArt = BLE::Char(UUID_TYPE_128, &albumArtUUID,
+    Char_UUID_t imageUUID = BLE::UUID::CreateCharUUID({0x30,0xcf,0xc2,0x3b,0x56,0xf0,0x41,0x2b,0xb3,0xbc,0x25,0x33,0xdb,0xf8,0xe2,0x8e});
+    image = BLE::Char(UUID_TYPE_128, &imageUUID,
             240,  /* multiple 240 byte chunks */
             CHAR_PROP_READ | CHAR_PROP_WRITE,
             ATTR_PERMISSION_NONE,
             GATT_NOTIFY_ATTRIBUTE_WRITE,
             10,
             (uint8_t)VALUE_VARIABLE_LENGTH);
-    if (albumArt.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
+    if (image.Add(this->Get_Handle()) != BLE_STATUS_SUCCESS)
         Sys::Error_Handler(); /* UNEXPECTED */
 
-    Char_UUID_t readyUUID = BLE::UUID::CreateCharUUID({0x98,0x2f,0xc7,0x75,0xbc,0x48,0x11,0xef,0x99,0x08,0x08,0x00,0x20,0x0c,0x9a,0x66});
+    Char_UUID_t readyUUID = BLE::UUID::CreateCharUUID({0x30,0xcf,0xc2,0x3b,0x57,0xf0,0x41,0x2b,0xb3,0xbc,0x25,0x33,0xdb,0xf8,0xe2,0x8e});
     ready = BLE::Char(UUID_TYPE_128, &readyUUID,
             1,
             CHAR_PROP_NOTIFY,
@@ -179,7 +138,7 @@ void BLE::MusicService::Init()
  * @param newValueLength: Length of the new value data to be written
  * @param pNewValue: Pointer to the new value data 
  */
-tBleStatus BLE::MusicService::Update_Char_Value(uint16_t UUID16, uint16_t newValueLength, uint8_t *pNewValue)
+tBleStatus BLE::CustomImageService::Update_Char_Value(uint16_t UUID16, uint16_t newValueLength, uint8_t *pNewValue)
 {
     tBleStatus ret = BLE_STATUS_INVALID_PARAMS;
     if (UUID16 == BLE::UUID::ExtractUUID16FromLE(ready.Get_UUID())) {

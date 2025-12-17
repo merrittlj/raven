@@ -209,14 +209,12 @@ namespace Sys
             void Music_Build_Track(std::string str);
             void Music_Build_Album(std::string str);
             void Music_Build_Album_Art(uint8_t *arr, size_t length);
-            void Music_Trigger();
 
             // New: Get album art handler
             ImageHandler* Get_Music_Album_Art_Handler() { return &musicAlbumArtHandler; }
             
             // Custom image methods
             void Custom_Image_Build(uint8_t *arr, size_t length);
-            void Custom_Image_Trigger();
             ImageHandler* Get_Custom_Image_Handler() { return &customImageHandler; }
 
             void Register_LED_Batt(uint32_t pIndex);

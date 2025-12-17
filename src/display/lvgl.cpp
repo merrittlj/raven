@@ -654,6 +654,19 @@
         }
     }
 
+    void LVGL::Custom_Image(Sys::CustomImageInfo info)
+    {
+        Sys::State *state = Sys::Controller::Instance()->sysState;
+
+        Create_Image_Descriptor(customImageBGBuffer, info.image, info.imageSize);
+        lv_image_set_src(customImageBG, &customImageBGBuffer.desc);
+
+        if (!state->Is_Screen_Active(Sys::Screen::CUSTOM_IMAGE)) {
+            Safe_Screen_Load(customImageScreen);
+            state->Screen_Activate(Sys::Screen::CUSTOM_IMAGE);
+        }
+    }
+
     void LVGL::Active_Screen()
     {
         lv_obj_clean(activeScreen);
@@ -723,6 +736,7 @@
         if (name == "Upcoming Events") Events_List_Screen();
         if (name == "Navigation") Safe_Screen_Load(navScreen);
         if (name == "Music") Safe_Screen_Load(musicScreen);
+        if (name == "Custom Image") Safe_Screen_Load(customImageScreen);
     }
 
     void LVGL::Button(uint8_t b)

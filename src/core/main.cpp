@@ -19,12 +19,12 @@
 #include "services/pref.hpp"
 #include "services/nav.hpp"
 #include "services/music.hpp"
+#include "services/custom_image.hpp"
 #include "services/event.hpp"
 #include "services/info.hpp"
 #include "services/data.hpp"
 #include "display/controller.hpp"
 #include "rtos/rtos.hpp"
-#include "haptic/haptic.hpp"
 
 #include "FreeRTOS.h" /* Must come first. */
 #include "task.h" /* RTOS task related API prototypes. */
@@ -66,6 +66,7 @@ int main()
     BLE::PrefService prefService = BLE::PrefService();
     BLE::NavService navService = BLE::NavService();
     BLE::MusicService musicService = BLE::MusicService();
+    BLE::CustomImageService customImageService = BLE::CustomImageService();
     BLE::EventService eventService = BLE::EventService();
     BLE::InfoService infoService = BLE::InfoService();
     BLE::DataService dataService = BLE::DataService();
@@ -100,23 +101,6 @@ int main()
     SPI_HandleTypeDef *spi = sysCtrl.Config_SPI();
     Sys::SPI_Controller spiCtrl = Sys::SPI_Controller(spi, Sys::SPI_Manager{busy,rst,dc,cs,pwr});
 
-    // TIM_HandleTypeDef *tim2 = sysCtrl.Config_TIM2();
-    // __HAL_TIM_SetCompare(tim2, TIM_CHANNEL_1, (uint64_t)I2C_ARR_IDEAL);
-    // HAL_TIM_PWM_Start(tim2, TIM_CHANNEL_1);
-
-    // Haptics are DISABLED
-
-    // I2C_HandleTypeDef *i2c = sysCtrl.Config_I2C();
-    // Sys::I2C_Controller i2cCtrl = Sys::I2C_Controller(i2c, 0x4A << 1);
-    // Haptic::Driver driver = Haptic::Driver(&i2cCtrl);
-    // Haptic::Controller hapticCtrl = Haptic::Controller(&driver);
-
-    // if (!driver.begin()) Sys::Error_Handler();
-    // if (!driver.defaultMotor()) Sys::Error_Handler();
-    // driver.enableFreqTrack(false);
-    // driver.setOperationMode(Haptic::INACTIVE);
-    // driver.clearIrq(driver.getIrqEvent());  /* I hate this */
-
     /* Wait until the CPU2 gets initialized */
     while((sysState.App_Flag_Get(Sys::State::App_Flag::CPU2_INITIALIZED) == Sys::State::Flag_Val::NOT_SET) \
             || (sysState.App_Flag_Get(Sys::State::App_Flag::WIRELESS_FW_RUNNING) == Sys::State::Flag_Val::NOT_SET))
@@ -133,6 +117,7 @@ int main()
     infoService.Init();
     dataService.Init();
     musicService.Init();
+    customImageService.Init();
     eventService.Init();
 
     bleApp.Advertising(SET);
@@ -140,7 +125,6 @@ int main()
     Display::Controller displayCtrl = Display::Controller(200, 200, spiCtrl, &sysCtrl, 0, &infoService);
     displayCtrl.Init();
 
-    // Debouncer btnPort(BUTTON_PIN_0 | BUTTON_PIN_1 | BUTTON_PIN_2 | BUTTON_PIN_3);
     Debouncer btnPort(0);
 
     sysCtrl.Config_RTC();

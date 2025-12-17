@@ -4,6 +4,7 @@
 #include "app/common.hpp"
 #include "display/controller.hpp"
 #include "services/music.hpp"
+#include "services/custom_image.hpp"
 #include "ble/uuid.hpp"
 
 #include "lvgl.h"
@@ -232,33 +233,37 @@ namespace Sys
         if (isComplete) {
             Music_Builder.imageSize = musicAlbumArtHandler.GetImageSize();
             Music_Builder.albumArt = musicAlbumArtHandler.GetImageData();
+            Display::Controller::Instance()->Music_Send(Music_Builder);
+
             musicAlbumArtHandler.Reset();
         } 
-    }
-
-    void State::Music_Trigger()
-    {
-        Display::Controller::Instance()->Music_Send(Music_Builder);
     }
 
     void State::Custom_Image_Build(uint8_t *arr, size_t length)
     {
         bool isComplete = customImageHandler.ProcessChunk(arr, length);
+
+        // Update the ready characteristic
+        BLE::CustomImageService *customImageService = BLE::CustomImageService::Instance();
+        uint8_t readyData = customImageHandler.GetReadyStatus();
+        
+        if (customImageService->Update_Char_Value(
+                BLE::UUID::ExtractUUID16FromLE(customImageService->ready.Get_UUID()),
+                customImageService->ready.Get_Value_Length(),
+                &readyData) != BLE_STATUS_SUCCESS)
+            Sys::Error_Handler();
+
         
         if (isComplete) {
-            Custom_Image_Trigger();
+            CustomImageInfo info;
+            info.imageSize = customImageHandler.GetImageSize(),
+            info.image = customImageHandler.GetImageData(),
+            Display::Controller::Instance()->Custom_Image_Send(info);
+
             customImageHandler.Reset();
         }
     }
     
-    void State::Custom_Image_Trigger()
-    {
-        CustomImageInfo info;
-        info.image = customImageHandler.GetImageData(),
-        info.imageSize = customImageHandler.GetImageSize(),
-        Display::Controller::Instance()->Custom_Image_Send(info);
-    }
-
     void State::Register_LED_Batt(uint32_t pIndex)
     {
         this->LED_Batt_Index = pIndex;

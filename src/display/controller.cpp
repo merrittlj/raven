@@ -125,6 +125,11 @@ namespace Display
         lvgl.Music(music);
     }
 
+    void Controller::Custom_Image_Send(Sys::CustomImageInfo img)
+    {
+        lvgl.Custom_Image(img);
+    }
+
     void Controller::Button(uint8_t b)
     {
         lvgl.Button(b);

@@ -69,6 +69,7 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCE_DIR}/services/pref.cpp
     ${PROJECT_SOURCE_DIR}/services/nav.cpp
     ${PROJECT_SOURCE_DIR}/services/music.cpp
+    ${PROJECT_SOURCE_DIR}/services/custom_image.cpp
     ${PROJECT_SOURCE_DIR}/services/event.cpp
     ${PROJECT_SOURCE_DIR}/services/info.cpp
     ${PROJECT_SOURCE_DIR}/services/data.cpp

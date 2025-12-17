@@ -1,5 +1,5 @@
-#ifndef MUSIC_HPP
-#define MUSIC_HPP
+#ifndef CUSTOM_IMAGE_HPP
+#define CUSTOM_IMAGE_HPP
 
 
 #include "ble/service.hpp"
@@ -12,7 +12,7 @@
 
 namespace BLE
 {
-    class MusicService : public BLE::Service<MusicService>
+    class CustomImageService : public BLE::Service<CustomImageService>
     {
         protected:
             uintptr_t handle;
@@ -22,7 +22,7 @@ namespace BLE
              * service_max_attribute_record = 1 for service +
              *                                2 for each Write/Notify characteristic +
              *                                1 for client char configuration descriptor + */
-            const uint8_t SERVICE_MAX_ATT_RECORDS = 15;
+            const uint8_t SERVICE_MAX_ATT_RECORDS = 6;
 
             tBleStatus Add();
 
@@ -30,14 +30,11 @@ namespace BLE
             SVCCTL_EvtAckStatus_t Event_Handler(void *pckt);
 
         public:
-            BLE::Char artist;
-            BLE::Char track;
-            BLE::Char album;
-            BLE::Char albumArt;
+            BLE::Char image;
             BLE::Char ready;
 
-            MusicService();
-            ~MusicService();
+            CustomImageService();
+            ~CustomImageService();
 
             uintptr_t Get_Handle() const;
             void Set_Handle(uintptr_t pHandle);
@@ -49,4 +46,4 @@ namespace BLE
 }
 
 
-#endif /* MUSIC_HPP */
+#endif /* CUSTOM_IMAGE_HPP */

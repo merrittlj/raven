@@ -82,6 +82,7 @@ namespace Display
 
             lv_obj_t *customImageScreen;
             lv_obj_t *customImageBG;
+            ImageDescriptor customImageBGBuffer;
 
             lv_obj_t *summaryScreen;
             lv_obj_t *summaryDateTime;
@@ -129,15 +130,17 @@ namespace Display
             void Event(Sys::EventInfo info);
             void Nav(Sys::NavInfo info);
             void Music(Sys::MusicInfo info);
+            void Custom_Image(Sys::CustomImageInfo info);
 
-            /* [1 - - - 3]
+            /* [1 - - - 2]
              * |  - - -  |
              * |  - - -  |
-             * [2 - - - 4] */
+             * [3 - - - 4] */
             /* Button One: Universal return to face button */
-            /* Button Two: Open active screens/tasks */
+            /* Button Two: Universal open active screens/tasks */
             /* Button Three: Multi-purpose #1, confirm, scroll up, dismiss, etc. */
             /* Button Four: Multi-purpose #2, cancel, scroll down, etc. */
+            /* Button 1 & 2 double press: Universal summary screen */
             /* Button 3 & 4 double press: Multiple-purpose #1 and #2 pressed simultaneously, group 3 selector */
             void Button(uint8_t b);
             void Button_Double(uint8_t b1, uint8_t b2);
