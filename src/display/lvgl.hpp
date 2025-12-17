@@ -8,6 +8,8 @@
 #include "services/info.hpp"
 
 #include "lvgl.h"
+#include "FreeRTOS.h" /* Must come first. */
+#include "queue.h" /* RTOS queue related API prototypes. */
 
 #include <cstdint>
 #include <vector>
@@ -25,7 +27,8 @@ namespace Display
             std::vector<uint8_t> buf1;
 
             lv_display_t *eInk;
-            static inline bool displayReady = true;
+            static volatile bool displayReady;
+            static SemaphoreHandle_t displayMutex;
 
             Face *face = nullptr;
 

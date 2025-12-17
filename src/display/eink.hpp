@@ -8,6 +8,7 @@
 
 #include <cstdint>
 #include <vector>
+#include <functional>
 
 
 namespace Display
@@ -39,6 +40,7 @@ namespace Display
             void Init_Partial();
             void Clear();
             void Display();
+            void DisplayAsync(std::function<void()> onComplete = nullptr);
             void DisplayPartBaseImage();
             void DisplayPart();
             void Sleep();

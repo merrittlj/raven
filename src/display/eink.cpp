@@ -125,7 +125,7 @@ namespace Display
         spi.SendCommand(0x22);  /* Display update control */
         spi.SendData(0xC7); 
         spi.SendCommand(0x20);  /* Display update activation */
-        spi.BlockBusy();
+        spi.BlockBusy();        /* This is where the refresh happens - may take a few seconds */
     }
 
     void EInk::TurnOnDisplayPart()
@@ -242,6 +242,35 @@ namespace Display
         Sleep();
     }
 
+    void EInk::DisplayAsync(std::function<void()> onComplete)
+    {
+        uint16_t widthBytes = manager.Width_Bytes();
+
+        SetWindows(0, 0, manager.width - 1, manager.height - 1);
+        SetCursor(0, 0);
+
+        spi.SendCommand(0x24);  /* Write RAM(BW) */
+        Sys::State *state = Sys::Controller::Instance()->sysState;
+        for (uint16_t j = 0; j < manager.height; j++) {
+            for (uint16_t i = 0; i < widthBytes; i++) {
+                if (state->Get_Pref()->scheme == Sys::Scheme::LIGHT)
+                    spi.SendData(buf.at(i + (j * widthBytes)));
+                /* TODO: more complex dark mode beyond inversion */
+                if (state->Get_Pref()->scheme == Sys::Scheme::DARK)
+                    spi.SendData(~(buf.at(i + (j * widthBytes))));  /* Simple inversion */
+            }
+        }
+
+        spi.SendCommand(0x22);  /* Display update control */
+        spi.SendData(0xC7); 
+        spi.SendCommand(0x20);  /* Display update activation */
+        spi.BlockBusyAsync([this, onComplete]() {
+            Sleep();
+            if (onComplete) onComplete();
+        });
+    }
+
+        
     void EInk::DisplayPartBaseImage()
     {
         uint16_t widthBytes = manager.Width_Bytes();

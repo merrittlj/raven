@@ -31,6 +31,9 @@
 
     namespace Display
 {
+    volatile bool LVGL::displayReady = true;
+    SemaphoreHandle_t LVGL::displayMutex = nullptr;
+
     LVGL::LVGL()
     {}
 
@@ -48,6 +51,8 @@
 
     void LVGL::Init()
     {
+        displayReady = true;
+
         lv_init();
         lv_tick_set_cb(HAL_GetTick);
 
@@ -56,7 +61,6 @@
         buf1 = std::vector<uint8_t>(manager.Buffer_Size() + 8);
         lv_display_set_buffers(eInk, &buf1[0], NULL, buf1.size(), LV_DISPLAY_RENDER_MODE_DIRECT);  /* TODO: dual buffers & diff render mode */
         lv_display_set_flush_cb(eInk, Flush);
-
 
         Sys::State *state = Sys::Controller::Instance()->sysState;
         state->Screen_Deactivate(Sys::Screen::NAVIGATION);
@@ -398,7 +402,25 @@
 
     void LVGL::Flush(lv_display_t *display, const lv_area_t *area, uint8_t *px_map)
     {
+        if(xTaskGetSchedulerState() == taskSCHEDULER_NOT_STARTED) return;
+
+        if (displayMutex == nullptr) displayMutex = xSemaphoreCreateMutex(); 
+
+        // Thread-safe check
+        if (xSemaphoreTake(displayMutex, 0) != pdTRUE) {
+            // Couldn't get mutex, display is busy
+            lv_display_flush_ready(display);
+            return;
+        }
+        
+        if (!displayReady) {
+            xSemaphoreGive(displayMutex);
+            lv_display_flush_ready(display);
+            return;
+        }
+        
         displayReady = false;
+        xSemaphoreGive(displayMutex);
 
         Manager man = Controller::Instance()->Get_Manager();
 
@@ -408,10 +430,15 @@
         *handlingBuffer = std::vector<uint8_t>(screen_data, screen_data + man.Buffer_Size());
 
         man.displayCallback->Init();
-        man.displayCallback->Display();
-        lv_display_flush_ready(display);
 
-        displayReady = lv_disp_flush_is_last(display);
+        man.displayCallback->DisplayAsync([display]() {
+            lv_display_flush_ready(display);
+
+            if (xSemaphoreTake(displayMutex, portMAX_DELAY) == pdTRUE) {
+                displayReady = true;
+                xSemaphoreGive(displayMutex);
+            }
+        });
     }
 
     void LVGL::Refresh()

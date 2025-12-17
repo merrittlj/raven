@@ -6,17 +6,16 @@
 #include "stm32wbxx_hal.h"
 
 
-Sys::SPI_Controller::SPI_Controller()
+Sys::SPI_Controller::SPI_Controller() : busyCallback(nullptr), busyTaskHandle(nullptr)
 {
 
 }
 
-Sys::SPI_Controller::SPI_Controller(SPI_HandleTypeDef *handle, SPI_Manager spiM)
+Sys::SPI_Controller::SPI_Controller(SPI_HandleTypeDef *handle, SPI_Manager spiM) : busyCallback(nullptr), busyTaskHandle(nullptr)
 {
     this->spi = handle;
     this->manager = spiM;
 }
-
 
 void Sys::SPI_Controller::WriteByte(uint8_t value)
 {
@@ -62,11 +61,46 @@ void Sys::SPI_Controller::Reset()
     Delay(10);
 }
 
+void Sys::SPI_Controller::BusyPollTask(void* params)
+{
+    Sys::SPI_Controller *self = static_cast<Sys::SPI_Controller*>(params);
+    GPIO::Controller *gpioCtrl = GPIO::Controller::Instance();
+    
+    // Poll until busy clears
+    while (gpioCtrl->Read_Component(self->manager.busy) == SET) {
+        vTaskDelay(pdMS_TO_TICKS(10));  // Check every 10ms
+    }
+    
+    // Busy cleared - execute callback
+    if (self->busyCallback) {
+        self->busyCallback();
+        self->busyCallback = nullptr;
+    }
+    
+    // Delete this task
+    self->busyTaskHandle = nullptr;
+    vTaskDelete(NULL);
+}
+
 void Sys::SPI_Controller::BlockBusy()
 {
     GPIO::Controller *gpioCtrl = GPIO::Controller::Instance();
     while (gpioCtrl->Read_Component(manager.busy) == SET)
         Delay(10);
+}
+
+void Sys::SPI_Controller::BlockBusyAsync(std::function<void()> callback)
+{
+    busyCallback = callback;
+
+    xTaskCreate(
+        BusyPollTask,           // Task function
+        "BusyPoll",            // Name
+        2048,                   // Stack size (words)
+        this,                // Parameter
+        tskIDLE_PRIORITY + 1,  // Priority
+        &busyTaskHandle        // Task handle
+    );
 }
 
 void Sys::SPI_Controller::Enable()

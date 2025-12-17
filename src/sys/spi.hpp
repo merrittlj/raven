@@ -4,8 +4,12 @@
 
 #include "hw/if.hpp"
 
+#include "FreeRTOS.h" /* Must come first. */
+#include "task.h" /* RTOS task related API prototypes. */
+
 #include <cstddef>
 #include <cstdint>
+#include <functional>
 
 
 namespace Sys
@@ -23,9 +27,15 @@ namespace Sys
     {
         private:
             SPI_HandleTypeDef *spi;
-            SPI_Manager manager;
+
+            std::function<void()> busyCallback;
+            TaskHandle_t busyTaskHandle;
+    
+            static void BusyPollTask(void* params);
 
         public:
+            SPI_Manager manager;
+
             SPI_Controller();
             SPI_Controller(SPI_HandleTypeDef *handle, SPI_Manager spiM);
 
@@ -34,7 +44,9 @@ namespace Sys
             void SendCommand(uint8_t reg);
             void SendData(uint8_t data);
             void Reset();
+
             void BlockBusy();
+            void BlockBusyAsync(std::function<void()> callback);
 
             void Enable();
             void Disable();
