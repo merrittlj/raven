@@ -386,7 +386,7 @@ LV_FONT_DECLARE(axel_time_date) /* Axel 22 bold */
         lv_obj_add_style(date, &texts, 0);
         lv_obj_add_style(date, &flexbox, 0);
         lv_label_set_text(date, "Mon XX");
-        lv_obj_set_style_text_font(date, &roboto_date, 0);
+        lv_obj_set_style_text_font(date, &axel_ui, 0);
         lv_obj_align(date, LV_ALIGN_BOTTOM_LEFT, 5, -5);
 
         time = lv_label_create(screen);
